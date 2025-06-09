@@ -1,9 +1,16 @@
+using MilkShake;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
 {
+
+    public Shaker shaker;
+    public ShakePreset shakePreset;
+
+
+
     public float speed = 20f;
     public float gravity = -9.81f;
     public float jumpHeight = 7f;
@@ -24,16 +31,18 @@ public class Movements : MonoBehaviour
         Respawn = GameObject.FindWithTag("Respawn");
 
         Finish = GameObject.FindWithTag("Finish");
+
+
     }
 
     void Awake()
-    {   
-         GameObject[] Cubes = GameObject.FindGameObjectsWithTag("Cube");
-            foreach (GameObject Cube in Cubes)
-            {
-                // Change color of all cubes to blue){
-           Cube.GetComponent<Renderer>().material.color = Color.red; // Change color of Cube
-            }
+    {
+        GameObject[] Cubes = GameObject.FindGameObjectsWithTag("Cube");
+        foreach (GameObject Cube in Cubes)
+        {
+            // Change color of all cubes to blue){
+            Cube.GetComponent<Renderer>().material.color = Color.red; // Change color of Cube
+        }
     }
 
     void Update()
@@ -102,41 +111,37 @@ public class Movements : MonoBehaviour
             }
             Debug.Log("Collided with Finish!");
         }
-        
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                 if (collision.gameObject.CompareTag("tae"))
-        {
-            transform.position = Finish.transform.position;
-
-
-
-                     GameObject[] Cubes = GameObject.FindGameObjectsWithTag("Cube");
-            foreach (GameObject Cube in Cubes)
-            {
-                // Change color of all cubes to blue){
-                Cube.GetComponent<Renderer>().material.color = Color.yellow; // Change color of Cube
-            }
-   
-            Debug.Log("Collided with Finish!");
-        }
+if (collision.gameObject.CompareTag("aaa"))
+{
+    if (shaker != null && shakePreset != null)
+    {
+        shaker.Shake(shakePreset);
+        Debug.Log("Camera shake triggered!");
     }
+    else
+    {
+        Debug.LogWarning("Shaker or ShakePreset not assigned!");
+    }
+}
+
+    }
+    
+    
 
 
+
+    // public Shaker shaker;
+
+    // public void Shake()
+    // {
+    //     if (shaker != null)
+    //     {
+    //         ShakeInstance shakeInstance = shaker.ShakeAll(new ShakeData(0.5f, 0.5f, 0.5f, 0.5f));
+    //         // Optionally, you can modify the shakeInstance properties here
+    //     }
+    // }
 
 
 
