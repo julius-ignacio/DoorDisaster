@@ -21,7 +21,7 @@ public class Movements : MonoBehaviour
     private Vector3 velocity;
     private bool isGrounded;
 
-    private GameObject Cube, Respawn, Finish;
+    private GameObject Cube, Respawn, Finish, Board;
 
     // Optional: For mobile joystick
     // public Joystick joystick;
@@ -31,6 +31,8 @@ public class Movements : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         Respawn = GameObject.FindWithTag("Respawn");
+
+        Board = GameObject.FindWithTag("MovableObject");
 
         Finish = GameObject.FindWithTag("Finish");
 
@@ -46,6 +48,7 @@ public class Movements : MonoBehaviour
             // Change color of all cubes to blue){
             Cube.GetComponent<Renderer>().material.color = Color.red; // Change color of Cube
         }
+
 
 
      //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
@@ -122,6 +125,16 @@ public class Movements : MonoBehaviour
         if (collision.gameObject.CompareTag("aaa"))
         {
                 audio.Play(); // Play sound effect on collision
+            Board.isStatic = false;
+
+                Rigidbody boardRb = Board.GetComponent<Rigidbody>();
+    if (boardRb != null)
+    {
+        boardRb.isKinematic = false; // Enable movement
+        boardRb.useGravity = true;   // Make sure gravity is applied
+    }
+
+
 
             if (shaker != null && shakePreset != null)
             {
@@ -136,6 +149,7 @@ public class Movements : MonoBehaviour
             
 
         }
+
 
 
     }
