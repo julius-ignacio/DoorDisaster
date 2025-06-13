@@ -15,6 +15,8 @@ public class Movements : MonoBehaviour
     public float gravity = -9.81f;
     public float jumpHeight = 7f;
 
+    private AudioSource audio;
+
     private CharacterController controller;
     private Vector3 velocity;
     private bool isGrounded;
@@ -32,6 +34,7 @@ public class Movements : MonoBehaviour
 
         Finish = GameObject.FindWithTag("Finish");
 
+        audio = GetComponent<AudioSource>();
 
     }
 
@@ -43,6 +46,9 @@ public class Movements : MonoBehaviour
             // Change color of all cubes to blue){
             Cube.GetComponent<Renderer>().material.color = Color.red; // Change color of Cube
         }
+
+
+     //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
     }
 
     void Update()
@@ -113,35 +119,30 @@ public class Movements : MonoBehaviour
         }
 
 
-if (collision.gameObject.CompareTag("aaa"))
-{
-    if (shaker != null && shakePreset != null)
-    {
-        shaker.Shake(shakePreset);
-        Debug.Log("Camera shake triggered!");
-    }
-    else
-    {
-        Debug.LogWarning("Shaker or ShakePreset not assigned!");
-    }
-}
+        if (collision.gameObject.CompareTag("aaa"))
+        {
+                audio.Play(); // Play sound effect on collision
+
+            if (shaker != null && shakePreset != null)
+            {
+                shaker.Shake(shakePreset);
+                Debug.Log("Camera shake triggered!");
+            }
+            else
+            {
+                Debug.LogWarning("Shaker or ShakePreset not assigned!");
+
+            }
+            
+
+        }
+
 
     }
     
     
 
 
-
-    // public Shaker shaker;
-
-    // public void Shake()
-    // {
-    //     if (shaker != null)
-    //     {
-    //         ShakeInstance shakeInstance = shaker.ShakeAll(new ShakeData(0.5f, 0.5f, 0.5f, 0.5f));
-    //         // Optionally, you can modify the shakeInstance properties here
-    //     }
-    // }
 
 
 
