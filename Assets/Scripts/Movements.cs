@@ -15,7 +15,7 @@ public class Movements : MonoBehaviour
     public float gravity = -9.81f;
     public float jumpHeight = 7f;
 
-    private AudioSource audio;
+    private AudioSource audi;
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -36,7 +36,7 @@ public class Movements : MonoBehaviour
 
         Finish = GameObject.FindWithTag("Finish");
 
-        audio = GetComponent<AudioSource>();
+        audi = GetComponent<AudioSource>();
 
     }
 
@@ -51,7 +51,7 @@ public class Movements : MonoBehaviour
 
 
 
-     //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
+        //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
     }
 
     void Update()
@@ -124,15 +124,21 @@ public class Movements : MonoBehaviour
 
         if (collision.gameObject.CompareTag("aaa"))
         {
-                audio.Play(); // Play sound effect on collision
+            audi.Play(); // Play sound effect on collision
             Board.isStatic = false;
 
-                Rigidbody boardRb = Board.GetComponent<Rigidbody>();
-    if (boardRb != null)
-    {
-        boardRb.isKinematic = false; // Enable movement
-        boardRb.useGravity = true;   // Make sure gravity is applied
-    }
+            // Find all MovableObjectsz
+            GameObject[] movableObjects = GameObject.FindGameObjectsWithTag("MovableObject");
+
+            foreach (GameObject obj in movableObjects)
+            {
+                Rigidbody rb = obj.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false; // Enable movement
+                    rb.useGravity = true;   // Make sure gravity is applied
+                }
+            }
 
 
 
@@ -146,15 +152,15 @@ public class Movements : MonoBehaviour
                 Debug.LogWarning("Shaker or ShakePreset not assigned!");
 
             }
-            
+
 
         }
 
 
 
     }
-    
-    
+
+
 
 
 
