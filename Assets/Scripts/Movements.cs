@@ -1,4 +1,6 @@
 using MilkShake;
+using Mono.Cecil.Cil;
+using Unity.VisualScripting;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 
@@ -6,7 +8,7 @@ using UnityEngine;
 public class Movements : MonoBehaviour
 {
 
-    public Shaker shaker;
+    public Shaker shaker, shaker3rdPerson;
     public ShakePreset shakePreset;
 
 
@@ -16,18 +18,21 @@ public class Movements : MonoBehaviour
     public float jumpHeight = 7f;
 
     private AudioSource audi;
+    private Animator Animator;
 
     private CharacterController controller;
     private Vector3 velocity;
     private bool isGrounded;
 
-    private GameObject Cube, Respawn, Finish, Board;
+    private GameObject Cube, Respawn, Finish, Board, FirstPersonCam, ThirdPersonCam;
+    GameObject[] chair, chair2;
 
-    // Optional: For mobile joystick
-    // public Joystick joystick;
+    LockerScript ls;
+
 
     void Start()
     {
+        Animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
 
         Respawn = GameObject.FindWithTag("Respawn");
@@ -36,7 +41,18 @@ public class Movements : MonoBehaviour
 
         Finish = GameObject.FindWithTag("Finish");
 
+        FirstPersonCam = GameObject.FindWithTag("FirstPersonCamera");
+
+        ThirdPersonCam = GameObject.FindWithTag("ThirdPersonCamera");
+
+
+        chair = GameObject.FindGameObjectsWithTag("Chair");
+        chair2 = GameObject.FindGameObjectsWithTag("Chair2");
+
         audi = GetComponent<AudioSource>();
+
+
+        ls = FindObjectOfType<LockerScript>();
 
     }
 
@@ -48,8 +64,6 @@ public class Movements : MonoBehaviour
             // Change color of all cubes to blue){
             Cube.GetComponent<Renderer>().material.color = Color.red; // Change color of Cube
         }
-
-
 
         //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
     }
@@ -64,12 +78,9 @@ public class Movements : MonoBehaviour
         }
 
         // // Get input (Keyboard or Virtual Joystick)
-        float x = Input.GetAxis("Vertical"); // For keyboard: A/D or arrow keys
-        float z = Input.GetAxis("Horizontal");   // For keyboard: W/S or arrow keys
+        float x = Input.GetAxis("Horizontal"); // A/D or Left/Right
+        float z = Input.GetAxis("Vertical");   // W/S or Up/Down
 
-        // For Joystick (uncomment if using joystick)
-        // float x = joystick.Horizontal;
-        // float z = joystick.Vertical;
 
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * speed * Time.deltaTime);
@@ -87,7 +98,21 @@ public class Movements : MonoBehaviour
 
         // Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         // controller.Move(move * Time.deltaTime * speed);
+
+
+    if (move != Vector3.zero)
+{
+    Animator.SetBool("IsMoving", true);
+}
+else
+{
+    Animator.SetBool("IsMoving", false);
+}
+
     }
+
+
+
 
 
     void OnControllerColliderHit(ControllerColliderHit collision)
@@ -126,6 +151,7 @@ public class Movements : MonoBehaviour
         {
             audi.Play(); // Play sound effect on collision
             Board.isStatic = false;
+            ls.lockersound.Play(); // Play locker sound effect on collision
 
             // Find all MovableObjectsz
             GameObject[] movableObjects = GameObject.FindGameObjectsWithTag("MovableObject");
@@ -142,9 +168,10 @@ public class Movements : MonoBehaviour
 
 
 
-            if (shaker != null && shakePreset != null)
+            if (shaker != null || shaker3rdPerson != null && shakePreset != null)
             {
                 shaker.Shake(shakePreset);
+                shaker3rdPerson.Shake(shakePreset);
                 Debug.Log("Camera shake triggered!");
             }
             else
@@ -154,6 +181,50 @@ public class Movements : MonoBehaviour
             }
 
 
+
+
+            // Move 'chair' objects towards random positions
+            foreach (GameObject obj in chair)
+            {
+                Vector3 randomTarget = new Vector3(
+                    Random.Range(-1f, 1f),
+                    Random.Range(-1f, 1f),
+                    Random.Range(-1f, 1f)
+                );
+                obj.transform.position = Vector3.MoveTowards(obj.transform.position, randomTarget, 0.1f * Time.deltaTime);
+            }
+
+            // Move 'chair2' objects away from random positions (opposite direction)
+            foreach (GameObject obj in chair2)
+            {
+                Vector3 randomTarget = new Vector3(
+                    Random.Range(-1f, 1f),
+                    Random.Range(-1f, 1f),
+                    Random.Range(-1f, 1f)
+                );
+                // Calculate direction away from randomTarget
+                Vector3 directionAway = (obj.transform.position - randomTarget).normalized;
+                obj.transform.position += directionAway * 0.1f * Time.deltaTime;
+            }
+
+
+
+
+            //CameraSwitcher
+             FirstPersonCam.SetActive(false);
+         ThirdPersonCam.SetActive(true);
+
+
+
+
+
+
+
+        }
+        else
+        {
+              FirstPersonCam.SetActive(true);
+              ThirdPersonCam.SetActive(false);
         }
 
 
