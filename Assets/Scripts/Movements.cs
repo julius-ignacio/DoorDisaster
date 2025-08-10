@@ -1,7 +1,4 @@
 using MilkShake;
-using Mono.Cecil.Cil;
-using Unity.VisualScripting;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -10,7 +7,7 @@ public class Movements : MonoBehaviour
 
     public Shaker shaker, shaker3rdPerson;
     public ShakePreset shakePreset;
-
+    public PanicMeterScript panicMeterScript; // Reference to the PanicMeterScript
 
 
     public float speed = 20f;
@@ -51,8 +48,6 @@ public class Movements : MonoBehaviour
 
         audi = GetComponent<AudioSource>();
 
-
-        ls = FindObjectOfType<LockerScript>();
 
     }
 
@@ -149,9 +144,11 @@ else
 
         if (collision.gameObject.CompareTag("aaa"))
         {
+
+
+
             audi.Play(); // Play sound effect on collision
             Board.isStatic = false;
-            ls.lockersound.Play(); // Play locker sound effect on collision
 
             // Find all MovableObjectsz
             GameObject[] movableObjects = GameObject.FindGameObjectsWithTag("MovableObject");
@@ -208,12 +205,16 @@ else
             }
 
 
+if (panicMeterScript != null)
+{
+    panicMeterScript.currHealth += 0.01f; // Increase by 10 (or any value you want)
+    panicMeterScript.currHealth = Mathf.Clamp(panicMeterScript.currHealth, 0, panicMeterScript.maxHealth);
+}
 
 
-            //CameraSwitcher
-             FirstPersonCam.SetActive(false);
-         ThirdPersonCam.SetActive(true);
-
+            //   CameraSwitcher
+            FirstPersonCam.SetActive(false);
+            ThirdPersonCam.SetActive(true);
 
 
 
@@ -223,8 +224,8 @@ else
         }
         else
         {
-              FirstPersonCam.SetActive(true);
-              ThirdPersonCam.SetActive(false);
+            FirstPersonCam.SetActive(true);
+            ThirdPersonCam.SetActive(false);
         }
 
 
