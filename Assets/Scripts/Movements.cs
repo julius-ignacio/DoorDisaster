@@ -112,6 +112,32 @@ else
 
     void OnControllerColliderHit(ControllerColliderHit collision)
     {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         if (collision.gameObject.CompareTag("Cube"))
         {
             transform.position = Respawn.transform.position;
