@@ -116,7 +116,10 @@ else
 
 
 
-
+        if (collision.gameObject.name == "TRIGGER_START")
+        {
+            Debug.Log("Collided with trigger start");
+}
 
 
 
