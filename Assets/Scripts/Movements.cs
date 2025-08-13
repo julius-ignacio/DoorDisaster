@@ -1,5 +1,6 @@
 using MilkShake;
 using UnityEngine;
+using Terresquall;
 
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
@@ -18,13 +19,11 @@ public class Movements : MonoBehaviour
     private Animator Animator;
 
     private CharacterController controller;
-    private Vector3 velocity;
-    private bool isGrounded;
+    public Vector3 velocity;
+    public bool isGrounded;
 
     private GameObject Cube, Respawn, Finish, Board, FirstPersonCam, ThirdPersonCam;
     GameObject[] chair, chair2;
-
-    LockerScript ls;
 
 
     void Start()
@@ -72,13 +71,41 @@ public class Movements : MonoBehaviour
             velocity.y = -2f; // small downward force to stick to ground
         }
 
-        // // Get input (Keyboard or Virtual Joystick)
-        float x = Input.GetAxis("Horizontal"); // A/D or Left/Right
-        float z = Input.GetAxis("Vertical");   // W/S or Up/Down
 
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * speed * Time.deltaTime);
+
+
+
+
+
+
+
+        // Movement only (joystick)
+        float x = VirtualJoystick.GetAxis("Horizontal"); // A/D or Left/Right
+        float z = VirtualJoystick.GetAxis("Vertical");   // W/S or Up/Down
+
+
+        // Movement relative to player, NOT camera
+        Vector3 move = new Vector3(x, 0, z);
+        controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
+        
+
+ // Only rotate camera from touch drag, not joystick!
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Moved)
+            {
+                float mouseX = touch.deltaPosition.x * 5 * Time.deltaTime;
+                float mouseY = touch.deltaPosition.y * 5 * Time.deltaTime;
+
+                xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+                YRotation += mouseX;
+
+                transform.localRotation = Quaternion.Euler(xRotation, YRotation, 0f);
+            }
+        }
+
 
         // // Jump
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -95,14 +122,14 @@ public class Movements : MonoBehaviour
         // controller.Move(move * Time.deltaTime * speed);
 
 
-    if (move != Vector3.zero)
-{
-    Animator.SetBool("IsMoving", true);
-}
-else
-{
-    Animator.SetBool("IsMoving", false);
-}
+        if (move != Vector3.zero)
+        {
+            Animator.SetBool("IsMoving", true);
+        }
+        else
+        {
+            Animator.SetBool("IsMoving", false);
+        }
 
     }
 
@@ -119,7 +146,7 @@ else
         if (collision.gameObject.name == "TRIGGER_START")
         {
             Debug.Log("Collided with trigger start");
-}
+        }
 
 
 
@@ -140,7 +167,7 @@ else
 
 
 
-        
+
         if (collision.gameObject.CompareTag("Cube"))
         {
             transform.position = Respawn.transform.position;
@@ -234,11 +261,11 @@ else
             }
 
 
-if (panicMeterScript != null)
-{
-    panicMeterScript.currHealth += 0.01f; // Increase by 10 (or any value you want)
-    panicMeterScript.currHealth = Mathf.Clamp(panicMeterScript.currHealth, 0, panicMeterScript.maxHealth);
-}
+            if (panicMeterScript != null)
+            {
+                panicMeterScript.currHealth += 0.01f; // Increase by 10 (or any value you want)
+                panicMeterScript.currHealth = Mathf.Clamp(panicMeterScript.currHealth, 0, panicMeterScript.maxHealth);
+            }
 
 
             //   CameraSwitcher
