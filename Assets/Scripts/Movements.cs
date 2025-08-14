@@ -39,9 +39,6 @@ public class Movements : MonoBehaviour
 
         FirstPersonCam = GameObject.FindWithTag("FirstPersonCamera");
 
-        ThirdPersonCam = GameObject.FindWithTag("ThirdPersonCamera");
-
-
         chair = GameObject.FindGameObjectsWithTag("Chair");
         chair2 = GameObject.FindGameObjectsWithTag("Chair2");
 
@@ -88,23 +85,8 @@ public class Movements : MonoBehaviour
         // Movement relative to player, NOT camera
         Vector3 move = new Vector3(x, 0, z);
         controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
-        
 
- // Only rotate camera from touch drag, not joystick!
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Moved)
-            {
-                float mouseX = touch.deltaPosition.x * 5 * Time.deltaTime;
-                float mouseY = touch.deltaPosition.y * 5 * Time.deltaTime;
-
-                xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-                YRotation += mouseX;
-
-                transform.localRotation = Quaternion.Euler(xRotation, YRotation, 0f);
-            }
-        }
+    
 
 
         // // Jump
@@ -268,20 +250,7 @@ public class Movements : MonoBehaviour
             }
 
 
-            //   CameraSwitcher
-            FirstPersonCam.SetActive(false);
-            ThirdPersonCam.SetActive(true);
 
-
-
-
-
-
-        }
-        else
-        {
-            FirstPersonCam.SetActive(true);
-            ThirdPersonCam.SetActive(false);
         }
 
 
