@@ -39,9 +39,6 @@ public class Movements : MonoBehaviour
 
         FirstPersonCam = GameObject.FindWithTag("FirstPersonCamera");
 
-        ThirdPersonCam = GameObject.FindWithTag("ThirdPersonCamera");
-
-
         chair = GameObject.FindGameObjectsWithTag("Chair");
         chair2 = GameObject.FindGameObjectsWithTag("Chair2");
 
@@ -88,6 +85,8 @@ public class Movements : MonoBehaviour
         // Movement relative to player, NOT camera
         Vector3 move = new Vector3(x, 0, z);
         controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
+
+    
 
 
         // // Jump
@@ -251,20 +250,7 @@ public class Movements : MonoBehaviour
             }
 
 
-            //   CameraSwitcher
-            FirstPersonCam.SetActive(false);
-            ThirdPersonCam.SetActive(true);
 
-
-
-
-
-
-        }
-        else
-        {
-            FirstPersonCam.SetActive(true);
-            ThirdPersonCam.SetActive(false);
         }
 
 
