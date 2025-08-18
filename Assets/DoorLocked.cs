@@ -1,20 +1,19 @@
 using EasyDoorSystem;
 using UnityEngine;
 
-public class UnlockDoor : MonoBehaviour
+public class DoorLocked : MonoBehaviour
 {
     public GameObject colliderObject; 
     public GameObject door;
 
     void OnTriggerEnter(Collider other)
     {
-        if (PickUpScript.hasKeycard) // ✅ check global flag
+        if (!PickUpScript.hasKeycard) // ✅ check global flag
         {
-            colliderObject.SetActive(false);
+            colliderObject.SetActive(true);
 
             var doorScript = door.GetComponent<EasyDoorSystem.EasyDoor>();
-            if (doorScript != null)
-                doorScript.enabled = true;
+                doorScript.enabled = false;
         }
     }
 }
