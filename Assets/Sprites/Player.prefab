@@ -149,12 +149,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cf3db043cf615b1c92e07ff203ff4c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaker: {fileID: 7322086476354160350}
-  shaker3rdPerson: {fileID: 0}
-  shakePreset: {fileID: 11400000, guid: 33bb6a5605d7dc1e29a4d8c2631869d3, type: 2}
   speed: 5
   gravity: -9.81
   jumpHeight: 1
+  velocity: {x: 0, y: 0, z: 0}
+  isGrounded: 0
 --- !u!114 &584738389482406501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,7 +177,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6354059074391542044}
   - component: {fileID: 5869156840690620562}
-  - component: {fileID: 4995816522377492855}
   - component: {fileID: 3537421507729576742}
   - component: {fileID: 7322086476354160350}
   m_Layer: 0
@@ -254,14 +252,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &4995816522377492855
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6324058723776104696}
-  m_Enabled: 1
 --- !u!114 &3537421507729576742
 MonoBehaviour:
   m_ObjectHideFlags: 0
