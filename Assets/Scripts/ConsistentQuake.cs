@@ -5,7 +5,9 @@ using System.Collections;
 public class ConsistentQuake : MonoBehaviour
 {
     public Shaker shaker;
+    public Camera coverCam;
     public ShakePreset shakePreset;
+    private PanicMeterScript panicMeterScript;
 
     private AudioSource audi;
 
@@ -18,6 +20,7 @@ public class ConsistentQuake : MonoBehaviour
     {
         audi = GetComponent<AudioSource>();
         StartCoroutine(QuakeRoutine());
+
     }
 
     IEnumerator QuakeRoutine()
@@ -30,9 +33,12 @@ public class ConsistentQuake : MonoBehaviour
 
             if (shaker != null && shakePreset != null)
             {
-                currentShake = shaker.Shake(shakePreset); // Start sustained shake
+                currentShake = Shaker.ShakeAll(shakePreset);
                 Debug.Log("Earthquake started!");
+            
             }
+
+      
 
             // ⏳ Wait quake duration
             yield return new WaitForSeconds(quakeDuration);

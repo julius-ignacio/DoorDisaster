@@ -4,15 +4,16 @@ public class UnCoverMechanic : MonoBehaviour
 {
 
     public GameObject Player, Model, CoverBtn, UnCoverBtn, joystick, jumpbtn;
-    public Camera CoverCamera;
+    public Camera CoverCamera, playerCamera;
 
 
     public void OnButtonClick()
     {
         Debug.Log("Button was clicked!");
-        Player.SetActive(true); // Unhide the player
         Model.SetActive(false); // Show the cover model
-        CoverCamera.gameObject.SetActive(false); // Activate the cover camera
+        CoverCamera.enabled = false; // Disable the cover camera
+        playerCamera.enabled = true; // Enable the player camera
+        Player.GetComponent<CharacterController>().enabled = true; // Enable player movement
 
         CoverBtn.SetActive(true); // Hide the button after clicking
         UnCoverBtn.SetActive(false); // Hide the button after clicking

@@ -9,7 +9,7 @@ public class Earthquake : MonoBehaviour
 
     public Shaker shaker;
     public ShakePreset shakePreset;
-    public PanicMeterScript panicMeterScript; // Reference to the PanicMeterScript
+
 
 
 
@@ -80,7 +80,7 @@ public class Earthquake : MonoBehaviour
 
             if (shaker != null || shakePreset != null)
             {
-                shaker.Shake(shakePreset);
+                Shaker.ShakeAll(shakePreset);
                 Debug.Log("Camera shake triggered!");
             }
             else
@@ -120,11 +120,7 @@ public class Earthquake : MonoBehaviour
             }
 
 
-            if (panicMeterScript != null)
-            {
-                panicMeterScript.currHealth += 0.01f; // Increase by 10 (or any value you want)
-                panicMeterScript.currHealth = Mathf.Clamp(panicMeterScript.currHealth, 0, panicMeterScript.maxHealth);
-            }
+        
 
 
 

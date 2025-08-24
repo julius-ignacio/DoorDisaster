@@ -3,9 +3,11 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    
+
     public void StartGame()
     {
-        SceneManager.LoadScene("Temple"); 
+        SceneManager.LoadScene("Temple");
     }
 
     public void QuitGame()
