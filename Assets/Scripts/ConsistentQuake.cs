@@ -7,7 +7,7 @@ public class ConsistentQuake : MonoBehaviour
     public Shaker shaker;
     public Camera coverCam;
     public ShakePreset shakePreset;
-    private PanicMeterScript panicMeterScript;
+    public PanicMeterScript panicMeterScript;
 
     private AudioSource audi;
 
@@ -23,39 +23,41 @@ public class ConsistentQuake : MonoBehaviour
 
     }
 
-    IEnumerator QuakeRoutine()
+  IEnumerator QuakeRoutine()
+{
+    while (true)
     {
-        while (true)
+        // 🔥 Start quake
+        audi?.Play();
+        if (shaker != null && shakePreset != null)
         {
-            // 🔥 Start quake
-            if (audi != null)
-                audi.Play();
-
-            if (shaker != null && shakePreset != null)
-            {
-                currentShake = Shaker.ShakeAll(shakePreset);
-                Debug.Log("Earthquake started!");
-            
-            }
-
-      
-
-            // ⏳ Wait quake duration
-            yield return new WaitForSeconds(quakeDuration);
-
-            // 🛑 Stop quake
-            if (currentShake != null)
-            {
-                currentShake.Stop(0.5f, true); // fade out over 0.5s
-                currentShake = null;
-                Debug.Log("Earthquake ended!");
-            }
-
-            if (audi != null)
-                audi.Stop();
-
-            // ⏳ Wait cooldown before next quake
-            yield return new WaitForSeconds(quakeInterval);
+            currentShake = Shaker.ShakeAll(shakePreset);
+            Debug.Log("Earthquake started!");
         }
+
+        // Panic increase during quake
+        float elapsed = 0f;
+        while (elapsed < quakeDuration)
+        {
+            if (!coverCam.enabled && panicMeterScript != null)
+                panicMeterScript.currHealth += Time.deltaTime * 10f; // adjust rate
+
+            elapsed += Time.deltaTime;
+            yield return null; // wait 1 frame
+        }
+
+        // 🛑 Stop quake
+        if (currentShake != null)
+        {
+            currentShake.Stop(0, true); 
+            currentShake = null;
+            Debug.Log("Earthquake ended!");
+        }
+        audi?.Stop();
+
+        // ⏳ Wait cooldown before next quake
+        yield return new WaitForSeconds(quakeInterval);
     }
+}
+
 }

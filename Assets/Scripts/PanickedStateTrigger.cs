@@ -2,13 +2,29 @@ using UnityEngine;
 
 public class PanickedStateTrigger : MonoBehaviour
 {
-    public GameObject panicMeterUI;
+    public GameObject panickEffectUI;
+    public PanicMeterScript panicMeterScript;
 
-    void panickedStateOn()
+    public AudioSource heartbeatSFX;
+
+    void Update()
     {
-        // panicMeterScript.currHealth += 0.01f; // Increase by 10 (or any value you want)
-        // panicMeterScript.currHealth = Mathf.Clamp(panicMeterScript.currHealth, 0, panicMeterScript.maxHealth);
+        if (panicMeterScript.currHealth >= 60)
+        {
+            panickEffectUI.SetActive(true);
+
+            if (!heartbeatSFX.isPlaying) // only start once
+            {
+                heartbeatSFX.Play();
+            }
+        }
+        else
+        {
+            if (heartbeatSFX.isPlaying)
+            {
+                heartbeatSFX.Stop();
+            }
+            panickEffectUI.SetActive(false);
+        }
     }
-    
-    
 }
