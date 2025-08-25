@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameOver : MonoBehaviour
 {
-    public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm;
+    public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI;
     public PanicMeterScript panicMeterScript;
     public Movements movementscript;
 
@@ -16,6 +16,7 @@ public class GameOver : MonoBehaviour
         PanicMeterUI.SetActive(false);
         CoverBtn.SetActive(false);
         uncoverBtm.SetActive(false);
+        PauseUI.SetActive(false);
 
         movementscript.enabled = false;
     }
