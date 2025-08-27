@@ -3,8 +3,10 @@ using UnityEngine;
 public class CoverMechanic : MonoBehaviour
 {
 
-    public GameObject Player, Model, CoverBtn, UnCoverBtn, joystick, jumpbtn, RestrictionWall;
+    public GameObject Model, CoverBtn, UnCoverBtn, joystick, jumpbtn, RestrictionWall;
     public Camera CoverCamera, playerCamera;
+    
+    public Movements PlayerMovements;
 
 
 
@@ -15,12 +17,15 @@ public class CoverMechanic : MonoBehaviour
         Model.SetActive(true); // Show the cover model
         CoverCamera.enabled = true; // Enable the cover camera
         playerCamera.enabled = false; // Enable the cover camera
-        Player.GetComponent<CharacterController>().enabled = false; // Disable player movement
         CoverBtn.SetActive(false); // Hide the button after clicking
         UnCoverBtn.SetActive(true);//show uncoverbutton
 
         joystick.SetActive(false); // Hide the joystick
         jumpbtn.SetActive(false); // Hide the jump button
+
+
+        PlayerMovements.speed = 0f;
+        PlayerMovements.jumpHeight = 0f;
     }
 
 

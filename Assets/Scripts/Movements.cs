@@ -46,7 +46,7 @@ public class Movements : MonoBehaviour
         // float x = VirtualJoystick.GetAxis("Horizontal"); // A/D or Left/Right
         // float z = VirtualJoystick.GetAxis("Vertical");   // W/S or Up/Down
 
-             // Movement only (keys)
+        // Movement only (keys)
         float x = Input.GetAxis("Horizontal"); // A/D or Left/Right
         float z = Input.GetAxis("Vertical");   // W/S or Up/Down
 
@@ -56,7 +56,7 @@ public class Movements : MonoBehaviour
         Vector3 move = new Vector3(x, 0, z);
         controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
 
-    
+
 
 
         // // Jump
@@ -68,6 +68,10 @@ public class Movements : MonoBehaviour
         // Gravity
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+        
+
+
+
     }
 
 
