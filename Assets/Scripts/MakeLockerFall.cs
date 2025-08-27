@@ -17,8 +17,8 @@ public class MakeLockerFall : MonoBehaviour
                 }
             }
 
-            // Optional: disable trigger so it only happens once
-            gameObject.SetActive(false);
+            // // Optional: disable trigger so it only happens once
+            // gameObject.SetActive(false);
         }
     }
 }
