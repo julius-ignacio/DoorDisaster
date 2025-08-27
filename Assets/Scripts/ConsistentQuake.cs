@@ -5,6 +5,8 @@ using System.Collections;
 public class ConsistentQuake : MonoBehaviour
 {
     public Shaker shaker;
+    private ShakeInstance currentShake;
+
     public Camera coverCam;
     public ShakePreset shakePreset;
     public PanicMeterScript panicMeterScript;
@@ -14,7 +16,8 @@ public class ConsistentQuake : MonoBehaviour
     public float quakeInterval = 15f;  // cooldown between quakes
     public float quakeDuration = 8f;   // how long quake lasts
 
-    private ShakeInstance currentShake;
+    public bool IsQuakeActive { get; private set; } = false;
+
 
     void Start()
     {
@@ -34,13 +37,15 @@ public class ConsistentQuake : MonoBehaviour
             currentShake = Shaker.ShakeAll(shakePreset);
             Debug.Log("Earthquake started!");
         }
+        
+        IsQuakeActive = true;
 
         // Panic increase during quake
-        float elapsed = 0f;
+            float elapsed = 0f;
         while (elapsed < quakeDuration)
         {
             if (!coverCam.enabled && panicMeterScript != null)
-                panicMeterScript.currHealth += Time.deltaTime * 10f; // adjust rate
+                panicMeterScript.currHealth += Time.deltaTime * 2f; // adjust rate
 
             elapsed += Time.deltaTime;
             yield return null; // wait 1 frame
@@ -54,9 +59,11 @@ public class ConsistentQuake : MonoBehaviour
             Debug.Log("Earthquake ended!");
         }
         audi?.Stop();
+        
+        IsQuakeActive = false;
 
         // ⏳ Wait cooldown before next quake
-        yield return new WaitForSeconds(quakeInterval);
+            yield return new WaitForSeconds(quakeInterval);
     }
 }
 
