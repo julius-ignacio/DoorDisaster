@@ -8,8 +8,6 @@ public class MakeObjectsMove : MonoBehaviour
 {
 
     public float chairMoveSpeed = 1f;
-    public GameObject[] locker;
-
     private AudioSource audi;
 
     public Vector3 velocity;
@@ -101,34 +99,6 @@ public class MakeObjectsMove : MonoBehaviour
         //     }
         // }
         
-
-
-        //   if (collision.gameObject.name == "hallway1")
-        // {
-
-        //     if (consistentQuakeScript != null && consistentQuakeScript.IsQuakeActive)
-        //     {
-
-        //         locker[0].GetComponent<LockerFall>().Fall(); // Call the Fall method on LockerFall script
-        //     }
-
-        // }
-
-
-        // if (collision.gameObject.name == "hallway2")
-        // {
-
-        //     if (consistentQuakeScript != null && consistentQuakeScript.IsQuakeActive)
-        //     {
-
-        //         locker[1].GetComponent<LockerFall>().Fall(); // Call the Fall method on LockerFall script
-        //     }
-
-        // }
-
-
-
-
 
 
     }
