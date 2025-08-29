@@ -89,21 +89,9 @@ public class MakeObjectsMove : MonoBehaviour
 
         }
 
-
-
-
-        // if (collision.gameObject.CompareTag("libraryTrig"))
-        // {
-        //     if (consistentQuakeScript != null && consistentQuakeScript.IsQuakeActive)
-        //     {
-
-        //     }
-        // }
-
-
-
-
-        switch (collision.gameObject.name)
+        if (consistentQuakeScript != null && consistentQuakeScript.IsQuakeActive)
+        {
+                switch (collision.gameObject.name)
         {
             case "hallway1":
                 { locker[0].GetComponent<LockerFall>().Fall(); }
@@ -150,6 +138,7 @@ public class MakeObjectsMove : MonoBehaviour
                     locker[18].GetComponent<LockerFall>().Fall();
                 }
                 break;
+               }
 
         }
 

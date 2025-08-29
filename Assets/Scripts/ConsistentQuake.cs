@@ -14,7 +14,7 @@ public class ConsistentQuake : MonoBehaviour
     private AudioSource audi;
 
     public float quakeInterval = 15f;  // cooldown between quakes
-    public float quakeDuration = 8f;   // how long quake lasts
+    public float quakeDuration = 10f;   // how long quake lasts
 
     public bool IsQuakeActive { get; private set; } = false;
 
