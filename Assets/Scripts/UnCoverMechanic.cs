@@ -23,7 +23,7 @@ public class UnCoverMechanic : MonoBehaviour
 
 
 
-        PlayerMovements.speed = 8f;
+        PlayerMovements.speed = 3f;
         PlayerMovements.jumpHeight = 1f;
     }
 }
