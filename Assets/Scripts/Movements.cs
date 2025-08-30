@@ -33,46 +33,39 @@ public class Movements : MonoBehaviour
         //   DoorTrialBtn.SetActive(false); // Hide the DoorTrialBtn at the start
     }
 
-    void Update()
+void Update()
+{
+    // Check if on ground
+    isGrounded = controller.isGrounded;
+    if (isGrounded && velocity.y < 0)
     {
-        // Check if on ground
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; // small downward force to stick to ground
-        }
-
-        // // Movement only (joystick)
-        // float x = VirtualJoystick.GetAxis("Horizontal"); // A/D or Left/Right
-        // float z = VirtualJoystick.GetAxis("Vertical");   // W/S or Up/Down
-
-        // Movement only (keys)
-        float x = Input.GetAxis("Horizontal"); // A/D or Left/Right
-        float z = Input.GetAxis("Vertical");   // W/S or Up/Down
-
-
-
-        // Movement relative to player, NOT camera
-        Vector3 move = new Vector3(x, 0, z);
-        controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
-
-
-
-
-        // // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-
-        // Gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-        
-
-
-
+        velocity.y = -2f; // small downward force to stick to ground
     }
+
+    // Get inputs from BOTH joystick and keyboard
+    float x = VirtualJoystick.GetAxis("Horizontal") + Input.GetAxis("Horizontal");
+    float z = VirtualJoystick.GetAxis("Vertical")   + Input.GetAxis("Vertical");
+
+    // Normalize if both inputs are pressed (prevents double speed)
+    Vector3 move = new Vector3(x, 0, z);
+    if (move.magnitude > 1f)
+        move.Normalize();
+
+    // Movement relative to player
+    controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
+
+    // Jump (keyboard only unless you add a UI button later)
+    if (Input.GetButtonDown("Jump") && isGrounded)
+    {
+        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    }
+
+    // Gravity
+    velocity.y += gravity * Time.deltaTime;
+    controller.Move(velocity * Time.deltaTime);
+}
+
+
 
 
 
