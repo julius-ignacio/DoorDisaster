@@ -22,8 +22,9 @@ public class PlaneTriggerMoveModel : MonoBehaviour
             Debug.Log("model moved to target position");
 
 
-           CoverCamera.transform.localPosition = targetPositionCamera;
-CoverCamera.transform.localRotation = Quaternion.Euler(targetRotationCamera);
+            CoverCamera.transform.localPosition = targetPositionCamera;
+            CoverCamera.transform.localRotation = Quaternion.Euler(targetRotationCamera);
+
 
             Debug.Log("model moved to target position");
         }
