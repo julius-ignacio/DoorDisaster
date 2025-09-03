@@ -1,29 +1,29 @@
-using System;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AnswerCheck : MonoBehaviour
 {
-    //public Button choice1, choice2, choice3;
     public TMP_Text testAnswerCheck;
-    private QuizChoices quizData = new QuizChoices();
-    private QuizScript quizScript = new QuizScript();
-    public int answerValue;
+    public int answerValue;                 // 0, 1, or 2 set per button in Inspector
+    public QuizScript quizScript;           // assign or auto-find
 
-
-
-    public void checkAnswer()
+    void Awake()
     {
-        if (answerValue == quizScript.correctAnswer)
-        {
-            testAnswerCheck.text = "Correct";
-        }
-        else
-        {
-            testAnswerCheck.text = "Wrong";
-        }
+        if (quizScript == null)
+            quizScript = GetComponentInParent<QuizScript>();  // finds the one on the quiz panel
     }
 
+    public void CheckAnswer()
+    {
+        if (quizScript == null)
+        {
+            Debug.LogError("AnswerCheck: QuizScript reference missing.");
+            return;
+        }
+
+        testAnswerCheck.text = "Correct";
+        if (answerValue == quizScript.correctAnswer) { }
+        else{ testAnswerCheck.text = "Wrong"; }
 }
+    }
+

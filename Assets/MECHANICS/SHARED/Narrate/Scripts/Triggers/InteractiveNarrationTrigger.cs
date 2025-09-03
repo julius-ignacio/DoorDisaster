@@ -17,6 +17,9 @@ namespace Narrate {
         private bool timeOut;
 
         private InteractionEventHandler handler;
+
+        public object OnLineFinish { get; internal set; }
+
         void Awake() {
             if (triggeredBy == null) {
                 Debug.LogWarning("InteractiveNarrationTrigger Warning: " + this.gameObject.name +
