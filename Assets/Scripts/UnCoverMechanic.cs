@@ -5,6 +5,7 @@ public class UnCoverMechanic : MonoBehaviour
 
     public GameObject Model, CoverBtn, UnCoverBtn, joystick, jumpbtn;
     public Camera CoverCamera, playerCamera;
+    public GameObject footsteps_enable;
 
     public Movements PlayerMovements;
     public void OnButtonClick()
@@ -20,6 +21,8 @@ public class UnCoverMechanic : MonoBehaviour
 
         joystick.SetActive(true); // Show the joystick
         jumpbtn.SetActive(true); // Show the jump button
+
+        footsteps_enable.SetActive(true);
 
 
 

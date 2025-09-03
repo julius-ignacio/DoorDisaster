@@ -1,4 +1,5 @@
 using System;
+using Narrate;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +9,7 @@ public class NPC : MonoBehaviour
     public GameObject npc, detectionPlane, helpBtn, QuizUI;
     public int valueToFireForQuizSys;
 
-public QuizScript quizScript;
-
+    public QuizScript quizScript;
 
     void OnTriggerEnter(Collider other)
     {
