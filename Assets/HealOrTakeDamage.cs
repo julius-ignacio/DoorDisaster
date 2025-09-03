@@ -11,10 +11,10 @@ public class HealOrTakeDamage : MonoBehaviour
     public float flashDuration = 0.3f;         // how long the flash stays
     public Color flashColor = new Color(1f, 0f, 0f, 0.5f); // semi-transparent red
 
-
     public AudioSource hurtSound;
 
     private Color originalColor;
+    private bool hasDealtDamage = false; // ✅ track if this locker has already hurt the player
 
     private void Start()
     {
@@ -27,7 +27,7 @@ public class HealOrTakeDamage : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (!hasDealtDamage && collision.gameObject.CompareTag("Player"))
         {
             if (consistentQuake != null && consistentQuake.IsQuakeActive)
             {
@@ -37,6 +37,8 @@ public class HealOrTakeDamage : MonoBehaviour
 
                 if (takeDamageImage != null)
                     StartCoroutine(FlashDamage());
+
+                hasDealtDamage = true; // ✅ only deal damage once
             }
         }
     }
