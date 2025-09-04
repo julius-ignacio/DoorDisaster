@@ -1,42 +1,49 @@
-using System;
-using HMStudio.EasyQuiz;
-using Narrate;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class NPC : MonoBehaviour
 {
-    public GameObject npc, detectionPlane, helpBtn, QuizUI;
+    public int npcId;
+    public GameObject helpBtn;
+    public GameObject quizUI;
+    public QuizScript quizScript;
 
     void Start()
     {
-        QuizUI.SetActive(false);
+        quizUI.SetActive(false);
+        helpBtn.SetActive(false);
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
-        {
             helpBtn.SetActive(true);
-        }
     }
-    
+
     void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             helpBtn.SetActive(false);
-            QuizUI.SetActive(false);
+            quizUI.SetActive(false);
         }
     }
 
-    public void OnButtonClick()
+    public void OnHelpButtonClick()
     {
-        Debug.Log("Help button clicked!");
-        npc.SetActive(false);
-        QuizUI.SetActive(true);
+        helpBtn.SetActive(false);
+        quizUI.SetActive(true);
 
-        // Load this NPC’s quiz
+        List<QuizQuestion> questions = null;
+        switch (npcId)
+        {
+            case 1: questions = QuizDatabase.NPC1; break;
+            case 2: questions = QuizDatabase.NPC2; break;
+            case 3: questions = QuizDatabase.NPC3; break;
+            case 4: questions = QuizDatabase.NPC4; break;
+        }
+
+        if (questions != null)
+            quizScript.BeginQuiz(questions);
     }
 }

@@ -1,46 +1,79 @@
-using TMPro;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class QuizScript : MonoBehaviour
 {
-    public GameObject choice1, choice2, choice3;
-    public int selected, correctAnswer;
-    public Camera npcCamera;
     public TMP_Text questionText;
-    private QuizChoices quizData = new QuizChoices();
+    public Button[] choiceButtons;
+    public TMP_Text scoreText;  
 
+    private List<QuizQuestion> currentQuestions;
+    private int currentIndex = 0;
+        private int score = 0;       // ⬅️ Track correct answers
 
-    public void Start()
+    public void BeginQuiz(List<QuizQuestion> questions)
     {
-        npcCamera.enabled = false;
+        currentQuestions = questions;
+        currentIndex = 0;
+         score = 0;
+         UpdateScoreUI();
+        ShowQuestion();
+        gameObject.SetActive(true); // show panel
     }
-    public void ChangeTexts()
+
+    void ShowQuestion()
     {
-        // Safety check
-        if (selected < 0 || selected >= quizData.questions.Count) return;
+        if (currentIndex >= currentQuestions.Count)
+        {
+            EndQuiz();
+            return;
+        }
 
-        // Get the selected question
-        QuizQuestion q = quizData.questions[selected];
-
-        // Update question
+        QuizQuestion q = currentQuestions[currentIndex];
         questionText.text = q.question;
 
-        // Update choices
-        choice1.GetComponentInChildren<TMP_Text>().text = q.choices[0];
-        choice2.GetComponentInChildren<TMP_Text>().text = q.choices[1];
-        choice3.GetComponentInChildren<TMP_Text>().text = q.choices[2];
+        for (int i = 0; i < choiceButtons.Length; i++)
+        {
+            TMP_Text btnText = choiceButtons[i].GetComponentInChildren<TMP_Text>();
+            btnText.text = q.choices[i];
 
-        correctAnswer = q.correctIndex;
+            // Remove any old listeners so clicks don’t stack
+            choiceButtons[i].onClick.RemoveAllListeners();
+        }
     }
 
-
-    public void QuizDone()
+    // 🔹 This is the method you’ll hook to the button OnClick()
+    public void AnswerQuestion(int choiceIndex)
     {
-        // Hide quiz UI
-        gameObject.SetActive(false);
+        QuizQuestion q = currentQuestions[currentIndex];
+        bool correct = (choiceIndex == q.correctIndex);
 
+      if (correct)
+        {
+            score++;
+            Debug.Log("✅ Correct!");
+        }
+        else
+        {
+            Debug.Log("❌ Wrong!");
+        }
 
+        UpdateScoreUI();
+        currentIndex++;
+        ShowQuestion();
+    }
+
+      void UpdateScoreUI()
+    {
+        if (scoreText != null)
+            scoreText.text = $"Score: {score}/{currentQuestions.Count}";
+    }
+
+    void EndQuiz()
+    {
+        Debug.Log("🎉 Quiz Finished!");
+        gameObject.SetActive(false); // hide panel
     }
 }
