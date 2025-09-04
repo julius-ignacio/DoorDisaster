@@ -8,8 +8,6 @@ using UnityEngine.UI;
 public class NPC : MonoBehaviour
 {
     public GameObject npc, detectionPlane, helpBtn, QuizUI;
-    public string quizFileName; // e.g. "Quiz_NPC1.xlsx"
-    public QuestionManager questionManager;
 
     void Start()
     {
@@ -40,6 +38,5 @@ public class NPC : MonoBehaviour
         QuizUI.SetActive(true);
 
         // Load this NPC’s quiz
-        questionManager.LoadQuizFile(quizFileName);
     }
 }
