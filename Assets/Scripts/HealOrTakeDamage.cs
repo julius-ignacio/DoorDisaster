@@ -29,8 +29,8 @@ public class HealOrTakeDamage : MonoBehaviour
     {
         if (!hasDealtDamage && collision.gameObject.CompareTag("Player"))
         {
-            if (consistentQuake != null && consistentQuake.IsQuakeActive)
-            {
+          //  if (consistentQuake != null && consistentQuake.IsQuakeActive)
+         //   {
                 Debug.Log("Player hit by locker during quake! Taking damage...");
                 heartSys.TakeDamage(1);
                 hurtSound?.Play();
@@ -39,7 +39,7 @@ public class HealOrTakeDamage : MonoBehaviour
                     StartCoroutine(FlashDamage());
 
                 hasDealtDamage = true; // ✅ only deal damage once
-            }
+           // }
         }
     }
 
