@@ -1,110 +1,45 @@
-#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
+using TMPro;
 
 namespace HMStudio.EasyQuiz
 {
-    [CustomEditor(typeof(QuestionViewer))]
-    public class QuestionViewerEditor : Editor
+    public class QuestionViewer : MonoBehaviour
     {
-        public override void OnInspectorGUI()
+        [Header("Data")]
+        public int questionID;
+        public string questionText;
+        public List<string> options = new List<string>();
+        public string correctAnswer;
+
+        [Header("UI Text References (TextMeshPro)")]
+        [SerializeField] private TextMeshProUGUI _tmpQuestion;
+        [SerializeField] private List<TextMeshProUGUI> _lstOptions = new List<TextMeshProUGUI>();
+
+        private List<QuestionData> questions;
+
+        public void SetQuestions(List<QuestionData> questions)
         {
-            QuestionViewer qv = (QuestionViewer)target;
+            this.questions = questions;
+        }
 
-            EditorGUILayout.LabelField("Question Viewer", EditorStyles.boldLabel);
+        public void LoadQuestionFromJson()
+        {
+            if (questions == null || questions.Count == 0 || questionID < 1 || questionID > questions.Count)
+                return;
+            var q = questions[questionID - 1];
+            questionText = q.question;
+            options = q.options;
+            correctAnswer = q.correct;
+            UpdateTextFields();
+        }
 
-            if (qv.questionID < 1)
-            {
-                qv.questionID = 1;
-            }
-
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Prev", GUILayout.Width(60)))
-            {
-                int total = qv.GetTotalQuestions();
-                if (total > 0)
-                {
-                    qv.questionID--;
-                    if (qv.questionID < 1)
-                        qv.questionID = total;
-                }
-                qv.LoadQuestionFromExcel();
-            }
-            qv.questionID = EditorGUILayout.IntField(qv.questionID, GUILayout.Width(50));
-            if (GUILayout.Button("Next", GUILayout.Width(60)))
-            {
-                int total = qv.GetTotalQuestions();
-                if (total > 0)
-                {
-                    qv.questionID++;
-                    if (qv.questionID > total)
-                        qv.questionID = 1;
-                }
-                qv.LoadQuestionFromExcel();
-            }
-            EditorGUILayout.EndHorizontal();
-
-            if (GUILayout.Button("Load Question"))
-            {
-                qv.LoadQuestionFromExcel();
-            }
-
-            int totalQuestions = qv.GetTotalQuestions();
-            EditorGUILayout.HelpBox($"Question {qv.questionID} / {totalQuestions}", MessageType.Info);
-
-            if (string.IsNullOrEmpty(qv.questionText))
-            {
-                EditorGUILayout.HelpBox("Question ID not found!", MessageType.Error);
-            }
-
-            EditorGUILayout.LabelField("Question", EditorStyles.boldLabel);
-            qv.questionText = EditorGUILayout.TextField(qv.questionText);
-
-            EditorGUILayout.LabelField("Options", EditorStyles.boldLabel);
-            for (int i = 0; i < qv.options.Count; i++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                qv.options[i] = EditorGUILayout.TextField("Option " + (i + 1), qv.options[i]);
-                if (GUILayout.Button("Remove", GUILayout.Width(70)))
-                {
-                    qv.options.RemoveAt(i);
-                    break;
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-            if (GUILayout.Button("Add Option"))
-            {
-                qv.options.Add("");
-            }
-
-            EditorGUILayout.LabelField("Correct Answer", EditorStyles.boldLabel);
-            qv.correctAnswer = EditorGUILayout.TextField(qv.correctAnswer);
-
-            if (GUILayout.Button("Update"))
-            {
-                qv.UpdateExcel();
-            }
-
-            if (!string.IsNullOrEmpty(qv.updateStatusMessage))
-            {
-                MessageType msgType = qv.updateStatusSuccess ? MessageType.Info : MessageType.Error;
-                EditorGUILayout.HelpBox(qv.updateStatusMessage, msgType);
-            }
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("UI Text References (assigned in Inspector)", EditorStyles.boldLabel);
-            SerializedProperty tmpQuestionProp = serializedObject.FindProperty("_tmpQuestion");
-            EditorGUILayout.PropertyField(tmpQuestionProp);
-            SerializedProperty lstOptionsProp = serializedObject.FindProperty("_lstOptions");
-            EditorGUILayout.PropertyField(lstOptionsProp, true);
-
-            serializedObject.ApplyModifiedProperties();
-
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(qv);
-            }
+        public void UpdateTextFields()
+        {
+            if (_tmpQuestion != null)
+                _tmpQuestion.text = questionText;
+            for (int i = 0; i < _lstOptions.Count && i < options.Count; i++)
+                _lstOptions[i].text = options[i];
         }
     }
 }
-#endif
