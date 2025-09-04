@@ -7,6 +7,7 @@ public class AnswerCheck : MonoBehaviour
     public int answerValue;                 // 0, 1, or 2 set per button in Inspector
     public QuizScript quizScript;           // assign or auto-find
 
+
     void Awake()
     {
         if (quizScript == null)
