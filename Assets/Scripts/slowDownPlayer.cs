@@ -5,11 +5,11 @@ public class SlowDownPlayer : MonoBehaviour
 {
     public Movements PlayerMovements;
     public ConsistentQuake consistentQuake;
-    public Image dizzyEffetctImage;
+    public GameObject dizzyEffetctImage;
 
     void Start()
     {
-        dizzyEffetctImage.enabled = false;
+        dizzyEffetctImage.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -19,12 +19,12 @@ public class SlowDownPlayer : MonoBehaviour
         if (consistentQuake.IsQuakeActive)
         {
             PlayerMovements.speed = 1.2f;
-            dizzyEffetctImage.enabled = true;
+            dizzyEffetctImage.SetActive(true);
         }
         else
         {
             PlayerMovements.speed = 3f;
-            dizzyEffetctImage.enabled = false;
+            dizzyEffetctImage.SetActive(false);
         }
     }
 
@@ -42,6 +42,6 @@ public class SlowDownPlayer : MonoBehaviour
 
         // When player leaves trigger, always reset speed to default
         PlayerMovements.speed = 3f;
-        dizzyEffetctImage.enabled = false;
+        dizzyEffetctImage.SetActive(false);
     }
 }

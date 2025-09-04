@@ -1,4 +1,5 @@
 using System;
+using HMStudio.EasyQuiz;
 using Narrate;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,19 +8,20 @@ using UnityEngine.UI;
 public class NPC : MonoBehaviour
 {
     public GameObject npc, detectionPlane, helpBtn, QuizUI;
-    public int valueToFireForQuizSys;
+    public string quizFileName; // e.g. "Quiz_NPC1.xlsx"
+    public QuestionManager questionManager;
 
-    public QuizScript quizScript;
+    void Start()
+    {
+        QuizUI.SetActive(false);
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             helpBtn.SetActive(true);
-            quizScript.selected = valueToFireForQuizSys;
-            quizScript.ChangeTexts(); // <-- This actually updates the UI
-            Debug.Log("Player entered NPC trigger. Selected value: " + quizScript.selected);
-                    }
+        }
     }
     
     void OnTriggerExit(Collider other)
@@ -36,5 +38,8 @@ public class NPC : MonoBehaviour
         Debug.Log("Help button clicked!");
         npc.SetActive(false);
         QuizUI.SetActive(true);
+
+        // Load this NPC’s quiz
+        questionManager.LoadQuizFile(quizFileName);
     }
 }

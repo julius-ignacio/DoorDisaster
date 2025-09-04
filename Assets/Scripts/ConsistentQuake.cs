@@ -4,6 +4,7 @@ using System.Collections;
 
 public class ConsistentQuake : MonoBehaviour
 {
+    public GameObject quakeIcon;
     public Shaker shaker;
     private ShakeInstance currentShake;
 
@@ -23,48 +24,51 @@ public class ConsistentQuake : MonoBehaviour
     {
         audi = GetComponent<AudioSource>();
         StartCoroutine(QuakeRoutine());
-
     }
 
-  IEnumerator QuakeRoutine()
-{
-    while (true)
+    IEnumerator QuakeRoutine()
     {
-        // 🔥 Start quake
-        audi?.Play();
-        if (shaker != null && shakePreset != null)
+        while (true)
         {
-            currentShake = Shaker.ShakeAll(shakePreset);
-            Debug.Log("Earthquake started!");
-        }
-        
-        IsQuakeActive = true;
+            // 🔥 Start quake
+            audi?.Play();
+            if (shaker != null && shakePreset != null)
+            {
+                currentShake = Shaker.ShakeAll(shakePreset);
+                quakeIcon.SetActive(true);
 
-        // Panic increase during quake
+                Debug.Log("Earthquake started!");
+            }
+
+            IsQuakeActive = true;
+
+            // Panic increase during quake
             float elapsed = 0f;
-        while (elapsed < quakeDuration)
-        {
-            if (!coverCam.enabled && panicMeterScript != null)
-                panicMeterScript.currHealth += Time.deltaTime * 2f; // adjust rate
+            while (elapsed < quakeDuration)
+            {
+                if (!coverCam.enabled && panicMeterScript != null)
+                    panicMeterScript.currHealth += Time.deltaTime * 2f; // adjust rate
 
-            elapsed += Time.deltaTime;
-            yield return null; // wait 1 frame
-        }
+                elapsed += Time.deltaTime;
+                yield return null; // wait 1 frame
+            }
 
-        // 🛑 Stop quake
-        if (currentShake != null)
-        {
-            currentShake.Stop(0, true); 
-            currentShake = null;
-            Debug.Log("Earthquake ended!");
-        }
-        audi?.Stop();
-        
-        IsQuakeActive = false;
+            // 🛑 Stop quake
+            if (currentShake != null)
+            {
+                currentShake.Stop(0, true);
+                currentShake = null;
+                quakeIcon.SetActive(false);
 
-        // ⏳ Wait cooldown before next quake
+                Debug.Log("Earthquake ended!");
+            }
+            audi?.Stop();
+
+            IsQuakeActive = false;
+
+            // ⏳ Wait cooldown before next quake
             yield return new WaitForSeconds(quakeInterval);
+        }
     }
-}
 
 }

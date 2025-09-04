@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class HeartSys : MonoBehaviour
 {
     public Image[] hearts; // assign 3 heart images in inspector
-    public int currentHearts = 3;
+    public int currentHearts = 5;
 
     public void UpdateHearts()
     {
