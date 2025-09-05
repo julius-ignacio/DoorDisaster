@@ -30,12 +30,12 @@ public class PanicMeterScript : MonoBehaviour
 
          if (currHealth >= 80f)
         {
-            fill.color = new Color32(241, 75, 65, 255); // #F14B41
+            fill.color = new Color32(241, 75, 65, 255); //#f14b41
             Debug.Log("color changed to red");
         }
               else if (currHealth >= 50f)
         {
-            fill.color = new Color32(255, 119, 196, 255);
+            fill.color = new Color32(255, 119, 196, 255);//#FF77C4
             Debug.Log("color changed to pink");
         }
         
