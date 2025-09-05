@@ -16,7 +16,7 @@ public class NPC : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") )
             helpBtn.SetActive(true);
     }
 

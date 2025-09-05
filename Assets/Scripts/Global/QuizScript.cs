@@ -7,7 +7,7 @@ public class QuizScript : MonoBehaviour
 {
     public TMP_Text questionText;
     public Button[] choiceButtons;
-    public TMP_Text scoreText;  
+    public TMP_Text scoreText;
 
     private List<QuizQuestion> currentQuestions;
     private int currentIndex = 0;
