@@ -12,6 +12,7 @@ public class HealOrTakeDamage : MonoBehaviour
     public Color flashColor = new Color(1f, 0f, 0f, 0.5f); // semi-transparent red
 
     public AudioSource hurtSound;
+    public AudioSource lockerObjectsFallSound;
 
     private Color originalColor;
     private bool hasDealtDamage = false; // ✅ track if this locker has already hurt the player
@@ -29,17 +30,19 @@ public class HealOrTakeDamage : MonoBehaviour
     {
         if (!hasDealtDamage && collision.gameObject.CompareTag("Player"))
         {
-          //  if (consistentQuake != null && consistentQuake.IsQuakeActive)
-         //   {
-                Debug.Log("Player hit by locker during quake! Taking damage...");
-                heartSys.TakeDamage(1);
-                hurtSound?.Play();
+            //  if (consistentQuake != null && consistentQuake.IsQuakeActive)
+            //   {
+            Debug.Log("Player hit by locker during quake! Taking damage...");
+            lockerObjectsFallSound?.Play();
 
-                if (takeDamageImage != null)
-                    StartCoroutine(FlashDamage());
+            heartSys.TakeDamage(1);
+            hurtSound?.Play();
 
-                hasDealtDamage = true; // ✅ only deal damage once
-           // }
+            if (takeDamageImage != null)
+                StartCoroutine(FlashDamage());
+
+            hasDealtDamage = true; // ✅ only deal damage once
+                                   // }
         }
     }
 
@@ -53,4 +56,6 @@ public class HealOrTakeDamage : MonoBehaviour
         takeDamageImage.enabled = false;
         takeDamageImage.color = originalColor;
     }
+
+
 }
