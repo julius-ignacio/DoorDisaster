@@ -8,6 +8,11 @@ public class UnCoverMechanic : MonoBehaviour
     public GameObject footsteps_enable;
 
     public Movements PlayerMovements;
+
+    void Start()
+    {
+        UnCoverBtn.SetActive(false);
+    }
     public void OnButtonClick()
     {
         Debug.Log("Button was clicked!");

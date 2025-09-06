@@ -12,6 +12,8 @@ public class ConsistentQuake : MonoBehaviour
     public ShakePreset shakePreset;
     public PanicMeterScript panicMeterScript;
 
+    public GameObject[] LockerNoises;
+
     private AudioSource audi;
 
     public float quakeInterval = 15f;  // cooldown between quakes
@@ -22,6 +24,7 @@ public class ConsistentQuake : MonoBehaviour
 
     void Start()
     {
+        quakeIcon.SetActive(false);
         audi = GetComponent<AudioSource>();
         StartCoroutine(QuakeRoutine());
     }
@@ -38,6 +41,20 @@ public class ConsistentQuake : MonoBehaviour
                 quakeIcon.SetActive(true);
 
                 Debug.Log("Earthquake started!");
+
+
+
+                foreach (GameObject obj in LockerNoises)
+                {
+                    if (obj != null)
+                    {
+                        AudioSource lockerAudio = obj.GetComponent<AudioSource>();
+                        if (lockerAudio != null)
+                        {
+                            lockerAudio.Play();
+                        }
+                    }
+                }
             }
 
             IsQuakeActive = true;
@@ -61,6 +78,18 @@ public class ConsistentQuake : MonoBehaviour
                 quakeIcon.SetActive(false);
 
                 Debug.Log("Earthquake ended!");
+
+                    foreach (GameObject obj in LockerNoises)
+                {
+                    if (obj != null)
+                    {
+                        AudioSource lockerAudio = obj.GetComponent<AudioSource>();
+                        if (lockerAudio != null)
+                        {
+                            lockerAudio.Stop();
+                        }
+                    }
+                }
             }
             audi?.Stop();
 

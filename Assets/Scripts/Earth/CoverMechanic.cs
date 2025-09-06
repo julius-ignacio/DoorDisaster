@@ -9,7 +9,10 @@ public class CoverMechanic : MonoBehaviour
     
     public Movements PlayerMovements;
 
-
+    void Start()
+    {
+         CoverBtn.SetActive(false);
+    }
 
 
     public void OnButtonClick()

@@ -4,13 +4,12 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections.Generic;
 
-public class GameGuide : MonoBehaviour  //, IPointerClickHandler
+public class GameStart : MonoBehaviour  //, IPointerClickHandler
 {
     public GameObject Header1, Header2, Body1, Body2, Bg, IntroPanel, HeaderLine, FooterLine, Lines, QuakeIcon, SlowIcon, NextBtn, PrevBtn, PanicMeter;
-
-
-
     public int currentBatchIndex = 0;
+    public GameObject[] ObjectsToBeActive;
+    public GameObject[] ObjectsToBeInactive;
 
     private bool isVisible = false; // tracks if tips are currently shown
 
@@ -27,6 +26,12 @@ public class GameGuide : MonoBehaviour  //, IPointerClickHandler
         Lines.SetActive(false);
         HeaderLine.SetActive(true);
         FooterLine.SetActive(true);
+
+        foreach (GameObject obj in ObjectsToBeActive)
+    {
+        if (obj != null)
+            obj.SetActive(false);
+    }
     }
 
     public void Next()
