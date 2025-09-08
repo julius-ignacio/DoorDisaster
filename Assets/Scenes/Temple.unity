@@ -2608,10 +2608,10 @@ MonoBehaviour:
   uncoverBtm: {fileID: 0}
   PauseUI: {fileID: 0}
   heartsys: {fileID: 0}
-  panicMeterScript: {fileID: 126313673}
-  hearts: {fileID: 0}
   panicText: {fileID: 0}
   injurtyText: {fileID: 0}
+  panicMeterScript: {fileID: 0}
+  hearts: {fileID: 0}
   movementscript: {fileID: 0}
 --- !u!43 &119132744
 Mesh:
@@ -2847,7 +2847,6 @@ GameObject:
   - component: {fileID: 126313676}
   - component: {fileID: 126313675}
   - component: {fileID: 126313674}
-  - component: {fileID: 126313673}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2855,22 +2854,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &126313673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126313672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5372e678d8025a05daf07513fa0115ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panicMeterSlider: {fileID: 0}
-  maxHealth: 100
-  currHealth: 0
-  fill: {fileID: 0}
 --- !u!114 &126313674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26208,7 +26191,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1131697722}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a35eee06b612fa6f7a877cb137d2d17a, type: 3}
   m_Name: 
