@@ -16,7 +16,7 @@ public class MakeObjectsMove : MonoBehaviour
 
     private GameObject Board;
     GameObject[] chair, chair2;
-    GameObject[] books1, books2, books3;
+   // GameObject[] books1, books2, books3;
     public ConsistentQuake consistentQuakeScript;
 
 
@@ -27,9 +27,9 @@ public class MakeObjectsMove : MonoBehaviour
         Board = GameObject.FindWithTag("MovableObject");
         chair = GameObject.FindGameObjectsWithTag("Chair");
         chair2 = GameObject.FindGameObjectsWithTag("Chair2");
-        books1 = GameObject.FindGameObjectsWithTag("books1");
-        books2 = GameObject.FindGameObjectsWithTag("books2");
-        books3 = GameObject.FindGameObjectsWithTag("books3");
+        // books1 = GameObject.FindGameObjectsWithTag("books1");
+        // books2 = GameObject.FindGameObjectsWithTag("books2");
+        // books3 = GameObject.FindGameObjectsWithTag("books3");
     }
 
     void OnControllerColliderHit(ControllerColliderHit collision)

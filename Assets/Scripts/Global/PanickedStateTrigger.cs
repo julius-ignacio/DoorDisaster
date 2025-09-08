@@ -7,6 +7,11 @@ public class PanickedStateTrigger : MonoBehaviour
 
     public AudioSource heartbeatSFX;
 
+    void Start()
+    {
+        panickEffectUI.SetActive(false);
+    }
+
     void Update()
     {
         if (panicMeterScript.currHealth >= 60)
