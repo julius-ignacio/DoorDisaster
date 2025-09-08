@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5415639993041644299}
-  - component: {fileID: 2640681174791092074}
   - component: {fileID: 1650090133477691615}
   - component: {fileID: 6183828359069446742}
   - component: {fileID: 3634725080174332874}
@@ -38,14 +37,6 @@ Transform:
   - {fileID: 5280205940735450420}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2640681174791092074
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5580301475011209447}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1650090133477691615
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -154,6 +145,10 @@ MonoBehaviour:
   jumpHeight: 1
   velocity: {x: 0, y: 0, z: 0}
   isGrounded: 0
+  footsteps: {fileID: 0}
+  footstepClips: []
+  walkStepInterval: 0.6
+  runStepInterval: 0.35
 --- !u!114 &584738389482406501
 MonoBehaviour:
   m_ObjectHideFlags: 0

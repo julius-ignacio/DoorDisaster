@@ -6,10 +6,14 @@ using System.Collections.Generic;
 
 public class GameStart : MonoBehaviour  //, IPointerClickHandler
 {
-    public GameObject Header1, Header2, Body1, Body2, Bg, IntroPanel, HeaderLine, FooterLine, Lines, QuakeIcon, SlowIcon, NextBtn, PrevBtn, PanicMeter;
+    public GameObject Header1, Header2, Body1, Body2, Bg, IntroPanel, HeaderLine,
+    FooterLine, Lines, QuakeIcon, SlowIcon,
+    NextBtn, PrevBtn, PanicMeter, HUD, PauseBtn;
+
+
+    public GameObject GamestartNarration; //Game start player narration /talking
     public int currentBatchIndex = 0;
-    public GameObject[] ObjectsToBeActive;
-    public GameObject[] ObjectsToBeInactive;
+    public Movements PlayerMovements; //disables the player from moving until the intro is done/intro panel is closed
 
     private bool isVisible = false; // tracks if tips are currently shown
 
@@ -26,12 +30,13 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
         Lines.SetActive(false);
         HeaderLine.SetActive(true);
         FooterLine.SetActive(true);
+        HUD.SetActive(false);
+        PauseBtn.SetActive(false);
 
-        foreach (GameObject obj in ObjectsToBeActive)
-    {
-        if (obj != null)
-            obj.SetActive(false);
-    }
+        GamestartNarration.SetActive(false);
+
+        PlayerMovements.speed = 0f;
+        PlayerMovements.jumpHeight = 0f;
     }
 
     public void Next()
@@ -46,23 +51,9 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
             Body2.SetActive(true);
             Body1.SetActive(false);
             Lines.SetActive(true);
-
-            if (Body2)
-            {
-                QuakeIcon.SetActive(true);
-                SlowIcon.SetActive(true);
-            }
-            else { QuakeIcon.SetActive(false); SlowIcon.SetActive(false); }
-
-
-
-
-
-
-
-
-
-
+            QuakeIcon.SetActive(true);
+            SlowIcon.SetActive(true);
+            
 
             Bg.SetActive(true); // show background if you want
             PrevBtn.SetActive(true);
@@ -73,6 +64,19 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
 
 
             // add here setting joysticks to enable!!!!
+            HUD.SetActive(true);
+
+
+            //enable player movments
+            PlayerMovements.speed = 3f;
+            PlayerMovements.jumpHeight = 1f;
+
+            //pausebtn active
+        PauseBtn.SetActive(true);
+
+
+            //player talks
+            GamestartNarration.SetActive(true);
         }
 
         isVisible = !isVisible; // flip state
