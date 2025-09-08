@@ -62,8 +62,44 @@ public class PickUpScript : MonoBehaviour
 
         }
     }
-public static bool hasKeycard = false; // global flag
-void PickUpObject(GameObject pickUpObj)
+    public static bool hasKeycard = false; // global flag
+
+
+ // ---------------- MOBILE BUTTON FUNCTIONS ----------------
+    public void OnPickDropPressed()
+    {
+        if (heldObj == null)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.forward, out hit, pickUpRange))
+            {
+                if (hit.transform.CompareTag("CanPickUp"))
+                {
+                    PickUpObject(hit.transform.gameObject);
+                }
+            }
+        }
+        else
+        {
+            if (canDrop)
+            {
+                StopClipping();
+                DropObject();
+            }
+        }
+    }
+
+    public void OnThrowPressed()
+    {
+        if (heldObj != null && canDrop)
+        {
+            StopClipping();
+            ThrowObject();
+        }
+    }
+
+
+    void PickUpObject(GameObject pickUpObj)
 {
     if (pickUpObj.GetComponent<Rigidbody>()) 
     {
