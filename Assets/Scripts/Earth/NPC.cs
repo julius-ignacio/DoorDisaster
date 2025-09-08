@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
-    public int npcId;
-    public GameObject helpBtn;
-    public GameObject quizUI;
-    public QuizScript quizScript;
+    public int npcId; //determines which of the choices will be displayed
+    public GameObject helpBtn; //opens quiz panel
+    public GameObject quizUI; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
+    public QuizScript quizScript; //Triggers method in quizscript to start quiz
 
     void Start()
     {
