@@ -4,22 +4,29 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
+      [Header("UI References")]
     public GameObject pauseUI, pauseBtn, resumeBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
-    private bool isPaused = false;
 
      public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI, heartsys;
+    public TMP_Text panicText, injurtyText;
+
+    [Header("Scripts")]
     public PanicMeterScript panicMeterScript;
     public HeartSys hearts;
-    public TMP_Text panicText, injurtyText;
     public Movements movementscript;
+
+
+    private bool isPaused = false;
+
 
 
     void Start()
     {
-        resumeBtn.SetActive(false);
-        ExitBtn.SetActive(false);
-        pauseBtn.SetActive(true); // Ensure pause UI is hidden at start
-        blackOverlay.SetActive(false); // Ensure black overlay is hidden at start
+        if (resumeBtn != null) resumeBtn.SetActive(false);
+        if (ExitBtn != null) ExitBtn.SetActive(false);
+        if (pauseBtn != null) pauseBtn.SetActive(true);
+        if (blackOverlay != null) blackOverlay.SetActive(false);
     }
 
     void Update()
@@ -31,23 +38,30 @@ public class GameManager : MonoBehaviour
             if (isPaused) Resume();
             else Pause();
         }
+
+        
     }
 
     void PlayerInjured_Death()
     {
-     if (panicMeterScript.currHealth >= 100)
+
+
+
+                if (panicMeterScript != null && panicMeterScript.currHealth >= 100)
         {
-            panicText.gameObject.SetActive(true);
-            injurtyText.gameObject.SetActive(false);
+            if (panicText != null) panicText.gameObject.SetActive(true);
+            if (injurtyText != null) injurtyText.gameObject.SetActive(false);
             playerGameOver();
         }
 
-        if (hearts.currentHearts <= 0)
+        if (hearts != null && hearts.currentHearts <= 0)
         {
-            panicText.gameObject.SetActive(false);
-            injurtyText.gameObject.SetActive(true);
+            if (panicText != null) panicText.gameObject.SetActive(false);
+            if (injurtyText != null) injurtyText.gameObject.SetActive(true);
             playerGameOver();
         }
+        
+
 }
 
 
@@ -56,15 +70,15 @@ public class GameManager : MonoBehaviour
 
     public void Pause()
     {
-        pauseUI.SetActive(true);   // Show pause menu
-        Time.timeScale = 0f;       // Stop the game
+        if (pauseUI != null) pauseUI.SetActive(true);
+        Time.timeScale = 0f;
         isPaused = true;
 
-        resumeBtn.SetActive(true);
-        ExitBtn.SetActive(true);
-        pauseBtn.SetActive(false); // 
-        blackOverlay.SetActive(true);
-        HUD.SetActive(false);
+        if (resumeBtn != null) resumeBtn.SetActive(true);
+        if (ExitBtn != null) ExitBtn.SetActive(true);
+        if (pauseBtn != null) pauseBtn.SetActive(false);
+        if (blackOverlay != null) blackOverlay.SetActive(true);
+        if (HUD != null) HUD.SetActive(false);
     }
 
     public void RestartLevel()
@@ -78,15 +92,14 @@ public class GameManager : MonoBehaviour
 
     public void Resume()
     {
-        Time.timeScale = 1f;       // Resume game
+        Time.timeScale = 1f;
         isPaused = false;
 
-
-        resumeBtn.SetActive(false);
-        ExitBtn.SetActive(false);
-        pauseBtn.SetActive(true);
-        blackOverlay.SetActive(false);
-        HUD.SetActive(true);
+        if (resumeBtn != null) resumeBtn.SetActive(false);
+        if (ExitBtn != null) ExitBtn.SetActive(false);
+        if (pauseBtn != null) pauseBtn.SetActive(true);
+        if (blackOverlay != null) blackOverlay.SetActive(false);
+        if (HUD != null) HUD.SetActive(true);
     }
 
     public void ExitGame()
@@ -101,16 +114,16 @@ public class GameManager : MonoBehaviour
 
     public void playerGameOver()
     {
-        Joystick.SetActive(false);
-        Jumpbtn.SetActive(false);
-        GameOverUI.SetActive(true);
-        PanicMeterUI.SetActive(false);
-        CoverBtn.SetActive(false);
-        uncoverBtm.SetActive(false);
-        PauseUI.SetActive(false);
-        heartsys.SetActive(false);
+        if (Joystick != null) Joystick.SetActive(false);
+        if (Jumpbtn != null) Jumpbtn.SetActive(false);
+        if (GameOverUI != null) GameOverUI.SetActive(true);
+        if (PanicMeterUI != null) PanicMeterUI.SetActive(false);
+        if (CoverBtn != null) CoverBtn.SetActive(false);
+        if (uncoverBtm != null) uncoverBtm.SetActive(false);
+        if (PauseUI != null) PauseUI.SetActive(false);
+        if (heartsys != null) heartsys.SetActive(false);
 
-        movementscript.enabled = false;
+        if (movementscript != null) movementscript.enabled = false;
 
     }
 }
