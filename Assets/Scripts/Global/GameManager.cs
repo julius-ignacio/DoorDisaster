@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-
       [Header("UI References")]
     public GameObject pauseUI, pauseBtn, resumeBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
 
