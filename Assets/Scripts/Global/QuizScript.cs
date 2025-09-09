@@ -10,11 +10,11 @@ public class QuizScript : MonoBehaviour
     public TMP_Text questionText;
     public Button[] choiceButtons;            // assign in inspector (e.g. 3 buttons)
     public TMP_Text scoreText;               // shows player score
-    public TMP_Text Scoree;                  // result text you used wala lang to pang test langggg ignore this
+   // public TMP_Text Scoree;                  // result text you used wala lang to pang test langggg ignore this
 
     [Header("Colors & Timing")] //Ignore these
     public Color correctColor = new Color(0.2f, 0.8f, 0.2f); // green
-    public Color wrongColor   = new Color(0.9f, 0.3f, 0.3f); // red
+    public Color wrongColor = new Color(0.9f, 0.3f, 0.3f); // red
     public float feedbackDelay = 2f;                       // seconds to show color. Delay to each after quiz question
 
 
@@ -22,6 +22,9 @@ public class QuizScript : MonoBehaviour
     private int currentIndex = 0; // which question we are on
     private int score = 0; // how many correct so far... 
     private Color[] originalButtonColors; //ignore
+
+
+    private
 
     void Awake()
     {
@@ -35,7 +38,7 @@ public class QuizScript : MonoBehaviour
     }
 
 
-//Is called when the player clicks the BUTTON in the other script 
+    //Is called when the player clicks the BUTTON in the other script 
     public void BeginQuiz(List<QuizQuestion> questions)
     {
         if (questions == null || questions.Count == 0)
@@ -44,7 +47,7 @@ public class QuizScript : MonoBehaviour
             return;
         }
 
-//Set up. passing the questions from the other script
+        //Set up. passing the questions from the other script
         currentQuestions = new List<QuizQuestion>(questions);
         currentIndex = 0;
         score = 0;
@@ -100,40 +103,39 @@ public class QuizScript : MonoBehaviour
     }
 
     // central handler for button clicks
-    public void OnChoiceButtonClicked(int choiceIndex)
+  public void OnChoiceButtonClicked(int choiceIndex)
+{
+    if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
+
+    QuizQuestion q = currentQuestions[currentIndex];
+    bool correct = (choiceIndex == q.correctIndex);
+
+    if (correct)
     {
-        // safety checks
-        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
-
-        QuizQuestion q = currentQuestions[currentIndex];
-
-        bool correct = (choiceIndex == q.correctIndex);
-        if (correct) score++;
-
-        // show colors: chosen button red/green; also show correct button as green
-        // disable all buttons so user can't click multiple times
-        for (int i = 0; i < choiceButtons.Length; i++)
-        {
-            Button b = choiceButtons[i];
-            b.interactable = false;
-        }
-
-        // color chosen
-        Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
-        if (chosenImg != null) chosenImg.color = correct ? correctColor : wrongColor;
-
-        // color correct answer (if different)
-        if (q.correctIndex >= 0 && q.correctIndex < choiceButtons.Length)
-        {
-            Image correctImg = choiceButtons[q.correctIndex].GetComponent<Image>();
-            if (correctImg != null) correctImg.color = correct ? correctColor : correctColor;
-        }
-
-        UpdateScoreUI();
-
-        // advance after a short delay
-        StartCoroutine(AdvanceAfterDelay(feedbackDelay));
+        score++;
+        DataManager.Instance.playerScore++; // ✅ track only one point per correct answer
     }
+
+    // disable buttons
+    for (int i = 0; i < choiceButtons.Length; i++)
+        choiceButtons[i].interactable = false;
+
+    // color feedback
+    Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
+    if (chosenImg != null) chosenImg.color = correct ? correctColor : wrongColor;
+
+    if (q.correctIndex >= 0 && q.correctIndex < choiceButtons.Length)
+    {
+        Image correctImg = choiceButtons[q.correctIndex].GetComponent<Image>();
+        if (correctImg != null) correctImg.color = correctColor;
+    }
+
+    UpdateScoreUI();
+    UpdateDataManager();
+
+    StartCoroutine(AdvanceAfterDelay(feedbackDelay));
+}
+
 
     IEnumerator AdvanceAfterDelay(float delay)
     {
@@ -142,13 +144,21 @@ public class QuizScript : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         currentIndex++;
-        ShowQuestion();
+        ShowQuestion(); 
     }
 
     void UpdateScoreUI()
     {
         if (scoreText != null) scoreText.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
-        if (Scoree != null) Scoree.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
+      //  if (Scoree != null) Scoree.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
+    }
+
+    void UpdateDataManager()
+    {
+        // DataManager.Instance.playerScore += score; //Adds current score to the total score
+
+        DataManager.Instance.totalQuestionsAnswered++; // current question index (1-based)
+
     }
 
     void EndQuiz()
