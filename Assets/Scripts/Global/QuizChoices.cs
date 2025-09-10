@@ -6,6 +6,7 @@ public class QuizQuestion
     public string question;
     public string[] choices; // store all choices in an array
     public int correctIndex; // optional: which choice is correct
+    
 }
 
 public static class QuizDatabase

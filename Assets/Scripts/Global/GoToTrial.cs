@@ -8,7 +8,7 @@ public class GoToTrial : MonoBehaviour
 {
 
     public Button actionButton;   // Assign in Inspector
-    private string sceneToLoad = "";
+    public string sceneToLoad = "";
 
     private void Start()
     {

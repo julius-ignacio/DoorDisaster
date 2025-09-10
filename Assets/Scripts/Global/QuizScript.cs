@@ -22,7 +22,11 @@ public class QuizScript : MonoBehaviour
     private int currentIndex = 0; // which question we are on
     private int score = 0; // how many correct so far... 
     private Color[] originalButtonColors; //ignore
+    public GameObject[] disablePlaneAfterQuiz, disableButtonAfterQuiz; //
 
+
+    public int currentNpcId; // To track which NPC is being helped
+public NpcAnimation npcAnimation; // Reference to NpcAnimation script
 
     private
 
@@ -61,7 +65,7 @@ public class QuizScript : MonoBehaviour
         // finished?
         if (currentIndex >= currentQuestions.Count)
         {
-            EndQuiz();
+            EndQuiz(currentNpcId);
             return;
         }
 
@@ -102,39 +106,63 @@ public class QuizScript : MonoBehaviour
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // central handler for button clicks
-  public void OnChoiceButtonClicked(int choiceIndex)
-{
-    if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
-
-    QuizQuestion q = currentQuestions[currentIndex];
-    bool correct = (choiceIndex == q.correctIndex);
-
-    if (correct)
+    public void OnChoiceButtonClicked(int choiceIndex)
     {
-        score++;
-        DataManager.Instance.playerScore++; // ✅ track only one point per correct answer
+        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
+
+        QuizQuestion q = currentQuestions[currentIndex];
+        bool correct = (choiceIndex == q.correctIndex);
+
+        if (correct)
+        {
+            score++;
+            DataManager.Instance.individualNpcScores[currentNpcId-1]++; // ✅ track only one point per correct answer
+        }
+
+        // disable buttons
+        for (int i = 0; i < choiceButtons.Length; i++)
+            choiceButtons[i].interactable = false;
+
+        // color feedback
+        Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
+        if (chosenImg != null) chosenImg.color = correct ? correctColor : wrongColor;
+
+        if (q.correctIndex >= 0 && q.correctIndex < choiceButtons.Length)
+        {
+            Image correctImg = choiceButtons[q.correctIndex].GetComponent<Image>();
+            if (correctImg != null) correctImg.color = correctColor;
+        }
+
+        UpdateScoreUI();
+        UpdateDataManager();
+
+        StartCoroutine(AdvanceAfterDelay(feedbackDelay));
     }
 
-    // disable buttons
-    for (int i = 0; i < choiceButtons.Length; i++)
-        choiceButtons[i].interactable = false;
 
-    // color feedback
-    Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
-    if (chosenImg != null) chosenImg.color = correct ? correctColor : wrongColor;
 
-    if (q.correctIndex >= 0 && q.correctIndex < choiceButtons.Length)
-    {
-        Image correctImg = choiceButtons[q.correctIndex].GetComponent<Image>();
-        if (correctImg != null) correctImg.color = correctColor;
-    }
 
-    UpdateScoreUI();
-    UpdateDataManager();
 
-    StartCoroutine(AdvanceAfterDelay(feedbackDelay));
-}
+
+
+
+
 
 
     IEnumerator AdvanceAfterDelay(float delay)
@@ -158,13 +186,18 @@ public class QuizScript : MonoBehaviour
         // DataManager.Instance.playerScore += score; //Adds current score to the total score
 
         DataManager.Instance.totalQuestionsAnswered++; // current question index (1-based)
-
     }
 
-    void EndQuiz()
+    void EndQuiz(int idToDisableTriggers)
     {
         Debug.Log("Quiz finished. Final score: " + score);
         // show result UI here or fire event
         gameObject.SetActive(false);
+        disableButtonAfterQuiz[idToDisableTriggers - 1].SetActive(false);
+        disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
+
+
+        //Play NPC animation and dissapear
+        npcAnimation.PlayAndDisappear(currentNpcId);
     }
 }

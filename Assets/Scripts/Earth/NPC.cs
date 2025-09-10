@@ -7,6 +7,8 @@ public class NPC : MonoBehaviour
     public GameObject helpBtn; //opens quiz panel
     public GameObject quizUI; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
     public QuizScript quizScript; //Triggers method in quizscript to start quiz
+    public GameObject NpcForAnimation;
+
 
     void Start()
     {
@@ -44,6 +46,11 @@ public class NPC : MonoBehaviour
         }
 
         if (questions != null)
-            quizScript.BeginQuiz(questions);
+        {
+               quizScript.BeginQuiz(questions);
+            quizScript.currentNpcId = npcId; // Pass the NPC ID to QuizScript
+            
+        }
+         
     }
 }
