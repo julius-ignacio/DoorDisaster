@@ -11,8 +11,7 @@ public class HealOrTakeDamage : MonoBehaviour
     public float flashDuration = 0.3f;         // how long the flash stays
     public Color flashColor = new Color(1f, 0f, 0f, 0.5f); // semi-transparent red
 
-    public AudioSource hurtSound;
-    public AudioSource lockerObjectsFallSound;
+    public AudioManager aud;
 
     private Color originalColor;
     private bool hasDealtDamage = false; // ✅ track if this locker has already hurt the player
@@ -33,10 +32,11 @@ public class HealOrTakeDamage : MonoBehaviour
             //  if (consistentQuake != null && consistentQuake.IsQuakeActive)
             //   {
             Debug.Log("Player hit by locker during quake! Taking damage...");
-            lockerObjectsFallSound?.Play();
+            aud.audClip.PlayOneShot(aud.Clips[5]); // play locker hit sound
 
             heartSys.TakeDamage(1);
-            hurtSound?.Play();
+            aud.audClip.PlayOneShot(aud.Clips[4]); // play hurt sound
+
 
             if (takeDamageImage != null)
                 StartCoroutine(FlashDamage());

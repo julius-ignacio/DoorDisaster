@@ -7,19 +7,18 @@ public class PanickedStateTrigger : MonoBehaviour
     public GameObject panickEffectUI;
     public PanicMeterScript panicMeterScript;
 
-    public AudioSource heartbeatSFX;
-
+    public AudioManager aud;
 
     [Header("Post Processing/ Camera blur effect")]
-    public Volume volume; // Assign your post-processing Volume in Inspector
+    public Volume volume; 
     private DepthOfField dof;
 
+    private bool heartbeatPlaying = false; // track loop state
 
     void Start()
     {
         panickEffectUI.SetActive(false);
 
-        // Try to get DepthOfField from the volume profile
         if (volume.profile.TryGet(out dof))
         {
             Debug.Log("Depth of Field found!");
@@ -32,26 +31,41 @@ public class PanickedStateTrigger : MonoBehaviour
 
     void Update()
     {
-        if (panicMeterScript.currHealth >= 60)
+        if (panicMeterScript.currHealth >= 75)
         {
+            // PANIC MAX — blur and heartbeat
             panickEffectUI.SetActive(true);
-
             EnableBlur(true);
 
-            if (!heartbeatSFX.isPlaying) // only start once
+            if (!heartbeatPlaying)
             {
-                heartbeatSFX.Play();
+                aud.PlayLoop(aud.Clips[8]); // heartbeat loop
+                heartbeatPlaying = true;
+            }
+        }
+        else if (panicMeterScript.currHealth >= 60)
+        {
+            // Mild panic — only UI
+            panickEffectUI.SetActive(true);
+            EnableBlur(false);
+
+            if (heartbeatPlaying)
+            {
+                aud.StopLoop();
+                heartbeatPlaying = false;
             }
         }
         else
         {
-            if (heartbeatSFX.isPlaying)
-            {
-                heartbeatSFX.Stop();
-            }
+            // Calm
             panickEffectUI.SetActive(false);
-
             EnableBlur(false);
+
+            if (heartbeatPlaying)
+            {
+                aud.StopLoop();
+                heartbeatPlaying = false;
+            }
         }
     }
 
@@ -59,7 +73,7 @@ public class PanickedStateTrigger : MonoBehaviour
     {
         if (dof != null)
         {
-            dof.active = enable; // Enables or disables the override
+            dof.active = enable;
         }
     }
 }

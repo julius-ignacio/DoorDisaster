@@ -15,18 +15,22 @@ public class QuizScript : MonoBehaviour
     [Header("Colors & Timing")] //Ignore these
     public Color correctColor = new Color(0.2f, 0.8f, 0.2f); // green
     public Color wrongColor = new Color(0.9f, 0.3f, 0.3f); // red
-    public float feedbackDelay = 2f;                       // seconds to show color. Delay to each after quiz question
+    public float feedbackDelay = 1f;                       // seconds to show color. Delay to each after quiz question
 
 
     private List<QuizQuestion> currentQuestions; // Rereference to current quiz questions
     private int currentIndex = 0; // which question we are on
-    private int score = 0; // how many correct so far... 
+    public int score = 0; // how many correct so far... 
     private Color[] originalButtonColors; //ignore
     public GameObject[] disablePlaneAfterQuiz, disableButtonAfterQuiz; //
 
 
     public int currentNpcId; // To track which NPC is being helped
-public NpcAnimation npcAnimation; // Reference to NpcAnimation script
+    public NpcAnimation[] npcAnimation; // Reference to NpcAnimation script
+
+
+    public GameNotifier gameNotifier; // Reference to GameNotifier script
+    public AudioManager aud;
 
     private
 
@@ -133,6 +137,7 @@ public NpcAnimation npcAnimation; // Reference to NpcAnimation script
         {
             score++;
             DataManager.Instance.individualNpcScores[currentNpcId-1]++; // ✅ track only one point per correct answer
+            DataManager.Instance.playerScore_erudition++; // ✅ track only one point per correct answer
         }
 
         // disable buttons
@@ -198,6 +203,10 @@ public NpcAnimation npcAnimation; // Reference to NpcAnimation script
 
 
         //Play NPC animation and dissapear
-        npcAnimation.PlayAndDisappear(currentNpcId);
+        npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+
+
+        //Game notif about earned points
+        if(score > 0) gameNotifier.EarnedPoints(score); aud.audClip.PlayOneShot(aud.Clips[9]); // play added points sfx
     }
 }

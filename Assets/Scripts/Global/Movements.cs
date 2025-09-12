@@ -13,12 +13,12 @@ public class Movements : MonoBehaviour
     public Vector3 velocity;
     public bool isGrounded;
 
-    [Header("Footstep Settings")]
-    public AudioSource footsteps;           // assign in Inspector
-    public AudioClip[] footstepClips;       // different sounds (optional)
     public float walkStepInterval = 0.6f;   // time between footsteps
     public float runStepInterval = 0.35f;   // faster for running
     private float stepTimer;
+        public bool footstepsEnabled = true;
+
+    public AudioManager aud;
 
     void Start()
     {
@@ -36,6 +36,7 @@ public class Movements : MonoBehaviour
 
     void Update()
     {
+        
         // Check if on ground
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0)
@@ -68,33 +69,34 @@ public class Movements : MonoBehaviour
         HandleFootsteps(move);
     }
 
-    void HandleFootsteps(Vector3 move)
-    {
-        // Check if moving & grounded
-        if (isGrounded && move.magnitude > 0.1f)
+void HandleFootsteps(Vector3 move)
+{
+        if (!footstepsEnabled) return; // 🚫 disable footsteps entirely
+    if (isGrounded && move.magnitude > 0.1f)
         {
             stepTimer -= Time.deltaTime;
 
             if (stepTimer <= 0f)
             {
-                // Pick random clip if you have many, otherwise just use footsteps.PlayOneShot
-                if (footstepClips.Length > 0)
+                if (aud.Clips.Length > 4)
                 {
-                    footsteps.PlayOneShot(footstepClips[Random.Range(0, footstepClips.Length)]);
+                    // play random footstep clip
+                    aud.PlaySFX(10); // index for footsteps in your Clips array
                 }
                 else
                 {
-                    footsteps.PlayOneShot(footsteps.clip);
+                    aud.PlaySFX(0); // fallback sound if no footsteps assigned
                 }
+             
 
-                // Reset timer (could add run detection here if you have sprinting)
                 stepTimer = walkStepInterval;
             }
         }
         else
         {
-            // Reset timer so footsteps don't "queue up" when standing still
-            stepTimer = 0f;
+            stepTimer = 0f; // reset
         }
-    }
 }
+
+    }
+
