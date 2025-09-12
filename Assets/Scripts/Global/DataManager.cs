@@ -5,7 +5,7 @@ public class DataManager : MonoBehaviour
     public static DataManager Instance;
 
     // Example stats
-    public int playerScore; 
+    public int playerScore_erudition; 
     public int remainingHealthPoints;
     public int totalQuestionsAnswered;
     public float timeTaken;

@@ -9,7 +9,7 @@ public class PanicMeterScript : MonoBehaviour
     //public TextMeshProUGUI healthBarValueText; // the text that says 100/100
     public int maxHealth; // maximum health
     public float currHealth; // current health
-                             // Start is called before the first frame update
+                             // Start is called before the first frame updat
 
     public Image fill;
     void Start()
@@ -28,20 +28,21 @@ public class PanicMeterScript : MonoBehaviour
 
         // Example: change fill color if above 50
 
-         if (currHealth >= 80f)
+        if (currHealth >= 80f)
         {
             fill.color = new Color32(241, 75, 65, 255); //#f14b41
             Debug.Log("color changed to red");
         }
-              else if (currHealth >= 50f)
+        else if (currHealth >= 50f)
         {
             fill.color = new Color32(255, 119, 196, 255);//#FF77C4
             Debug.Log("color changed to pink");
         }
-        
+
         else
         {
             fill.color = new Color32(242, 175, 255, 255); // #F2AFFF
+
         }
     }
 

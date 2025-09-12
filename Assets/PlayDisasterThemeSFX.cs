@@ -2,15 +2,19 @@ using UnityEngine;
 
 public class PlayDisasterThemeSFX : MonoBehaviour
 {
-    public AudioSource disasterThemeSFX; // Assign the AudioSource component in the Inspector
+    public AudioManager aud; // Assign the AudioSource component in the Inspector
+    public int selectedTheme;
 
     void OnTriggerEnter(Collider other)
     {
-        disasterThemeSFX.Play();
+       if (!other.CompareTag("Player")) return;
+
+        // Play the selected disaster theme based on the selectedTheme variable
+        aud.PlayLoop(aud.Clips[selectedTheme]); // play looped theme
     }
 
-     void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider other)
     {
-        disasterThemeSFX.Stop();
+        aud.audLoop.Stop();
     }
 }

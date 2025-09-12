@@ -1,60 +1,57 @@
+using System;
 using UnityEngine;
 
 public class NpcAnimation : MonoBehaviour
 {
     public Animator npcAnimator;
-    public string animationTrigger = "correctAnswer"; // The trigger name in Animator
-    public float disappearDelay = 3f;        // Time before disappearing
-    public GameObject npcModel;              // Reference to NPC model (child mesh/renderer)
+    public float disappearDelay = 5f;
+    public GameObject npcModel;
+    public AudioManager aud;
 
     void Start()
     {
         if (npcAnimator == null)
             npcAnimator = GetComponent<Animator>();
-        
+
         if (npcModel == null)
-            npcModel = this.gameObject; // fallback: whole object
+            npcModel = this.gameObject;
+
+        // if (aud == null)
+       // aud = FindObjectOfType<AudioManager>();
     }
 
     public void PlayAndDisappear(int currentNpcId)
     {
         if (npcAnimator != null)
         {
+            int score = DataManager.Instance.individualNpcScores[currentNpcId - 1];
 
-
-            if (DataManager.Instance.individualNpcScores[currentNpcId - 1] >= 3) // Assuming 3 is the threshold for "helped"
+            if (score == 3)
             {
-                npcAnimator.SetTrigger(animationTrigger);
+                npcAnimator.SetTrigger("Victory");
+                aud.audClip.PlayOneShot(aud.Clips[0]);
+                aud.audClip.PlayOneShot(aud.Clips[1]);
             }
-            else if (DataManager.Instance.individualNpcScores[currentNpcId - 1] < 3)
+            else if (score == 0)
             {
-                npcAnimator.SetTrigger(animationTrigger);
-
+                npcAnimator.SetTrigger("Death");
+                aud.audClip.PlayOneShot(aud.Clips[2]);
             }
-            else
+            else if (score == 1 || score == 2)
             {
-                npcAnimator.SetTrigger(animationTrigger);
-                
+                npcAnimator.SetTrigger("Clap");
+                aud.audClip.PlayOneShot(aud.Clips[3]);
             }
         }
-
-
-
-
-
 
         StartCoroutine(DisappearAfterDelay(disappearDelay));
     }
 
+
     private System.Collections.IEnumerator DisappearAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-
-        // Option 1: just hide the model
         if (npcModel != null)
             npcModel.SetActive(false);
-
-        // Option 2: completely remove NPC
-        // Destroy(gameObject);
     }
 }

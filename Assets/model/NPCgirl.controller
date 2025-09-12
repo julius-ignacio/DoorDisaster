@@ -13,14 +13,14 @@ AnimatorStateMachine:
     m_State: {fileID: -1776456432819021117}
     m_Position: {x: 80, y: 160, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 5495280552830505476}
-    m_Position: {x: 90, y: 290, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: 545472692976708517}
-    m_Position: {x: 450, y: 180, z: 0}
+    m_Position: {x: 370, y: 240, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1703844401498989178}
-    m_Position: {x: -180, y: 190, z: 0}
+    m_Position: {x: -160, y: 240, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 4228110483759135127}
+    m_Position: {x: 100, y: 330, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -28,7 +28,7 @@ AnimatorStateMachine:
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
   m_EntryPosition: {x: 90, y: 60, z: 0}
-  m_ExitPosition: {x: 800, y: 120, z: 0}
+  m_ExitPosition: {x: 90, y: 560, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: -1776456432819021117}
 --- !u!1102 &-1776456432819021117
@@ -42,9 +42,9 @@ AnimatorState:
   m_Speed: 1
   m_CycleOffset: 1
   m_Transitions:
-  - {fileID: -54216225870336853}
   - {fileID: 4214844775212635637}
   - {fileID: 8502609889368985899}
+  - {fileID: -1015459779700706182}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -60,7 +60,7 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!1101 &-54216225870336853
+--- !u!1101 &-1015459779700706182
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -68,11 +68,11 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 6
-    m_ConditionEvent: correctAnswers
-    m_EventTreshold: 2
+  - m_ConditionMode: 1
+    m_ConditionEvent: Clap
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
-  m_DstState: {fileID: 5495280552830505476}
+  m_DstState: {fileID: 4228110483759135127}
   m_Solo: 0
   m_Mute: 0
   m_IsExit: 0
@@ -94,8 +94,20 @@ AnimatorController:
   m_Name: NPCgirl
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: correctAnswers
-    m_Type: 3
+  - m_Name: Victory
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Death
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Clap
+    m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
@@ -173,8 +185,8 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 6
-    m_ConditionEvent: correctAnswers
+  - m_ConditionMode: 1
+    m_ConditionEvent: Death
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 545472692976708517}
@@ -190,14 +202,14 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
---- !u!1102 &5495280552830505476
+--- !u!1102 &4228110483759135127
 AnimatorState:
   serializedVersion: 6
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Cheer
+  m_Name: Clap
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -210,7 +222,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: 7729b97b662543c98bbacf7aefe2d284, type: 3}
+  m_Motion: {fileID: -203655887218126122, guid: d43412805425dc4b8b394cebad3ba030, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -224,8 +236,8 @@ AnimatorStateTransition:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   m_Conditions:
-  - m_ConditionMode: 6
-    m_ConditionEvent: correctAnswers
+  - m_ConditionMode: 1
+    m_ConditionEvent: Victory
     m_EventTreshold: 3
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1703844401498989178}
