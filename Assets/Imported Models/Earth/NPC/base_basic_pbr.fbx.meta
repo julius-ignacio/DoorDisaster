@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d43412805425dc4b8b394cebad3ba030
+guid: 351f1f6398d6e69bf964e659fefa8b0a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: model
-    second: {fileID: 2435367579533464329, guid: 351f1f6398d6e69bf964e659fefa8b0a, type: 3}
+    second: {fileID: 2100000, guid: c21dfb8a000abeef88f5c6987930601c, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -85,7 +85,12 @@ ModelImporter:
   humanDescription:
     serializedVersion: 3
     human: []
-    skeleton: []
+    skeleton:
+    - name: base_basic_pbr(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
+      scale: {x: 100, y: 100, z: 100}
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -96,11 +101,11 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 3
+  animationType: 2
   humanoidOversampling: 1
   avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
