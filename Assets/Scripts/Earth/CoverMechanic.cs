@@ -11,7 +11,6 @@ public class CoverMechanic : MonoBehaviour
 
     void Start()
     {
-         CoverBtn.SetActive(false);
     }
 
 
