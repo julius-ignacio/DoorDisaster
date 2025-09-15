@@ -32,11 +32,10 @@ public class HealOrTakeDamage : MonoBehaviour
             //  if (consistentQuake != null && consistentQuake.IsQuakeActive)
             //   {
             Debug.Log("Player hit by locker during quake! Taking damage...");
-            aud.audClip.PlayOneShot(aud.Clips[5]); // play locker hit sound
+             aud.PlaySFX(5); // play locker hit sound
 
             heartSys.TakeDamage(1);
-            aud.audClip.PlayOneShot(aud.Clips[4]); // play hurt sound
-
+            aud.PlaySFX(4);
 
             if (takeDamageImage != null)
                 StartCoroutine(FlashDamage());

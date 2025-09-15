@@ -23,7 +23,7 @@ public class SlowDownPlayer : MonoBehaviour
         }
         else
         {
-            PlayerMovements.speed = 3f;
+            PlayerMovements.speed = 2f;
             SlowIcon.SetActive(false);
         }
     }
@@ -33,7 +33,7 @@ public class SlowDownPlayer : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         // Keep checking if quake is active WHILE inside the trigger
-        PlayerMovements.speed = consistentQuake.IsQuakeActive ? 1.2f : 3f;
+        PlayerMovements.speed = consistentQuake.IsQuakeActive ? 1.2f : 2f;
         SlowIcon.SetActive(consistentQuake.IsQuakeActive);
     }
 
@@ -42,7 +42,7 @@ public class SlowDownPlayer : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         // When player leaves trigger, always reset speed to default
-        PlayerMovements.speed = 3f;
+        PlayerMovements.speed = 2f;
         SlowIcon.SetActive(false);
     }
 }

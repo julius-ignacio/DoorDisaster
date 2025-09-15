@@ -16,7 +16,11 @@ public class GameManager : MonoBehaviour
     public Movements movementscript;
 
 
-    private bool isPaused = false;
+    public bool isPaused = false;
+
+
+        [Header("HUD Handling")]
+    public CanvasGroup hudCanvasGroup; // assign the HUD's CanvasGroup he
 
 
 
@@ -26,6 +30,14 @@ public class GameManager : MonoBehaviour
         if (ExitBtn != null) ExitBtn.SetActive(false);
         if (pauseBtn != null) pauseBtn.SetActive(true);
         if (blackOverlay != null) blackOverlay.SetActive(false);
+
+          // Make sure HUD starts visible
+        if (hudCanvasGroup != null)
+        {
+            hudCanvasGroup.alpha = 1f;
+            hudCanvasGroup.interactable = true;
+            hudCanvasGroup.blocksRaycasts = true;
+        }
     }
 
     void Update()
@@ -77,7 +89,13 @@ public class GameManager : MonoBehaviour
         if (ExitBtn != null) ExitBtn.SetActive(true);
         if (pauseBtn != null) pauseBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(true);
-        if (HUD != null) HUD.SetActive(false);
+        if (hudCanvasGroup != null)
+{
+    hudCanvasGroup.alpha = 0f;
+    hudCanvasGroup.interactable = false;
+    hudCanvasGroup.blocksRaycasts = false;
+}
+
     }
 
     public void RestartLevel()
@@ -99,6 +117,14 @@ public class GameManager : MonoBehaviour
         if (pauseBtn != null) pauseBtn.SetActive(true);
         if (blackOverlay != null) blackOverlay.SetActive(false);
         if (HUD != null) HUD.SetActive(true);
+
+             // Show HUD again
+        if (hudCanvasGroup != null)
+        {
+            hudCanvasGroup.alpha = 1f;
+            hudCanvasGroup.interactable = true;
+            hudCanvasGroup.blocksRaycasts = true;
+        }
     }
 
     public void ExitGame()

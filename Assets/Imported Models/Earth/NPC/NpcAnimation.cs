@@ -29,18 +29,18 @@ public class NpcAnimation : MonoBehaviour
             if (score == 3)
             {
                 npcAnimator.SetTrigger("Victory");
-                aud.audClip.PlayOneShot(aud.Clips[0]);
-                aud.audClip.PlayOneShot(aud.Clips[1]);
+                aud.PlaySFX(0);
             }
             else if (score == 0)
             {
                 npcAnimator.SetTrigger("Death");
-                aud.audClip.PlayOneShot(aud.Clips[2]);
+                aud.PlaySFX(2);
             }
             else if (score == 1 || score == 2)
             {
                 npcAnimator.SetTrigger("Clap");
-                aud.audClip.PlayOneShot(aud.Clips[3]);
+                aud.PlaySFX(3);
+
             }
         }
 
