@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha9)) PlaySFX(8); //heartbeat
         if (Input.GetKeyDown(KeyCode.Alpha0)) PlaySFX(9); //added points sfx
         if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(10); //foot steps
+        if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(11); //light switch
     }
 
     public void PlaySFX(int index)

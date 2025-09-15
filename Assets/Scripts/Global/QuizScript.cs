@@ -207,6 +207,6 @@ public class QuizScript : MonoBehaviour
 
 
         //Game notif about earned points
-        if(score > 0) gameNotifier.EarnedPoints(score); aud.audClip.PlayOneShot(aud.Clips[9]); // play added points sfx
+        if(score > 0) gameNotifier.EarnedPoints(score); aud.PlaySFX(9); // play added points sfx
     }
 }
