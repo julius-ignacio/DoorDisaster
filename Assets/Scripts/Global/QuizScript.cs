@@ -101,6 +101,8 @@ public class QuizScript : MonoBehaviour
                 btn.onClick.RemoveAllListeners();
                 int choiceIndex = i; // capture
                 btn.onClick.AddListener(() => OnChoiceButtonClicked(choiceIndex));
+
+                Debug.Log($"Setting up button {i}: active={btn.gameObject.activeSelf}, choiceIndex={i}, choices.Length={q.choices.Length}");
             }
             else
             {
@@ -108,6 +110,10 @@ public class QuizScript : MonoBehaviour
                 btn.gameObject.SetActive(false);
             }
         }
+
+
+
+        
 
         Debug.Log($"Question: {q.question}, Choices={q.choices.Length}, Buttons={choiceButtons.Length}, CorrectIndex={q.correctIndex}");
 
@@ -131,12 +137,26 @@ public class QuizScript : MonoBehaviour
     // central handler for button clicks
     public void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return; 
+            Debug.Log($"OnChoiceButtonClicked called with index {choiceIndex}, buttons={choiceButtons.Length}, choices={currentQuestions[currentIndex].choices.Length}");
+    if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
+    if (choiceIndex < 0 || choiceIndex >= choiceButtons.Length) {
+        Debug.LogError($"Choice index {choiceIndex} is out of bounds for choiceButtons.Length={choiceButtons.Length}");
+        return;
+    }
+    QuizQuestion q = currentQuestions[currentIndex];
+    if (choiceIndex >= q.choices.Length) {
+        Debug.LogError($"Choice index {choiceIndex} is out of bounds for choices.Length={q.choices.Length}");
+        return;
+    }
+    bool correct = (choiceIndex == q.correctIndex);
+
+
+        // if (currentQuestions == null || currentIndex >= currentQuestions.Count) return; 
             
 
 
-        QuizQuestion q = currentQuestions[currentIndex]; 
-        bool correct = (choiceIndex == q.correctIndex);
+        // QuizQuestion q = currentQuestions[currentIndex]; 
+        // bool correct = (choiceIndex == q.correctIndex);
         
 
         if (correct)

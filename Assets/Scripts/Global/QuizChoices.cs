@@ -95,21 +95,21 @@ public static class QuizDatabase
     // NPC5 questions
     public static List<QuizQuestion> NPC5 = new List<QuizQuestion>
     {
-    new QuizQuestion {
-        question = "Why is it important to stay calm during an earthquake?",
-        choices = new string[] { "To think clearly and make safe decisions", "Because it makes the earthquake shorter", "So others won't notice" },
-        correctIndex = 0
-    },
-    new QuizQuestion {
-        question = "What should you check at home to reduce earthquake hazards?",
-        choices = new string[] { "Secure heavy furniture and appliances", "Paint the walls brightly", "Add more mirrors" },
-        correctIndex = 0
-    },
-    new QuizQuestion {
-        question = "After an earthquake, why should you avoid using matches or lighters?",
-        choices = new string[] { "There may be gas leaks", "It wastes time", "It causes bad luck" },
-        correctIndex = 0
-      }
+        new QuizQuestion {
+            question = "What is the safest position during an earthquake if you’re indoors?5",
+            choices = new string[] { "Run outside", "Drop, Cover, Hold On", "Stand near a window" },
+            correctIndex = 1
+        },
+        new QuizQuestion {
+            question = "Where is the safest place to take cover during an earthquake?5",
+            choices = new string[] { "Under a sturdy table", "Near glass windows", "Next to tall shelves" },
+            correctIndex = 0
+        },
+        new QuizQuestion {
+            question = "What should you avoid using during or right after an earthquake?5",
+            choices = new string[] { "The elevator", "The stairs", "The doorway" },
+            correctIndex = 0
+        }
    };
 
 
