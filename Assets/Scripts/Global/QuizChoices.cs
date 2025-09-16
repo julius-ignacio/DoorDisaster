@@ -6,7 +6,7 @@ public class QuizQuestion
     public string question;
     public string[] choices; // store all choices in an array
     public int correctIndex; // optional: which choice is correct
-    
+
 }
 
 public static class QuizDatabase
@@ -80,7 +80,7 @@ public static class QuizDatabase
             correctIndex = 0
         },
         new QuizQuestion {
-            question = "If you’re driving during an earthquake, what’s the safest action?",
+            question = "If you’re driving during an earthquake, what's the safest action?",
             choices = new string[] { "Stop in a clear area and stay in the vehicle", "Stop under a bridge", "Keep driving fast" },
             correctIndex = 0
         },
@@ -90,5 +90,28 @@ public static class QuizDatabase
             correctIndex = 0
         }
     };
+
+
+    // NPC5 questions
+    public static List<QuizQuestion> NPC5 = new List<QuizQuestion>
+    {
+    new QuizQuestion {
+        question = "Why is it important to stay calm during an earthquake?",
+        choices = new string[] { "To think clearly and make safe decisions", "Because it makes the earthquake shorter", "So others won't notice" },
+        correctIndex = 0
+    },
+    new QuizQuestion {
+        question = "What should you check at home to reduce earthquake hazards?",
+        choices = new string[] { "Secure heavy furniture and appliances", "Paint the walls brightly", "Add more mirrors" },
+        correctIndex = 0
+    },
+    new QuizQuestion {
+        question = "After an earthquake, why should you avoid using matches or lighters?",
+        choices = new string[] { "There may be gas leaks", "It wastes time", "It causes bad luck" },
+        correctIndex = 0
+      }
+   };
+
+
 }
 
