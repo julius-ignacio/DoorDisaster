@@ -43,6 +43,7 @@ public class NPC : MonoBehaviour
             case 2: questions = QuizDatabase.NPC2; break;
             case 3: questions = QuizDatabase.NPC3; break;
             case 4: questions = QuizDatabase.NPC4; break;
+            case 5: questions = QuizDatabase.NPC5; break;
         }
 
         if (questions != null)

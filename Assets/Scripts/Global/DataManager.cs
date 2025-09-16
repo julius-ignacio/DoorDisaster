@@ -9,7 +9,8 @@ public class DataManager : MonoBehaviour
     public int remainingHealthPoints;
     public int totalQuestionsAnswered;
     public float timeTaken;
-    public int[] individualNpcScores = new int[4]; // Scores for each of the 4 NPCs
+    public int[] individualNpcScores = new int[5]; // Scores for each of the 4 NPCs
+
 
     private void Awake()
     {

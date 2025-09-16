@@ -16,7 +16,7 @@ public class Movements : MonoBehaviour
     public float walkStepInterval = 0.6f;   // time between footsteps
     public float runStepInterval = 0.35f;   // faster for running
     private float stepTimer;
-        public bool footstepsEnabled = true;
+    public bool footstepsEnabled = true;
 
     public AudioManager aud;
 
@@ -82,6 +82,7 @@ void HandleFootsteps(Vector3 move)
                 {
                     // play random footstep clip
                     aud.PlaySFX(10); // index for footsteps in your Clips array
+                    
                 }
                 else
                 {

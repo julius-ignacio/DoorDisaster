@@ -24,6 +24,7 @@ public class AudioManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0)) PlaySFX(9); //added points sfx
         if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(10); //foot steps
         if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(11); //light switch
+        if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(12); // Earth-Walking on grass
     }
 
     public void PlaySFX(int index)

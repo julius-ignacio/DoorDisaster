@@ -108,6 +108,9 @@ public class QuizScript : MonoBehaviour
                 btn.gameObject.SetActive(false);
             }
         }
+
+        Debug.Log($"Question: {q.question}, Choices={q.choices.Length}, Buttons={choiceButtons.Length}, CorrectIndex={q.correctIndex}");
+
     }
 
 
@@ -128,21 +131,25 @@ public class QuizScript : MonoBehaviour
     // central handler for button clicks
     public void OnChoiceButtonClicked(int choiceIndex)
     {
-        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
+        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return; 
+            
 
-        QuizQuestion q = currentQuestions[currentIndex];
+
+        QuizQuestion q = currentQuestions[currentIndex]; 
         bool correct = (choiceIndex == q.correctIndex);
+        
 
         if (correct)
         {
             score++;
-            DataManager.Instance.individualNpcScores[currentNpcId-1]++; // ✅ track only one point per correct answer
+            DataManager.Instance.individualNpcScores[currentNpcId - 1]++; // ✅ track only one point per correct answer
             DataManager.Instance.playerScore_erudition++; // ✅ track only one point per correct answer
         }
 
         // disable buttons
         for (int i = 0; i < choiceButtons.Length; i++)
             choiceButtons[i].interactable = false;
+
 
         // color feedback
         Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
@@ -153,6 +160,8 @@ public class QuizScript : MonoBehaviour
             Image correctImg = choiceButtons[q.correctIndex].GetComponent<Image>();
             if (correctImg != null) correctImg.color = correctColor;
         }
+
+        
 
         UpdateScoreUI();
         UpdateDataManager();
