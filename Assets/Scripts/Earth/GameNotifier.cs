@@ -16,7 +16,7 @@ public class GameNotifier : MonoBehaviour
 
     public void EarnedPoints(int points, float duration = 3f)
     {
-        StartCoroutine(ShowNotificationCoroutine($"+{points} Erudition Points Earned!", duration));
+        StartCoroutine(ShowNotificationCoroutine($"+{points} Points Earned!", duration));
     }
 
 public void PanicWarning(float duration = 3f)
