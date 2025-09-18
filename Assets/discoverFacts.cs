@@ -11,7 +11,7 @@ public class discoverFacts : MonoBehaviour
     [Header("Audio & Point sys")]
     public AudioManager aud;
     public GameObject ReadBtn;
-    public GameObject Trigger;
+    public GameObject[] Trigger;
     public GameObject[] facts;
     public int factIndex;
 
@@ -43,15 +43,15 @@ public class discoverFacts : MonoBehaviour
 
 
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player")) { ReadBtn.SetActive(true); }
-    }
+    // private void OnTriggerEnter(Collider other)
+    // {
+    //     if (other.CompareTag("Player")) { ReadBtn.SetActive(true); }
+    // }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player")) { ReadBtn.SetActive(false); facts[factIndex].SetActive(false); }
-    }
+    // private void OnTriggerExit(Collider other)
+    // {
+    //     if (other.CompareTag("Player")) { ReadBtn.SetActive(false); facts[factIndex].SetActive(false); }
+    // }
 
     public void DecipherInitiated()
     {
@@ -59,7 +59,7 @@ public class discoverFacts : MonoBehaviour
         DecipherSlider.gameObject.SetActive(true);
         DecipherText.gameObject.SetActive(true);
         ReadBtn.SetActive(false);
-        Trigger.SetActive(false);
+        Trigger[factIndex].SetActive(false);
         if (fillRoutine == null) // prevent multiple coroutines stacking
             fillRoutine = StartCoroutine(FillSlider());
     }
@@ -106,6 +106,8 @@ private IEnumerator FillSlider()
     void ReadFacts(int index)
     {
         Debug.Log("Player has discovered a fact!");
+        Debug.Log($"fact index: {factIndex}, fact: {facts[factIndex].name}");
+
 
         facts[index].SetActive(true);
         DataManager.Instance.playerScore_erudition++;
