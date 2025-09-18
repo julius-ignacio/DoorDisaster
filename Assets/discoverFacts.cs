@@ -93,7 +93,7 @@ private IEnumerator FillSlider()
     // Now continue
     DecipherSlider.gameObject.SetActive(false);
     DecipherText.gameObject.SetActive(false);
-    ReadFacts();
+    ReadFacts(factIndex);
     pointer.SetActive(true);
 }
 
@@ -103,12 +103,7 @@ private IEnumerator FillSlider()
 
 
 
-    public void ReadFacts()
-    {
-        Success(factIndex);
-    }
-
-    void Success(int index)
+    void ReadFacts(int index)
     {
         Debug.Log("Player has discovered a fact!");
 
