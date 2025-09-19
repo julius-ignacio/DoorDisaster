@@ -1,16 +1,22 @@
-using System.Collections;
+    using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class QuizScript : MonoBehaviour
 {
+
+    public GameObject helpBtn; //opens quiz panel
+    public GameObject quizUI; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
+
+
     [Header("UI")]
     public TMP_Text questionText;
     public Button[] choiceButtons;            // assign in inspector (e.g. 3 buttons)
     public TMP_Text scoreText;               // shows player score
-   // public TMP_Text Scoree;                  // result text you used wala lang to pang test langggg ignore this
+                                             // public TMP_Text Scoree;                  // result text you used wala lang to pang test langggg ignore this
 
     [Header("Colors & Timing")] //Ignore these
     public Color correctColor = new Color(0.2f, 0.8f, 0.2f); // green
@@ -22,7 +28,7 @@ public class QuizScript : MonoBehaviour
     private int currentIndex = 0; // which question we are on
     public int score = 0; // how many correct so far... 
     private Color[] originalButtonColors; //ignore
-    public GameObject[] disablePlaneAfterQuiz, disableButtonAfterQuiz; //
+    public GameObject[] disablePlaneAfterQuiz; //
 
 
     public int currentNpcId; // To track which NPC is being helped
@@ -32,7 +38,13 @@ public class QuizScript : MonoBehaviour
     public GameNotifier gameNotifier; // Reference to GameNotifier script
     public AudioManager aud;
 
-    private
+
+    void Start()
+    {
+        quizUI.SetActive(false);
+        helpBtn.SetActive(false);
+    }
+
 
     void Awake()
     {
@@ -44,6 +56,37 @@ public class QuizScript : MonoBehaviour
             originalButtonColors[i] = img != null ? img.color : Color.white;
         }
     }
+
+
+
+    public void OnHelpButtonClick()
+    {
+        helpBtn.SetActive(false);
+        quizUI.SetActive(true);
+
+        List<QuizQuestion> questions = null;
+        switch (currentNpcId)
+        {
+            case 1: questions = QuizDatabase.NPC1; break;
+            case 2: questions = QuizDatabase.NPC2; break;
+            case 3: questions = QuizDatabase.NPC3; break;
+            case 4: questions = QuizDatabase.NPC4; break;
+            case 5: questions = QuizDatabase.NPC5; break;
+        }
+
+        BeginQuiz(questions);
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     //Is called when the player clicks the BUTTON in the other script 
@@ -97,8 +140,13 @@ public class QuizScript : MonoBehaviour
                 // reset interactivity
                 btn.interactable = true;
 
+                Debug.Log($"Button {i} interactable={btn.interactable}, hasListener={btn.onClick.GetPersistentEventCount()}");
+
                 // remove previous listeners then add new one
                 btn.onClick.RemoveAllListeners();
+
+                Debug.Log($"Button {i} interactable={btn.interactable}, hasListener={btn.onClick.GetPersistentEventCount()}");
+
                 int choiceIndex = i; // capture
                 btn.onClick.AddListener(() => OnChoiceButtonClicked(choiceIndex));
 
@@ -113,7 +161,7 @@ public class QuizScript : MonoBehaviour
 
 
 
-        
+
 
         Debug.Log($"Question: {q.question}, Choices={q.choices.Length}, Buttons={choiceButtons.Length}, CorrectIndex={q.correctIndex}");
 
@@ -137,34 +185,41 @@ public class QuizScript : MonoBehaviour
     // central handler for button clicks
     public void OnChoiceButtonClicked(int choiceIndex)
     {
-            Debug.Log($"OnChoiceButtonClicked called with index {choiceIndex}, buttons={choiceButtons.Length}, choices={currentQuestions[currentIndex].choices.Length}");
-    if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
-    if (choiceIndex < 0 || choiceIndex >= choiceButtons.Length) {
-        Debug.LogError($"Choice index {choiceIndex} is out of bounds for choiceButtons.Length={choiceButtons.Length}");
-        return;
-    }
-    QuizQuestion q = currentQuestions[currentIndex];
-    if (choiceIndex >= q.choices.Length) {
-        Debug.LogError($"Choice index {choiceIndex} is out of bounds for choices.Length={q.choices.Length}");
-        return;
-    }
-    bool correct = (choiceIndex == q.correctIndex);
+        Debug.Log($"Answer clicked for NPC {currentNpcId}, writing to index {currentNpcId - 1}");
+
+        Debug.Log($"OnChoiceButtonClicked called with index {choiceIndex}, buttons={choiceButtons.Length}, choices={currentQuestions[currentIndex].choices.Length}");
+        if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
+        if (choiceIndex < 0 || choiceIndex >= choiceButtons.Length)
+        {
+            Debug.LogError($"Choice index {choiceIndex} is out of bounds for choiceButtons.Length={choiceButtons.Length}");
+            return;
+        }
+        QuizQuestion q = currentQuestions[currentIndex];
+        if (choiceIndex >= q.choices.Length)
+        {
+            Debug.LogError($"Choice index {choiceIndex} is out of bounds for choices.Length={q.choices.Length}");
+            return;
+        }
+        bool correct = choiceIndex == q.correctIndex;
 
 
         // if (currentQuestions == null || currentIndex >= currentQuestions.Count) return; 
-            
+
 
 
         // QuizQuestion q = currentQuestions[currentIndex]; 
         // bool correct = (choiceIndex == q.correctIndex);
-        
 
-        if (correct)
-        {
-            score++;
-            DataManager.Instance.individualNpcScores[currentNpcId - 1]++; // ✅ track only one point per correct answer
-            DataManager.Instance.playerScore_erudition++; // ✅ track only one point per correct answer
-        }
+
+     if (correct)
+{
+    score++;
+    Debug.Log($"Correct answer for NPC {currentNpcId}");
+
+    // ✅ Only track GLOBAL score here
+    DataManager.Instance.playerScore_erudition++;
+}
+
 
         // disable buttons
         for (int i = 0; i < choiceButtons.Length; i++)
@@ -181,7 +236,10 @@ public class QuizScript : MonoBehaviour
             if (correctImg != null) correctImg.color = correctColor;
         }
 
-        
+        Debug.Log($"OnChoiceButtonClicked fired! choiceIndex={choiceIndex}, correct={correct}");
+
+
+
 
         UpdateScoreUI();
         UpdateDataManager();
@@ -206,13 +264,13 @@ public class QuizScript : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         currentIndex++;
-        ShowQuestion(); 
+        ShowQuestion();
     }
 
     void UpdateScoreUI()
     {
         if (scoreText != null) scoreText.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
-      //  if (Scoree != null) Scoree.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
+        //  if (Scoree != null) Scoree.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
     }
 
     void UpdateDataManager()
@@ -222,20 +280,27 @@ public class QuizScript : MonoBehaviour
         DataManager.Instance.totalQuestionsAnswered++; // current question index (1-based)
     }
 
-    void EndQuiz(int idToDisableTriggers)
+    
+
+void EndQuiz(int idToDisableTriggers)
+{
+    Debug.Log($"Quiz finished. NPC {currentNpcId}, Score={score}");
+
+    // ✅ Save this NPC's score
+    DataManager.Instance.npcScores[currentNpcId] = score;
+
+    disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
+    npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+
+    gameObject.SetActive(false);
+    helpBtn.SetActive(false);
+
+    if (score > 0)
     {
-        Debug.Log("Quiz finished. Final score: " + score);
-        // show result UI here or fire event
-        gameObject.SetActive(false);
-        disableButtonAfterQuiz[idToDisableTriggers - 1].SetActive(false);
-        disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
-
-
-        //Play NPC animation and dissapear
-        npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
-
-
-        //Game notif about earned points
-        if(score > 0) gameNotifier.EarnedPoints(score); aud.PlaySFX(9); // play added points sfx
+        gameNotifier.EarnedPoints(score);
+        aud.PlaySFX(9);
     }
+}
+
+
 }

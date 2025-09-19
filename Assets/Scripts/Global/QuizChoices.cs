@@ -96,7 +96,7 @@ public static class QuizDatabase
     public static List<QuizQuestion> NPC5 = new List<QuizQuestion>
     {
         new QuizQuestion {
-            question = "What is the safest position during an earthquake if you’re indoors?5",
+            question = "What is the safest position during an earthquake if youre indoors?5",
             choices = new string[] { "Run outside", "Drop, Cover, Hold On", "Stand near a window" },
             correctIndex = 1
         },

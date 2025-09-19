@@ -22,37 +22,36 @@ public class NpcAnimation : MonoBehaviour
 
 public void PlayAndDisappear(int currentNpcId)
 {
-    if (npcAnimator != null)
-    {
-        int score = 0;
-        if (currentNpcId > 0 && currentNpcId <= DataManager.Instance.individualNpcScores.Length)
-        {
-            score = DataManager.Instance.individualNpcScores[currentNpcId - 1];
-        }
-        else
-        {
-            Debug.LogError($"currentNpcId {currentNpcId} is out of bounds for individualNpcScores array!");
-        }
+    int score = 0;
 
-        if (score == 3)
-        {
-            npcAnimator.SetTrigger("Victory");
-            aud.PlaySFX(0);
-        }
-        else if (score == 0)
-        {
-            npcAnimator.SetTrigger("Death");
-            aud.PlaySFX(2);
-        }
-        else if (score == 1 || score == 2)
-        {
-            npcAnimator.SetTrigger("Clap");
-            aud.PlaySFX(3);
-        }
+    if (DataManager.Instance.npcScores.TryGetValue(currentNpcId, out score))
+    {
+        Debug.Log($"NPC {currentNpcId} score found: {score}");
+    }
+    else
+    {
+        Debug.LogWarning($"No score found for NPC {currentNpcId}, defaulting to 0");
+    }
+
+    if (score == 3)
+    {
+        npcAnimator.SetTrigger("Victory");
+        aud.PlaySFX(0);
+    }
+    else if (score == 0)
+    {
+        npcAnimator.SetTrigger("Death");
+        aud.PlaySFX(2);
+    }
+    else if (score == 1 || score == 2)
+    {
+        npcAnimator.SetTrigger("Clap");
+        aud.PlaySFX(3);
     }
 
     StartCoroutine(DisappearAfterDelay(disappearDelay));
 }
+
 
 
     private System.Collections.IEnumerator DisappearAfterDelay(float delay)
