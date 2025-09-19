@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
@@ -9,7 +10,8 @@ public class DataManager : MonoBehaviour
     public int remainingHealthPoints;
     public int totalQuestionsAnswered;
     public float timeTaken;
-    public int[] individualNpcScores = new int[5]; // Scores for each of the 4 NPCs
+    public Dictionary<int, int> npcScores = new Dictionary<int, int>();
+
 
 
     private void Awake()
