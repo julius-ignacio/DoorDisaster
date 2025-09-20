@@ -2,12 +2,17 @@ using UnityEngine;
 
 public class PlaneTriggerMoveModel : MonoBehaviour
 {
+
+[Header("MODEL")]
+
     public GameObject model; // Assign in Inspector
     public Vector3 targetPosition; 
     public Vector3 targetRotation; 
     
 
 
+
+[Header("CAMERA")]
     public GameObject CoverCamera; // Assign in Inspector
     public Vector3 targetPositionCamera; 
     public Vector3 targetRotationCamera; 
