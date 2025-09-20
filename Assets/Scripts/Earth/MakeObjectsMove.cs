@@ -91,53 +91,81 @@ public class MakeObjectsMove : MonoBehaviour
 
         if (consistentQuakeScript != null && consistentQuakeScript.IsQuakeActive)
         {
-                switch (collision.gameObject.name)
-        {
-            case "hallway1":
-                { locker[0].GetComponent<LockerFall>().Fall(); }
-                break;
+            switch (collision.gameObject.name)
+            {
+                case "hallway1":
+                    { locker[0].GetComponent<LockerFall>().Fall(); }
+                    break;
 
-            case "hallway2":
-                { locker[1].GetComponent<LockerFall2>().Fall(); }
-                break;
+                case "hallway2":
+                    { locker[1].GetComponent<LockerFall2>().Fall(); }
+                    break;
 
-            case "hallway3":
-                {
-                    locker[2].GetComponent<LockerFall>().Fall();
-                    locker[3].GetComponent<LockerFall>().Fall();
-                    locker[4].GetComponent<LockerFall>().Fall();
-                    locker[5].GetComponent<LockerFall2>().Fall();
-                }
-                break;
+                case "hallway3":
+                    {
+                        locker[2].GetComponent<LockerFall>().Fall();
+                        locker[3].GetComponent<LockerFall>().Fall();
+                        locker[4].GetComponent<LockerFall>().Fall();
+                        locker[5].GetComponent<LockerFall2>().Fall();
+                    }
+                    break;
 
-            case "hallway4":
-                {
-                    locker[6].GetComponent<LockerFall2>().Fall();
-                    locker[7].GetComponent<LockerFall2>().Fall();
-                    locker[8].GetComponent<LockerFall2>().Fall();
-                }
-                break;
+                case "hallway4":
+                    {
+                        locker[6].GetComponent<LockerFall2>().Fall();
+                        locker[7].GetComponent<LockerFall2>().Fall();
+                        locker[8].GetComponent<LockerFall2>().Fall();
+                    }
+                    break;
 
-            case "hallway5":
-                {
-                    locker[9].GetComponent<LockerFall2>().Fall();
-                    locker[10].GetComponent<LockerFall2>().Fall();
-                    locker[11].GetComponent<LockerFall2>().Fall();
-                    locker[12].GetComponent<LockerFall2>().Fall();
-                    locker[13].GetComponent<LockerFall2>().Fall();
-                }
-                break;
+                case "hallway5":
+                    {
+                        locker[9].GetComponent<LockerFall2>().Fall();
+                        locker[10].GetComponent<LockerFall2>().Fall();
+                        locker[11].GetComponent<LockerFall2>().Fall();
+                        locker[12].GetComponent<LockerFall2>().Fall();
+                        locker[13].GetComponent<LockerFall2>().Fall();
+                        locker[20].GetComponent<LockerFall>().Fall();
+                    }
+                    break;
 
 
-            case "hallway6":
-                {
-                    locker[14].GetComponent<LockerFall2>().Fall();
-                    locker[15].GetComponent<LockerFall2>().Fall();
-                    locker[16].GetComponent<LockerFall>().Fall();
-                    locker[17].GetComponent<LockerFall>().Fall();
-                    locker[18].GetComponent<LockerFall>().Fall();
-                }
-                break;
+                case "hallway6":
+                    {
+                        locker[14].GetComponent<LockerFall2>().Fall();
+                        locker[16].GetComponent<LockerFall>().Fall();
+                        locker[17].GetComponent<LockerFall>().Fall();
+                        locker[18].GetComponent<LockerFall>().Fall();
+
+                    }
+                    break;
+
+
+
+
+                case "hallway7":
+                    {
+                        locker[15].GetComponent<LockerFall2>().Fall();
+                        locker[19].GetComponent<LockerFall>().Fall();
+                    }
+                    break;
+
+                case "hallway8":
+                    {
+
+                        locker[23].GetComponent<LockerFall2>().Fall();
+                        locker[24].GetComponent<LockerFall2>().Fall();
+                    }
+                    break;
+
+                case "hallway9":
+                    {
+
+                        locker[21].GetComponent<LockerFall2>().Fall();
+                        locker[22].GetComponent<LockerFall2>().Fall();
+                    }
+                    break;
+                
                }
 
         }
