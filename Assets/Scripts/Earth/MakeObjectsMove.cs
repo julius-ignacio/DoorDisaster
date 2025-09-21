@@ -16,7 +16,7 @@ public class MakeObjectsMove : MonoBehaviour
 
     private GameObject Board;
     GameObject[] chair, chair2;
-   // GameObject[] books1, books2, books3;
+    // GameObject[] books1, books2, books3;
     public ConsistentQuake consistentQuakeScript;
 
 
@@ -165,8 +165,85 @@ public class MakeObjectsMove : MonoBehaviour
                         locker[22].GetComponent<LockerFall2>().Fall();
                     }
                     break;
-                
-               }
+
+
+                case "hallway10":
+                    {
+                        locker[25].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                case "hallway11":
+                    {
+
+                        locker[26].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                case "hallway12":
+                    {
+
+                        locker[27].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                case "hallway13":
+                    {
+
+                        locker[28].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                case "hallway14":
+                    {
+
+                        locker[29].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                case "hallway15":
+                    {
+
+                        locker[30].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                case "hallway16":
+                    {
+
+                        locker[31].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                case "MainLibRack1":
+                    {
+
+                        locker[32].GetComponent<RackFall>().Fall();
+                    }
+                    break;
+
+
+                case "MainLibRack2":
+                    {
+
+                        locker[33].GetComponent<RackFall>().Fall();
+                    }
+                    break;
+
+
+
+                case "Library2Rack":
+                    {
+
+                        locker[34].GetComponent<RackFall>().Fall();
+                    }
+                    break;
+
+            }
 
         }
 

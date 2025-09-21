@@ -217,7 +217,7 @@ public class QuizScript : MonoBehaviour
     Debug.Log($"Correct answer for NPC {currentNpcId}");
 
     // ✅ Only track GLOBAL score here
-    DataManager.Instance.playerScore_erudition++;
+    DataManager.Instance.quizScore++;
 }
 
 

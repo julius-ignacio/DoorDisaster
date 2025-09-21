@@ -6,12 +6,21 @@ public class DataManager : MonoBehaviour
     public static DataManager Instance;
 
     // Example stats
-    public int playerScore_erudition; 
     public int remainingHealthPoints;
     public int totalQuestionsAnswered;
+    public int factsDiscovered;
+    public int quizScore;
     public float timeTaken;
+    public string scene;
+
+    public int playerTotalScore;
+
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
+    void Update()
+    {
+        playerTotalScore = quizScore + factsDiscovered;
+    }
 
 
     private void Awake()

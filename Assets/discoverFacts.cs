@@ -110,7 +110,7 @@ private IEnumerator FillSlider()
 
 
         facts[index].SetActive(true);
-        DataManager.Instance.playerScore_erudition++;
+        DataManager.Instance.quizScore++;
         aud.PlaySFX(9);
 
     }
