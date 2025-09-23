@@ -1,39 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance;
-
-    // Example stats
-    public int remainingHealthPoints;
-    public int totalQuestionsAnswered;
+    // Example stats public int totalQuestionsAnswered;
     public int factsDiscovered;
     public int quizScore;
     public float timeTaken;
     public string scene;
-
-    public int playerTotalScore;
-
-    public Dictionary<int, int> npcScores = new Dictionary<int, int>();
+    public int playerTotalScore, totalQuestionsAnswered;
+    public Dictionary<int, int> npcScores = new Dictionary<int, int>(); //can be reconstructed depending on urr trial
 
     void Update()
     {
         playerTotalScore = quizScore + factsDiscovered;
     }
-
-
     private void Awake()
-    {
-        // Singleton pattern
+    { // Singleton pattern 
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // keeps data across scenes
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        else { Destroy(gameObject); }
     }
 }
