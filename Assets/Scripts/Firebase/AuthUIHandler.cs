@@ -11,28 +11,28 @@ public class AuthUIHandler : MonoBehaviour
     public TMP_InputField passwordInput, login_passwordInput;
     public TMP_InputField ageInput;
     public TMP_InputField gradeLevelInput;
-    public TMP_Text feedbackText;
+    public TMP_Text feedbackTextlog, feedbackTextReg;
 
 public void OnRegisterButton()
 {
-    string email = emailInput.text;
+    string email = emailInput.text.Trim();
     string password = passwordInput.text;
 
     if (string.IsNullOrEmpty(email) || !email.Contains("@"))
     {
-        feedbackText.text = "Please enter a valid email.";
+        feedbackTextReg.text = "Please enter a valid email.";
         return;
     }
     if (string.IsNullOrEmpty(password) || password.Length < 6)
     {
-        feedbackText.text = "Password must be at least 6 characters.";
+        feedbackTextReg.text = "Password must be at least 6 characters.";
         return;
     }
 
     int age, grade;
     if (!int.TryParse(ageInput.text, out age) || !int.TryParse(gradeLevelInput.text, out grade))
     {
-        feedbackText.text = "Age and Grade must be numbers.";
+        feedbackTextReg.text = "Age and Grade must be numbers.";
         return;
     }
 
@@ -40,13 +40,13 @@ public void OnRegisterButton()
     {
         if (success)
         {
-            feedbackText.text = "Register successful!";
+            feedbackTextReg.text = "Register successful!";
             Debug.Log("Token: " + idToken);
             Debug.Log("UserID: " + localId);
         }
         else
         {
-            feedbackText.text = "Register failed!";
+            feedbackTextReg.text = "Register failed!";
         }
     }));
 }
@@ -59,7 +59,7 @@ public void OnRegisterButton()
         {
             if (success)
             {
-                feedbackText.text = "✅ Login successful!";
+                feedbackTextlog.text = "✅ Login successful!";
                 Debug.Log("Token: " + idToken);
                 Debug.Log("UserID: " + localId);
 
@@ -67,7 +67,7 @@ public void OnRegisterButton()
             }
             else
             {
-                feedbackText.text = "❌ Login failed!";
+                feedbackTextlog.text = "❌ Login failed!";
             }
         }));
     }

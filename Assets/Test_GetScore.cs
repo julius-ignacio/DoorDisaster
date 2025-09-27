@@ -10,8 +10,8 @@ public class Test_GetScore : MonoBehaviour
     {
         if (DataManager.Instance != null)
         {
-          scoreText.text = $"correcttt: {StageData.Instance.quizScore}";
-            quiestionsAnsweredText.text = $"Total questions: {StageData.Instance.questionsAnswered}";
+          scoreText.text = $"correcttt: {DataManager.Instance.quizScore}";
+            quiestionsAnsweredText.text = $"Total questions: {DataManager.Instance.totalQuestionsAnswered}";
         }
     }
 }

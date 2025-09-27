@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
       [Header("UI References")]
-    public GameObject pauseUI, pauseBtn, resumeBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
+    public GameObject pauseUI, pauseBtn, resumeBtn, RestartBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
 
      public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI, heartsys;
     public TMP_Text panicText, injurtyText;
@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
         if (resumeBtn != null) resumeBtn.SetActive(false);
         if (ExitBtn != null) ExitBtn.SetActive(false);
         if (pauseBtn != null) pauseBtn.SetActive(true);
+        if (RestartBtn != null) RestartBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(false);
 
           // Make sure HUD starts visible
@@ -87,6 +88,7 @@ public class GameManager : MonoBehaviour
 
         if (resumeBtn != null) resumeBtn.SetActive(true);
         if (ExitBtn != null) ExitBtn.SetActive(true);
+        if (RestartBtn != null) RestartBtn.SetActive(true);
         if (pauseBtn != null) pauseBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(true);
         if (hudCanvasGroup != null)
@@ -115,6 +117,7 @@ public class GameManager : MonoBehaviour
         if (resumeBtn != null) resumeBtn.SetActive(false);
         if (ExitBtn != null) ExitBtn.SetActive(false);
         if (pauseBtn != null) pauseBtn.SetActive(true);
+        if (RestartBtn != null) RestartBtn.SetActive(true);
         if (blackOverlay != null) blackOverlay.SetActive(false);
         if (HUD != null) HUD.SetActive(true);
 
