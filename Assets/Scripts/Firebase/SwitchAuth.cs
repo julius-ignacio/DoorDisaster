@@ -5,7 +5,6 @@ using UnityEngine.Scripting;
 [Preserve]
 public class SwitchAuth : MonoBehaviour
 {
-    [Header("Container Objects")]
     public GameObject register, login;
 
     public TextMeshProUGUI switchertextbtn; // Assign TMP text directly in Inspector

@@ -14,12 +14,6 @@ public class NpcController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
-
-        // Play default animation
-        if (animator != null)
-        {
-            animator.SetTrigger("Walk"); // assuming you have a "Walk" trigger
-        }
     }
 
     void Update()

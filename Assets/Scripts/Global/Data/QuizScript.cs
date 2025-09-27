@@ -218,6 +218,8 @@ public class QuizScript : MonoBehaviour
 
     // ✅ Only track GLOBAL score here
     DataManager.Instance.quizScore++;
+
+
 }
 
 

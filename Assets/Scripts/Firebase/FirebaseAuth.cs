@@ -12,39 +12,6 @@ public class FirebaseAuth : MonoBehaviour
     public static string UserIdToken;
     public static string UserLocalId;
 
-    [System.Serializable]
-    public class AuthRequest
-    {
-        public string email;
-        public string password;
-        public bool returnSecureToken = true;
-    }
-
-    [System.Serializable]
-    public class AuthResponse
-    {
-        public string idToken;
-        public string email;
-        public string localId;
-    }
-    
-    [System.Serializable]
-public class RegisterRequest
-{
-    public string email;
-    public string password;
-    public bool returnSecureToken = true;
-}
-
-[System.Serializable]
-public class UserProfile
-{
-    public string name;
-    public string email;
-    public int age;
-    public int gradeLevel;
-}
-
 
     // Register
     public IEnumerator RegisterUser(string email, string password, string name, int age, int gradeLevel, Action<bool, string, string> callback)

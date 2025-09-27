@@ -48,10 +48,3 @@ public class FirebaseDatabase : MonoBehaviour
     }
 }
 
-// Example player data class
-[System.Serializable]
-public class PlayerData
-{
-    public int score;
-    public float posX, posY, posZ;
-}
