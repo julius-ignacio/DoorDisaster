@@ -1323,7 +1323,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &520442249
@@ -3420,6 +3420,94 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 972963887}
   m_CullTransparentMesh: 1
+--- !u!1 &1013441636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1013441638}
+  - component: {fileID: 1013441637}
+  m_Layer: 0
+  m_Name: DataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1013441637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013441636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0847f96fb77c4a8a58a0d32a4b0022a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    playerId: 
+    playerName: 
+    email: 
+    age: 0
+    gradeLevel: 0
+    trials:
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    overallTotalScore: 0
+    totalQuestionsAnswered: 0
+    lastPlayedScene: 
+  quizScore: 0
+  totalQuestionsAnswered: 0
+  currentTrial: 0
+  currentStage: 0
+--- !u!4 &1013441638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013441636}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 689.5887, y: 0.47047836, z: -351.3447}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1067485735
 GameObject:
   m_ObjectHideFlags: 0
@@ -5812,7 +5900,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1754526528
@@ -7209,6 +7297,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2135792708}
+  - {fileID: 1013441638}
   - {fileID: 1857669824}
   - {fileID: 1195005084}
   - {fileID: 1291743145}

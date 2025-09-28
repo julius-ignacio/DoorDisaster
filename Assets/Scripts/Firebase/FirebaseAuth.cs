@@ -11,13 +11,31 @@ public class FirebaseAuth : MonoBehaviour
 
     public static string UserIdToken;
     public static string UserLocalId;
+    public PlayerData playerData;
+    
+    
+    
 
 
     // Register
     public IEnumerator RegisterUser(string email, string password, string name, int age, int gradeLevel, Action<bool, string, string> callback)
     {
+
+        if (DataManager.Instance == null)
+        {
+            Debug.LogError("❌ DataManager is not ready yet!");
+            yield break;
+        }
+
+        if (DataManager.Instance.playerData == null)
+        {
+            DataManager.Instance.playerData = new PlayerData();
+            DataManager.Instance.InitPlayerData(); // Make InitPlayerData public
+        }
+
+
         string registerUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + apiKey;
-        
+
 
         RegisterRequest requestData = new RegisterRequest { email = email, password = password };
         string jsonData = JsonUtility.ToJson(requestData);
@@ -27,7 +45,7 @@ public class FirebaseAuth : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
 
         yield return request.SendWebRequest();
 
@@ -37,34 +55,22 @@ public class FirebaseAuth : MonoBehaviour
             UserIdToken = authResponse.idToken;
             UserLocalId = authResponse.localId;
 
-            // Save extra profile fields into Firebase Database
-            UserProfile profile = new UserProfile
-            {
-                name = name,
-                email = email,
-                age = age,
-                gradeLevel = gradeLevel
-            };
+            // Initialize player data
+            DataManager.Instance.playerData.playerId = UserLocalId;
+            DataManager.Instance.playerData.playerName = name;
+            DataManager.Instance.playerData.email = email;
+            DataManager.Instance.playerData.age = age;
+            DataManager.Instance.playerData.gradeLevel = gradeLevel;
 
-            string profileJson = JsonUtility.ToJson(profile);
-            string dbUrl = $"https://doordisaster-7003b-default-rtdb.firebaseio.com/users/{UserLocalId}.json?auth={UserIdToken}";
+            // Save to DB as PlayerData (not separate profile)
+            yield return DataManager.Instance.StartCoroutine(
+                FindObjectOfType<FirebaseDatabase>().SaveData(UserIdToken, UserLocalId, DataManager.Instance.playerData)
+            );
 
-            UnityWebRequest dbRequest = UnityWebRequest.Put(dbUrl, profileJson);
-            dbRequest.SetRequestHeader("Content-Type", "application/json");
-
-            yield return dbRequest.SendWebRequest();
-
-            if (dbRequest.result == UnityWebRequest.Result.Success)
-            {
-                Debug.Log("✅ Registered and profile saved!");
-                callback(true, authResponse.idToken, authResponse.localId);
-            }
-            else
-            {
-                Debug.LogError("⚠️ Auth success but profile save failed: " + dbRequest.error);
-                callback(false, null, null);
-            }
+            Debug.Log("✅ Registered and PlayerData saved!");
+            callback(true, authResponse.idToken, authResponse.localId);
         }
+
         else
         {
             Debug.LogError("❌ Register error: " + request.error + "\n" + request.downloadHandler.text);

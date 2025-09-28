@@ -1,13 +1,16 @@
 [System.Serializable]
 public class PlayerData
 {
+    // Profile
     public string playerId;
     public string playerName;
+    public string email;
+    public int age;
+    public int gradeLevel;
 
-    public TrialData[] trials = new TrialData[3]; // 3 trials in total
-    public int overallTotalScore; // sum of all trials
-
-    // Optional meta
+    // Game progress
+    public TrialData[] trials = new TrialData[3];
+    public int overallTotalScore;
     public int totalQuestionsAnswered;
     public string lastPlayedScene;
 }

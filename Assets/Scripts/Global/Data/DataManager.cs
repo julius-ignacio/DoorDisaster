@@ -33,7 +33,7 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    private void InitPlayerData()
+    public void InitPlayerData()
     {
         playerData.playerId = FirebaseAuth.UserLocalId;
         playerData.playerName = "Player";
