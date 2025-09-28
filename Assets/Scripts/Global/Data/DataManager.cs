@@ -14,6 +14,11 @@ public class DataManager : MonoBehaviour
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
 
+    [Header("Current Trial and Stage")]
+    public int currentTrial;
+    public int currentStage;
+
+
     private void Awake()
     {
         if (Instance == null)

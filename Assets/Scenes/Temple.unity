@@ -2654,76 +2654,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 93670920}
   m_CullTransparentMesh: 1
---- !u!1 &102133557
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 102133558}
-  - component: {fileID: 102133559}
-  m_Layer: 5
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &102133558
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 102133557}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 126313677}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &102133559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 102133557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddd52592cdcc3259db818dbbcec9e033, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pauseUI: {fileID: 0}
-  pauseBtn: {fileID: 0}
-  resumeBtn: {fileID: 0}
-  RestartBtn: {fileID: 0}
-  ExitBtn: {fileID: 0}
-  blackOverlay: {fileID: 0}
-  HUD: {fileID: 1646818488}
-  Joystick: {fileID: 1304858277}
-  Jumpbtn: {fileID: 519943866}
-  GameOverUI: {fileID: 0}
-  PanicMeterUI: {fileID: 0}
-  CoverBtn: {fileID: 0}
-  uncoverBtm: {fileID: 0}
-  PauseUI: {fileID: 0}
-  heartsys: {fileID: 0}
-  panicText: {fileID: 0}
-  injurtyText: {fileID: 0}
-  panicMeterScript: {fileID: 0}
-  hearts: {fileID: 0}
-  movementscript: {fileID: 0}
-  isPaused: 0
-  hudCanvasGroup: {fileID: 0}
 --- !u!1 &120572490
 GameObject:
   m_ObjectHideFlags: 0
@@ -2875,7 +2805,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 102133558}
   - {fileID: 1075585812}
   - {fileID: 1782479743}
   - {fileID: 921757273}
@@ -4137,7 +4066,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -184.80388
+      value: -197.4
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4145,7 +4074,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -231.7
+      value: -56.51
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -24381,7 +24310,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 700223932}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 727434904}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &700223932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24600,6 +24541,7 @@ GameObject:
   - component: {fileID: 727434909}
   - component: {fileID: 727434910}
   - component: {fileID: 727434911}
+  - component: {fileID: 727434912}
   m_Layer: 0
   m_Name: EarthTrigger
   m_TagString: Earth
@@ -24721,8 +24663,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d54e7c70f74ce47948b6706c673e2835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionButton: {fileID: 1782479740}
-  sceneToLoad: DoorOfEarth
+  actionButton1: {fileID: 700223931}
+  actionButton2: {fileID: 955659314}
+  actionButtons: {fileID: 1803201279}
+  sceneToLoad:
+  - DoorOfEarth1
+  - DoorOfEarth2
+  dm: {fileID: 1013441637}
+  trialIndex: 0
 --- !u!114 &727434911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24737,6 +24685,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aud: {fileID: 328583030}
   selectedTheme: 1
+--- !u!114 &727434912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727434904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f886b928e3f9fa7339294fb96a03368e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionUi: {fileID: 1803201279}
 --- !u!21 &741254447
 Material:
   serializedVersion: 8
@@ -28971,6 +28932,91 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1013441636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1013441638}
+  - component: {fileID: 1013441637}
+  m_Layer: 0
+  m_Name: DataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1013441637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013441636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0847f96fb77c4a8a58a0d32a4b0022a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    playerId: 
+    playerName: 
+    trials:
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    - stages:
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      - quizScore: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+      trialTotalScore: 0
+    overallTotalScore: 0
+    totalQuestionsAnswered: 0
+    lastPlayedScene: 
+  quizScore: 0
+  totalQuestionsAnswered: 0
+  currentTrial: 0
+  currentStage: 0
+--- !u!4 &1013441638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013441636}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 689.5887, y: 0.47047836, z: -351.3447}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1014736672
 GameObject:
   m_ObjectHideFlags: 0
@@ -33703,11 +33749,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 163, y: 0, z: 0}
---- !u!1 &1304858277 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8834734170784175512, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
-  m_PrefabInstance: {fileID: 983610264}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1304858278 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8834734170784175513, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
@@ -41057,8 +41098,9 @@ GameObject:
   - component: {fileID: 1782479742}
   - component: {fileID: 1782479741}
   - component: {fileID: 1782479740}
+  - component: {fileID: 1782479744}
   m_Layer: 5
-  m_Name: DoorTrialButton
+  m_Name: OpenLevelSelectionBtn
   m_TagString: DoorTrialBtn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41108,16 +41150,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: d54e7c70f74ce47948b6706c673e2835, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: set_name
-        m_Mode: 5
+      - m_Target: {fileID: 1782479744}
+        m_TargetAssemblyTypeName: OpenLevelSelection, Assembly-CSharp
+        m_MethodName: OpenSelection
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: DoorOfEarth
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
 --- !u!114 &1782479741
@@ -41178,6 +41220,19 @@ RectTransform:
   m_AnchoredPosition: {x: -0.00012207031, y: -181}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1782479744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782479739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f886b928e3f9fa7339294fb96a03368e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionUi: {fileID: 1803201279}
 --- !u!1001 &1782484470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41801,7 +41856,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1803201280
 RectTransform:
   m_ObjectHideFlags: 0
@@ -48877,6 +48932,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 288443190}
+  - {fileID: 1013441638}
   - {fileID: 126313677}
   - {fileID: 1568654233}
   - {fileID: 578845553}

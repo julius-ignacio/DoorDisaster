@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class EndGame_SaveData : MonoBehaviour
 {
-    public int trialIndex;   // Assign in Inspector or set from GameFlow manager
-    public int stageIndex;   // Assign in Inspector or set from GameFlow manager
     public FirebaseDatabase firebaseDatabase; // Drag your FirebaseDatabase GameObject here
     public GameObject SaveBtn;
+    public DataManager dataManager;
 
 
     void Start()
@@ -25,7 +24,7 @@ public class EndGame_SaveData : MonoBehaviour
         }
     }
 
-    public void OTriggerExit(Collider other)
+    public void OnTriggerExit(Collider other)
     {
                if (other.CompareTag("Player"))
         {
@@ -49,7 +48,7 @@ public class EndGame_SaveData : MonoBehaviour
         }
 
         // Update structured data from global values
-        DataManager.Instance.SaveStageData(trialIndex, stageIndex);
+        DataManager.Instance.SaveStageData(dataManager.currentTrial, dataManager.currentStage);
 
         // Push to Firebase
         StartCoroutine(firebaseDatabase.SaveData(
@@ -58,6 +57,6 @@ public class EndGame_SaveData : MonoBehaviour
             DataManager.Instance.playerData
         ));
 
-        Debug.Log("✅ Stage data saved for Trial " + trialIndex + " Stage " + stageIndex);
+        Debug.Log("✅ Stage data saved for Trial " + dataManager.currentTrial + " Stage " + dataManager.currentStage);
     }
 }
