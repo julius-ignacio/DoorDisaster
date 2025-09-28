@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.08235294, g: 0.2, b: 0.32156864, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.017
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -2705,6 +2705,7 @@ MonoBehaviour:
   pauseUI: {fileID: 0}
   pauseBtn: {fileID: 0}
   resumeBtn: {fileID: 0}
+  RestartBtn: {fileID: 0}
   ExitBtn: {fileID: 0}
   blackOverlay: {fileID: 0}
   HUD: {fileID: 1646818488}
@@ -4128,7 +4129,7 @@ PrefabInstance:
       objectReference: {fileID: 328583030}
     - target: {fileID: 3749785191498821014, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: speed
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3749785191498821014, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: footsteps
@@ -36523,7 +36524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1646818489
 RectTransform:
   m_ObjectHideFlags: 0
@@ -41415,7 +41416,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22405530, guid: 2ac2e515cfc05514a83b8ef083430da7, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 34.463543
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22405530, guid: 2ac2e515cfc05514a83b8ef083430da7, type: 3}
       propertyPath: m_AnchoredPosition.x
