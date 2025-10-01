@@ -112,7 +112,7 @@ private IEnumerator FillSlider()
         facts[index].SetActive(true);
         DataManager.Instance.quizScore++;
         aud.PlaySFX(9);
-
+        DataManager.Instance.factsDiscovered++;
     }
     
 

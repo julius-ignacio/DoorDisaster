@@ -7,10 +7,6 @@ public class PlayIsabellaLullabyOST : MonoBehaviour
     public AudioSource source;
     public GameObject wall;
 
-    void Start()
-    {
-        wall.SetActive(false);
-    }
 
     void OnTriggerEnter(Collider other)
     {

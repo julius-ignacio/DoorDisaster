@@ -23,6 +23,9 @@ public class QuizScript : MonoBehaviour
     public Color wrongColor = new Color(0.9f, 0.3f, 0.3f); // red
     public float feedbackDelay = 1f;                       // seconds to show color. Delay to each after quiz question
 
+    [Header("Npc icons")]
+    public NpcIcons npcicon;
+
 
     private List<QuizQuestion> currentQuestions; // Rereference to current quiz questions
     private int currentIndex = 0; // which question we are on
@@ -297,10 +300,13 @@ void EndQuiz(int idToDisableTriggers)
     gameObject.SetActive(false);
     helpBtn.SetActive(false);
 
-    if (score > 0)
-    {
-        gameNotifier.EarnedPoints(score);
-        aud.PlaySFX(9);
+        if (score > 0)
+        {
+            gameNotifier.EarnedPoints(score);
+            aud.PlaySFX(9);
+
+            if (npcicon != null) { npcicon.makeIconActive(); }
+        
     }
 }
 

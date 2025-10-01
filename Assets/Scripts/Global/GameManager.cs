@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour
         if (resumeBtn != null) resumeBtn.SetActive(false);
         if (ExitBtn != null) ExitBtn.SetActive(false);
         if (pauseBtn != null) pauseBtn.SetActive(true);
-        if (RestartBtn != null) RestartBtn.SetActive(true);
+        if (RestartBtn != null) RestartBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(false);
         if (HUD != null) HUD.SetActive(true);
 

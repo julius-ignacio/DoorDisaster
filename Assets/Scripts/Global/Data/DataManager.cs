@@ -10,6 +10,7 @@ public class DataManager : MonoBehaviour
 
     // 🔹 Legacy/global fields (for quick access in scripts)
     public int quizScore;
+    public int factsDiscovered;
     public int totalQuestionsAnswered;
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
