@@ -11,7 +11,6 @@ public class GoToTrial : MonoBehaviour
     public GameObject actionButtons;
     public string[] sceneToLoad;
 
-    public DataManager dm;
 
     public int trialIndex;   // 0 = Door1, 1 = Door2, 2 = Door3
     private void Start()
@@ -31,7 +30,7 @@ public class GoToTrial : MonoBehaviour
             trialIndex = 0;
             actionButtons.SetActive(true);
 
-            Debug.Log($"Selected Trial {trialIndex}, Stage {dm.currentStage}");
+            Debug.Log($"Selected Trial {trialIndex}, Stage {DataManager.Instance.currentStage}");
         }
         else if (other.CompareTag("Water"))
         {
@@ -51,7 +50,7 @@ public class GoToTrial : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit(Collider other)
+     void OnTriggerExit(Collider other)
     {
         // Hide button when leaving
         if (other.CompareTag("Earth") || other.CompareTag("Water") || other.CompareTag("Fire"))
@@ -62,7 +61,7 @@ public class GoToTrial : MonoBehaviour
         }
     }
 
-    private void OnButtonClickedStage1()
+    public void OnButtonClickedStage1()
     {
         if (!string.IsNullOrEmpty(sceneToLoad[0]))
         {
@@ -70,13 +69,13 @@ public class GoToTrial : MonoBehaviour
             DataManager.Instance.currentStage = 0;
             DataManager.Instance.currentTrial = trialIndex;
 
-            Debug.Log($"Selected Trial {trialIndex}, Stage {dm.currentStage}");
+            Debug.Log($"Selected Trial {trialIndex}, Stage {DataManager.Instance.currentStage}");
 
             SceneManager.LoadScene(sceneToLoad[0]);
         }
     }
 
-    private void OnButtonClickedStage2()
+    public void OnButtonClickedStage2()
     {
         if (!string.IsNullOrEmpty(sceneToLoad[1]))
         {
@@ -84,7 +83,7 @@ public class GoToTrial : MonoBehaviour
             DataManager.Instance.currentStage = 1;
             DataManager.Instance.currentTrial = trialIndex;
 
-            Debug.Log($"Selected Trial {trialIndex}, Stage {dm.currentStage}");
+            Debug.Log($"Selected Trial {trialIndex}, Stage {DataManager.Instance.currentStage}");
             SceneManager.LoadScene(sceneToLoad[1]);
         }
     }
