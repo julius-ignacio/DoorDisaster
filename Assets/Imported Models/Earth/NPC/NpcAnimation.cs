@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class NpcAnimation : MonoBehaviour
@@ -7,6 +8,7 @@ public class NpcAnimation : MonoBehaviour
     public float disappearDelay = 5f;
     public GameObject npcModel;
     public AudioManager aud;
+    public HeartSys heart;
 
     void Start()
     {
@@ -17,37 +19,49 @@ public class NpcAnimation : MonoBehaviour
             npcModel = this.gameObject;
 
         // if (aud == null)
-       // aud = FindObjectOfType<AudioManager>();
+        // aud = FindObjectOfType<AudioManager>();
     }
 
 public void PlayAndDisappear(int currentNpcId)
 {
     int score = 0;
+    
 
     if (DataManager.Instance.npcScores.TryGetValue(currentNpcId, out score))
-    {
-        Debug.Log($"NPC {currentNpcId} score found: {score}");
-    }
-    else
-    {
-        Debug.LogWarning($"No score found for NPC {currentNpcId}, defaulting to 0");
+        {
+            Debug.Log($"NPC {currentNpcId} score found: {score}");
+        }
+        else
+        {
+            Debug.LogWarning($"No score found for NPC {currentNpcId}, defaulting to 0");
+        }
+
+
+        if (npcModel.GetComponent<Animator>())
+        {
+            if (score == 3)
+            {
+                npcAnimator.SetTrigger("Victory");
+                aud.PlaySFX(0);
+            }
+            else if (score == 0)
+            {
+                npcAnimator.SetTrigger("Death");
+                aud.PlaySFX(2);
+            }
+            else if (score == 1 || score == 2)
+            {
+                npcAnimator.SetTrigger("Clap");
+                aud.PlaySFX(3);
+            }
+        }
+        else
+        {
+            heart.Heal(1);
     }
 
-    if (score == 3)
-    {
-        npcAnimator.SetTrigger("Victory");
-        aud.PlaySFX(0);
-    }
-    else if (score == 0)
-    {
-        npcAnimator.SetTrigger("Death");
-        aud.PlaySFX(2);
-    }
-    else if (score == 1 || score == 2)
-    {
-        npcAnimator.SetTrigger("Clap");
-        aud.PlaySFX(3);
-    }
+
+
 
     StartCoroutine(DisappearAfterDelay(disappearDelay));
 }

@@ -113,5 +113,19 @@ public static class QuizDatabase
    };
 
 
+
+       // Medkit questions
+    public static List<QuizQuestion> Medkit = new List<QuizQuestion>
+    {
+        new QuizQuestion {
+            question = "Why is it important to include a medkit in your emergency preparedness plan?",
+            choices = new string[] { "Because it can provide immediate first aid before professional help arrives", 
+    "Because it guarantees survival in all disaster situations", 
+    "Because it replaces the need for professional medical care"  },
+            correctIndex = 0
+        }
+   };
+
+
 }
 
