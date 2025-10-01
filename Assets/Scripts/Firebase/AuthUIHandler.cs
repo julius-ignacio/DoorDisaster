@@ -55,28 +55,40 @@ public class AuthUIHandler : MonoBehaviour
 
 
 
-    public void OnLoginButton()
+public void OnLoginButton()
+{
+    StartCoroutine(firebaseAuth.LoginUser(login_emailInput.text, login_passwordInput.text, (success, idToken, localId) =>
     {
-        StartCoroutine(firebaseAuth.LoginUser(login_emailInput.text, login_passwordInput.text, (success, idToken, localId) =>
+        if (success)
         {
-            if (success)
+            feedbackTextlog.text = "✅ Login successful!";
+            Debug.Log("Token: " + idToken);
+            Debug.Log("UserID: " + localId);
+
+            // 🔹 Load player data from Firebase
+            StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
             {
-                feedbackTextlog.text = "✅ Login successful!";
-                Debug.Log("Token: " + idToken);
-                Debug.Log("UserID: " + localId);
+                if (loadedData != null)
+                {
+                    DataManager.Instance.playerData = loadedData;
+                    Debug.Log("✅ Player data loaded into DataManager");
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ No existing player data found, using defaults");
+                }
+            }));
 
-                // TODO: Move to Game Scene
+            // Delay and then load MainMenu
+            StartCoroutine(LoadMainMenuWithDelay(2f));
+        }
+        else
+        {
+            feedbackTextlog.text = "❌ Login failed!";
+        }
+    }));
+}
 
-
-                // Delay and then load MainMenu
-                StartCoroutine(LoadMainMenuWithDelay(2f));
-            }
-            else
-            {
-                feedbackTextlog.text = "❌ Login failed!";
-            }
-        }));
-    }
     
         private IEnumerator LoadMainMenuWithDelay(float delay)
     {

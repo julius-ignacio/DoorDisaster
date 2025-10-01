@@ -24,7 +24,7 @@ public class QuizScript : MonoBehaviour
     public float feedbackDelay = 1f;                       // seconds to show color. Delay to each after quiz question
 
     [Header("Npc icons")]
-    public NpcIcons npcicon;
+    public NpcsSaved npcsaved;
 
 
     private List<QuizQuestion> currentQuestions; // Rereference to current quiz questions
@@ -305,7 +305,7 @@ void EndQuiz(int idToDisableTriggers)
             gameNotifier.EarnedPoints(score);
             aud.PlaySFX(9);
 
-            if (npcicon != null) { npcicon.makeIconActive(); }
+            if (npcsaved != null) { npcsaved.makeIconActive(); }
         
     }
 }

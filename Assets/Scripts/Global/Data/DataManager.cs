@@ -34,7 +34,14 @@ public class DataManager : MonoBehaviour
         }
     }
 
+
+
     public void InitPlayerData()
+{
+    if (playerData == null)
+        playerData = new PlayerData();
+
+    if (string.IsNullOrEmpty(playerData.playerId))
     {
         playerData.playerId = FirebaseAuth.UserLocalId;
         playerData.playerName = "Player";
@@ -48,6 +55,8 @@ public class DataManager : MonoBehaviour
                 playerData.trials[i].stages[j] = new StageData();
         }
     }
+}
+
 
     // 🔹 Called when you want to sync global fields into structured DB
     public void SaveStageData(int trialIndex, int stageIndex)
