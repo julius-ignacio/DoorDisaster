@@ -3,17 +3,36 @@ using UnityEngine;
 
 public class DoorLocked : MonoBehaviour
 {
-    public GameObject colliderObject; 
-    public GameObject door;
+    public GameObject colliderObject, getKeyBtn, getKeyTrigger; 
+    public GameObject door, doorlockPrompt;
+    public GetKey getkey;
+
+    void Start()
+    {
+        colliderObject.SetActive(true);
+        doorlockPrompt.SetActive(true);
+    }
+
 
     void OnTriggerEnter(Collider other)
     {
-        if (!PickUpScript.hasKeycard) // ✅ check global flag
+        if (getkey.isDoorLocked == false) // ✅ check global flag
+        {
+            colliderObject.SetActive(false);
+
+            doorlockPrompt.SetActive(false);
+
+            // var doorScript = door.GetComponent<EasyDoorSystem.EasyDoor>();
+            // doorScript.enabled = true;
+
+            door.GetComponent<EasyDoorSystem.EasyDoor>().enabled = true;
+        }
+        
+                else // ✅ check global flag
         {
             colliderObject.SetActive(true);
-
-            var doorScript = door.GetComponent<EasyDoorSystem.EasyDoor>();
-                doorScript.enabled = false;
+            doorlockPrompt.SetActive(true);
+                door.GetComponent <EasyDoorSystem.EasyDoor>().enabled = false;
         }
     }
 }

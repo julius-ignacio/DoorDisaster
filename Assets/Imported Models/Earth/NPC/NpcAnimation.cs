@@ -57,7 +57,10 @@ public void PlayAndDisappear(int currentNpcId)
         }
         else
         {
+            if (score != 0)
+            {
             heart.Heal(1);
+            }
     }
 
 

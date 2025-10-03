@@ -5,10 +5,11 @@ public class UnlockDoor : MonoBehaviour
 {
     public GameObject colliderObject; 
     public GameObject door;
+    public GetKey getkey;
 
     void OnTriggerEnter(Collider other)
     {
-        if (PickUpScript.hasKeycard) // ✅ check global flag
+        if (getkey.isDoorLocked = false) // ✅ check global flag
         {
             colliderObject.SetActive(false);
 

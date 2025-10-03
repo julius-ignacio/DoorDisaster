@@ -75,6 +75,7 @@ public class QuizScript : MonoBehaviour
             case 3: questions = QuizDatabase.NPC3; break;
             case 4: questions = QuizDatabase.NPC4; break;
             case 5: questions = QuizDatabase.NPC5; break;
+            case 6: questions = QuizDatabase.Medkit; break;
         }
 
         BeginQuiz(questions);

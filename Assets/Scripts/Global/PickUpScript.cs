@@ -111,10 +111,10 @@ public class PickUpScript : MonoBehaviour
 
         Physics.IgnoreCollision(heldObj.GetComponent<Collider>(), player.GetComponent<Collider>(), true);
 
-        if (pickUpObj.name == "keycard") // check if it’s the keycard
-        {
-            hasKeycard = true; // mark as collected
-        }
+        // if (pickUpObj.name == "keycard") // check if it’s the keycard
+        // {
+        //     hasKeycard = true; // mark as collected
+        // }
     }
 }
 
