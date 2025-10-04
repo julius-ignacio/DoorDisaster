@@ -114,17 +114,61 @@ public static class QuizDatabase
 
 
 
-       // Medkit questions
+    // Medkit questions
     public static List<QuizQuestion> Medkit = new List<QuizQuestion>
     {
         new QuizQuestion {
             question = "Why is it important to include a medkit in your emergency preparedness plan?",
-            choices = new string[] { "Because it can provide immediate first aid before professional help arrives", 
-    "Because it guarantees survival in all disaster situations", 
+            choices = new string[] { "Because it can provide immediate first aid before professional help arrives",
+    "Because it guarantees survival in all disaster situations",
     "Because it replaces the need for professional medical care"  },
             correctIndex = 0
         }
    };
+
+
+    public static List<QuizQuestion> Medkit2 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "In which situation would a medkit be most valuable during a disaster?",
+        choices = new string[] {
+            "When someone suffers a minor injury and immediate care is needed before professionals arrive",
+            "When you need food and water during a prolonged evacuation",
+            "When trying to predict when rescuers will arrive"
+        },
+        correctIndex = 0
+    }
+};
+
+    public static List<QuizQuestion> Water1 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "Why is it important to include water bottles in your emergency kit?",
+        choices = new string[] {
+            "Because the human body needs water to survive and dehydration can occur quickly",
+            "Because water bottles can be used as toys to reduce boredom",
+            "Because water bottles can replace the need for medical supplies"
+        },
+        correctIndex = 0
+    }
+};
+
+
+public static List<QuizQuestion> Water2 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "If you have a limited number of water bottles during an evacuation, what should be your top priority for their use?",
+        choices = new string[] { 
+            "Drinking, since staying hydrated is critical for survival", 
+            "Washing clothes to stay clean", 
+            "Putting out small fires"  
+        },
+        correctIndex = 0
+    }
+};
+
+
+
 
 
 }

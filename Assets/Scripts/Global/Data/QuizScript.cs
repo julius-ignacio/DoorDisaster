@@ -76,6 +76,9 @@ public class QuizScript : MonoBehaviour
             case 4: questions = QuizDatabase.NPC4; break;
             case 5: questions = QuizDatabase.NPC5; break;
             case 6: questions = QuizDatabase.Medkit; break;
+            case 7: questions = QuizDatabase.Medkit2; break;
+            case 8: questions = QuizDatabase.Water1; break;
+            case 9: questions = QuizDatabase.Water2; break;
         }
 
         BeginQuiz(questions);
@@ -303,10 +306,23 @@ void EndQuiz(int idToDisableTriggers)
 
         if (score > 0)
         {
-            gameNotifier.EarnedPoints(score);
-            aud.PlaySFX(9);
+            if (currentNpcId > 0 && currentNpcId <= 5)
+            {
+                gameNotifier.EarnedPoints(score);
+                aud.PlaySFX(9);
 
-            if (npcsaved != null) { npcsaved.makeIconActive(); }
+                if (npcsaved != null) { npcsaved.makeIconActive(); }
+            }
+
+            else if (currentNpcId == 6 && currentNpcId == 7)
+            {
+                aud.PlaySFX(19);
+            }
+
+              else if (currentNpcId == 8 && currentNpcId == 9)
+            {
+                aud.PlaySFX(18);
+            }
         
     }
 }
