@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TowelPickup : MonoBehaviour
 {
@@ -6,21 +6,47 @@ public class TowelPickup : MonoBehaviour
     public GameObject towel;
     public SubtitleManager subtitleManager;
 
+    private bool hasPickedUp = false;
+
     void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !hasPickedUp)
         {
             if (Input.GetKey(KeyCode.E))
             {
-                // Hide the towel object
+                hasPickedUp = true;
+
+                // Hide towel object (but keep the script GameObject active)
                 towel.SetActive(false);
 
-                // Hide the objective
+                // Hide objective
                 subtitleManager.HideObjective();
 
-                // Show pickup message
-                subtitleManager.ShowCustomMessage("Got the wet towel! This will help me breathe.", 2f);
+                // Slow down oxygen drain
+                PlayerOxygen oxygen = other.GetComponent<PlayerOxygen>();
+                if (oxygen != null)
+                {
+                    oxygen.EquipTowel();
+                }
+
+                // Messages
+                subtitleManager.ShowCustomMessage(
+                    "Got the wet towel! This will help me breathe.",
+                    2f,
+                    () => {
+                        subtitleManager.ShowCustomMessage(
+                            "Oh no! I need to save the cat!",
+                            3f,
+                            () => subtitleManager.ShowObjective("Find the cat in the living room")
+                        );
+                    }
+                );
             }
         }
+    }
+
+    public bool HasPickedUpTowel()
+    {
+        return hasPickedUp;
     }
 }

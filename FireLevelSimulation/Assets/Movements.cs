@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
@@ -12,7 +13,7 @@ public class Movements : MonoBehaviour
     public LayerMask groundMask;
 
     [Header("Mouse Look Settings")]
-    public float mouseSensitivity = 2f; // More reasonable sensitivity
+    public float mouseSensitivity = 2f;
     public Transform playerBody;
     public Camera firstPersonCamera;
 
@@ -20,6 +21,14 @@ public class Movements : MonoBehaviour
     public AudioSource footstepAudioSource;
     public AudioClip[] footstepSounds;
     public float footstepInterval = 0.5f;
+
+    [Header("Health System")]
+    public int maxHealth = 100;
+    public int currentHealth;
+    public Slider healthBar;
+
+    [Header("Inventory/Items")]
+    public bool hasTowel = false;
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -32,10 +41,8 @@ public class Movements : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
 
-        // Lock cursor to center of screen
         Cursor.lockState = CursorLockMode.Locked;
 
-        // If no camera assigned, try to find the actual Camera component (not just GameObject)
         if (firstPersonCamera == null)
         {
             Camera foundCamera = GetComponentInChildren<Camera>();
@@ -43,19 +50,39 @@ public class Movements : MonoBehaviour
                 firstPersonCamera = foundCamera;
         }
 
-        // If no player body assigned, use this transform
         if (playerBody == null)
             playerBody = transform;
 
-        // Debug info
+        // Initialize health system
+        currentHealth = maxHealth;
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+
+            // Force fill color update
+            Image fillImage = healthBar.fillRect?.GetComponent<Image>();
+            if (fillImage != null)
+            {
+                fillImage.color = Color.green;
+            }
+
+            Debug.Log("Health bar initialized - Value: " + currentHealth + "/" + maxHealth);
+        }
+
         Debug.Log("Camera found: " + (firstPersonCamera != null));
-        if (firstPersonCamera != null)
-            Debug.Log("Camera name: " + firstPersonCamera.name);
         Debug.Log("Player body: " + (playerBody != null));
     }
 
     void Update()
     {
+        // DEBUG: Check controller state
+        if (!controller.enabled)
+        {
+            Debug.Log("Controller is DISABLED! Player probably died.");
+            return;
+        }
+
         HandleGroundCheck();
         HandleMovement();
         HandleJump();
@@ -65,71 +92,61 @@ public class Movements : MonoBehaviour
 
     void LateUpdate()
     {
-        // Handle mouse look in LateUpdate to avoid conflicts with movement
         HandleMouseLook();
     }
 
     void HandleGroundCheck()
     {
-        // Use controller bounds for ground check (more stable than fixed offset)
         Vector3 groundCheckPos = controller.bounds.center - new Vector3(0, controller.bounds.extents.y, 0);
         isGrounded = Physics.CheckSphere(groundCheckPos, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; // Small downward force to keep grounded
+            velocity.y = -2f; // Keep grounded
         }
     }
 
     void HandleMovement()
     {
-        // Get input
-        float x = Input.GetAxis("Horizontal"); // A/D keys
-        float z = Input.GetAxis("Vertical");   // W/S keys
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
 
-        // Calculate movement direction relative to where we're looking
+        // DEBUG: Check input
+        if (x != 0 || z != 0)
+            Debug.Log("Input detected - X: " + x + ", Z: " + z + ", IsGrounded: " + isGrounded);
+
         Vector3 move = transform.right * x + transform.forward * z;
 
-        // Determine speed (walk or run)
         float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
 
-        // Move the character
         controller.Move(move * speed * Time.deltaTime);
 
-        // Check if we're moving for footsteps
         isMoving = move.magnitude > 0.1f && isGrounded;
     }
 
     void HandleMouseLook()
     {
-        if (Cursor.lockState != CursorLockMode.Locked)
-            return;
+        if (Cursor.lockState != CursorLockMode.Locked) return;
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Rotate player horizontally (Y axis)
         playerBody.Rotate(Vector3.up * mouseX);
 
-        // Rotate camera vertically (X axis)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         if (firstPersonCamera != null)
-        {
             firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        }
     }
 
     void HandleJump()
     {
-        // Jump
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
 
-        // Apply gravity only if not grounded (fix jitter)
         if (!isGrounded)
         {
             velocity.y += gravity * Time.deltaTime;
@@ -146,11 +163,9 @@ public class Movements : MonoBehaviour
 
             if (footstepTimer <= 0f)
             {
-                // Play random footstep sound
                 int randomIndex = Random.Range(0, footstepSounds.Length);
                 footstepAudioSource.PlayOneShot(footstepSounds[randomIndex]);
 
-                // Reset timer (faster for running)
                 float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
                 footstepTimer = footstepInterval * (walkSpeed / currentSpeed);
             }
@@ -159,37 +174,90 @@ public class Movements : MonoBehaviour
 
     void HandleCursorToggle()
     {
-        // Toggle cursor lock with Escape key
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (Cursor.lockState == CursorLockMode.Locked)
-            {
                 Cursor.lockState = CursorLockMode.None;
-            }
             else
-            {
                 Cursor.lockState = CursorLockMode.Locked;
-            }
         }
     }
 
-    // Public methods for other scripts
-    public bool IsGrounded()
+    // =====================
+    // Health System Methods
+    // =====================
+    public void TakeDamage(int damage)
     {
-        return isGrounded;
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        if (healthBar != null)
+            healthBar.value = currentHealth;
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
 
-    public bool IsMoving()
+    public void Die()
     {
-        return isMoving;
+        Debug.Log("Player is dead");
+        controller.enabled = false; // disable movement when dead
+
+        // Trigger Game Over
+        GameOverManager.TriggerDeath(
+            "HEALTH DEPLETED",
+            "You were burned by the fire! Remember to plan your escape early."
+        );
     }
 
-    public float GetCurrentSpeed()
+
+    // =====================
+    // Inventory/Item Methods
+    // =====================
+    public bool HasTowel()
     {
-        return Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        return hasTowel;
     }
 
-    // Draw ground check sphere in scene view
+    public void SetTowel(bool value)
+    {
+        hasTowel = value;
+    }
+
+    public void PickupTowel()
+    {
+        hasTowel = true;
+        Debug.Log("Picked up towel!");
+    }
+
+    public void UseTowel()
+    {
+        if (hasTowel)
+        {
+            hasTowel = false;
+            Debug.Log("Used towel!");
+            // Add towel usage logic here
+        }
+        else
+        {
+            Debug.Log("No towel to use!");
+        }
+    }
+
+    // Existing helper methods
+    public bool IsGrounded() => isGrounded;
+    public bool IsMoving() => isMoving;
+    public float GetCurrentSpeed() => Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+
+    // Emergency method for testing
+    public void ForceEnable()
+    {
+        controller.enabled = true;
+        Debug.Log("Movement force enabled!");
+    }
+
     void OnDrawGizmosSelected()
     {
         if (controller == null) return;

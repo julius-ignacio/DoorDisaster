@@ -15,6 +15,12 @@ public class SubtitleManager : MonoBehaviour
     public GameObject objectivePanel;
     public TextMeshProUGUI objectiveText;
 
+    [Header("Health UI")]
+    public GameObject healthBar; // Reference to your HP bar GameObject
+
+    [Header("Oxygen UI")]
+    public GameObject oxygenBar; // Reference to your Oxygen bar GameObject
+
     [Header("Story Settings")]
     public bool autoStartStory = true;
 
@@ -51,6 +57,18 @@ public class SubtitleManager : MonoBehaviour
         if (subtitlePanel != null)
             subtitlePanel.SetActive(false);
 
+        if (objectivePanel != null)
+            objectivePanel.SetActive(false);
+
+        if (healthBar != null)
+            healthBar.SetActive(false);
+
+        if (oxygenBar != null)
+            oxygenBar.SetActive(false);
+
+        // Disable movement during story
+        Cursor.lockState = CursorLockMode.None;
+
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
     }
@@ -71,6 +89,45 @@ public class SubtitleManager : MonoBehaviour
             yield return StartCoroutine(ShowSubtitle(wakingStory[i], duration));
             yield return new WaitForSeconds(0.3f);
         }
+
+        // ✅ FIXED: Enable movement after story
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // ✅ Force enable player movement
+        Movements player = FindObjectOfType<Movements>();
+        if (player != null)
+        {
+            player.ForceEnable();
+            Debug.Log("Player movement force enabled after subtitles");
+        }
+
+        // ✅ Show HP bar after the story ends
+        if (healthBar != null)
+        {
+            healthBar.SetActive(true);
+            Debug.Log("Health bar shown");
+        }
+
+        // ✅ Show oxygen bar after the story ends
+        if (oxygenBar != null)
+        {
+            oxygenBar.SetActive(true);
+            Debug.Log("Oxygen bar shown via GameObject");
+        }
+
+        // ✅ Show oxygen bar via PlayerOxygen script
+        PlayerOxygen oxygenSystem = FindObjectOfType<PlayerOxygen>();
+        if (oxygenSystem != null)
+        {
+            oxygenSystem.ShowOxygenBar();
+            Debug.Log("Oxygen bar shown via PlayerOxygen script");
+        }
+
+        // ✅ Show first objective after story ends
+        ShowObjective("Find a way out of the house");
+
+        Debug.Log("Subtitle sequence complete - movement should now be enabled");
     }
 
     IEnumerator ShowSubtitle(string text, float displayTime, Action onComplete = null)
@@ -120,7 +177,7 @@ public class SubtitleManager : MonoBehaviour
         StartCoroutine(ShowSubtitle(message, duration, onComplete));
     }
 
-    // --- Updated Methods ---
+    // --- Objective Methods ---
     public void ShowObjective(string text)
     {
         if (objectivePanel != null && objectiveText != null)
