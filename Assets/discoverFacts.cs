@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class discoverFacts : MonoBehaviour
 {
     [Header("Audio & Point sys")]
-    public AudioManager aud;
     public GameObject ReadBtn;
     public GameObject[] Trigger;
     public GameObject[] facts;
@@ -111,7 +110,7 @@ private IEnumerator FillSlider()
 
         facts[index].SetActive(true);
         DataManager.Instance.quizScore++;
-        aud.PlaySFX(9);
+          AudioManager.Instance.PlaySFX(8);
         DataManager.Instance.factsDiscovered++;
     }
     

@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class RoomLightOnOff : MonoBehaviour
 {
-    public AudioManager aud;
     public GameObject lights, ShowBtn;
     public TMP_Text ButtonText;
     void Start()
@@ -17,12 +16,12 @@ public class RoomLightOnOff : MonoBehaviour
     {
         if (lights.activeSelf)
         {
-            aud.PlaySFX(11);
+              AudioManager.Instance.PlaySFX(7);
             ButtonText.text = "Turn ON"; lights.SetActive(false);
         }
         else
         {
-            aud.PlaySFX(11);
+              AudioManager.Instance.PlaySFX(7);
             lights.SetActive(true); ButtonText.text = "Turn OFF";
         }
     }

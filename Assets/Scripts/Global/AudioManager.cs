@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager Instance;
     [Header("Audio Sources")]
     public AudioSource audClip;
     public AudioSource audLoop;
@@ -10,21 +11,18 @@ public class AudioManager : MonoBehaviour
     public AudioClip[] Clips;
 
 
-    void Update()
+    
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) PlaySFX(0); //victory //walking on grass
-        if (Input.GetKeyDown(KeyCode.Alpha2)) PlaySFX(1); //wow //Quake theme
-        if (Input.GetKeyDown(KeyCode.Alpha3)) PlaySFX(2); //death //Flood theme
-        if (Input.GetKeyDown(KeyCode.Alpha4)) PlaySFX(3); //clap //Fire theme
-        if (Input.GetKeyDown(KeyCode.Alpha5)) PlaySFX(4); //hurt
-        if (Input.GetKeyDown(KeyCode.Alpha6)) PlaySFX(5); //locker hit
-        if (Input.GetKeyDown(KeyCode.Alpha7)) PlaySFX(6); //locker noise
-        if (Input.GetKeyDown(KeyCode.Alpha8)) PlaySFX(7); //quake
-        if (Input.GetKeyDown(KeyCode.Alpha9)) PlaySFX(8); //heartbeat
-        if (Input.GetKeyDown(KeyCode.Alpha0)) PlaySFX(9); //added points sfx
-        if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(10); //foot steps
-        if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(11); //light switch
-        if (Input.GetKeyDown(KeyCode.Minus)) PlaySFX(12); // Earth-Walking on grass
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void PlaySFX(int index)

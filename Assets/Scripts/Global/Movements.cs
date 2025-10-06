@@ -18,7 +18,6 @@ public class Movements : MonoBehaviour
     private float stepTimer;
     public bool footstepsEnabled = true;
 
-    public AudioManager aud;
 
     void Start()
     {
@@ -78,15 +77,15 @@ void HandleFootsteps(Vector3 move)
 
             if (stepTimer <= 0f)
             {
-                if (aud.Clips.Length > 4)
+                if (  AudioManager.Instance.Clips.Length > 4)
                 {
                     // play random footstep clip
-                    aud.PlaySFX(10); // index for footsteps in your Clips array
+                      AudioManager.Instance.PlaySFX(2); // index for footsteps in your Clips array
                     
                 }
                 else
                 {
-                    aud.PlaySFX(0); // fallback sound if no footsteps assigned
+                      AudioManager.Instance.PlaySFX(0); // fallback sound if no footsteps assigned
                 }
              
 

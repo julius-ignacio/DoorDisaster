@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ScarySFXTrigger : MonoBehaviour
 {
-    public AudioManager aud;
     public int scarySFXindex;
     public GameObject PlaneTriggerDestroy;
 
@@ -10,8 +9,8 @@ public class ScarySFXTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            aud.audClip.volume = 0.5f;
-            aud.PlaySFX(scarySFXindex);
+              AudioManager.Instance.audClip.volume = 0.5f;
+              AudioManager.Instance.PlaySFX(scarySFXindex);
             // PlaneTriggerDestroy.SetActive(false);
         }
     }
@@ -20,7 +19,7 @@ public class ScarySFXTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            aud.audClip.volume = 1f;
+              AudioManager.Instance.audClip.volume = 1f;
         } 
     }
 }

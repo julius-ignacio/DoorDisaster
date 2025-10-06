@@ -47,7 +47,6 @@ public class QuizScript : MonoBehaviour
 
 
     public GameNotifier gameNotifier; // Reference to GameNotifier script
-    public AudioManager aud;
 
 
     void Start()
@@ -333,19 +332,19 @@ public class QuizScript : MonoBehaviour
             if (currentNpcId > 0 && currentNpcId <= 5)
             {
                 gameNotifier.EarnedPoints(score);
-                aud.PlaySFX(9); //points
+                AudioManager.Instance.PlaySFX(8); //points
 
                 if (npcsaved != null) { npcsaved.makeIconActive(); }
             }
 
             else if (currentNpcId >= 6 && currentNpcId <= 8)
             {
-                aud.PlaySFX(19); //medkit
+             AudioManager.Instance.PlaySFX(19); //medkit
             }
 
             else if (currentNpcId >= 9 && currentNpcId <= 11)
             {
-                aud.PlaySFX(18); //drink water
+             AudioManager.Instance.PlaySFX(18); //drink water
             }
 
         }

@@ -14,8 +14,6 @@ public class PanicMeterScript : MonoBehaviour
                              // Start is called before the first frame updat
 
     public GameObject panickEffectUI;
-    public AudioManager aud;
-
 
     private bool heartbeatPlaying = false; // track loop state
 
@@ -61,7 +59,7 @@ public class PanicMeterScript : MonoBehaviour
             EnableBlur(true);
             if (!heartbeatPlaying)
             {
-                aud.PlayLoop(aud.Clips[8]); // heartbeat loop
+              AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[17]); // heartbeat loop
                 heartbeatPlaying = true;
             }
             Debug.Log("color changed to red");
@@ -78,7 +76,7 @@ public class PanicMeterScript : MonoBehaviour
             EnableBlur(false); //no blur
             if (!heartbeatPlaying)
             {
-                aud.PlayLoop(aud.Clips[8]); // heartbeat loop
+          AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[17]); // heartbeat loop
                 heartbeatPlaying = true;
             }
             Debug.Log("color changed to red");
@@ -98,7 +96,7 @@ public class PanicMeterScript : MonoBehaviour
 
             if (heartbeatPlaying)
             {
-                aud.StopLoop();
+                  AudioManager.Instance.StopLoop();
                 heartbeatPlaying = false;
             }
         }
@@ -113,7 +111,7 @@ public class PanicMeterScript : MonoBehaviour
 
             if (heartbeatPlaying)
             {
-                aud.StopLoop();
+                  AudioManager.Instance.StopLoop();
                 heartbeatPlaying = false;
             }
         }

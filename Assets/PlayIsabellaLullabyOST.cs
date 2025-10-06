@@ -1,10 +1,11 @@
 using System.Net.NetworkInformation;
+using MilkShake;
 using UnityEngine;
 
-public class PlayIsabellaLullabyOST : MonoBehaviour
+public class PlayIsabellaLullabyOST_StopQuake : MonoBehaviour
 {
-    public AudioManager aud;
-    public AudioSource source;
+    public ConsistentQuake consistentQuake;
+    public Shaker shake;
     public GameObject wall;
 
 
@@ -12,14 +13,20 @@ public class PlayIsabellaLullabyOST : MonoBehaviour
     {
         if (other.CompareTag("Player")) // optional safety check
         {
-            AudioClip temp = aud.Clips[10];      // store the first one
-            aud.Clips[10] = aud.Clips[13];       // assign slot 13 into slot 10
-            aud.Clips[13] = temp;                // put the stored value into slot 13
+            AudioClip temp = AudioManager.Instance.Clips[2];      // store the first one
+            AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];       // assign slot 13 into slot 10
+            AudioManager.Instance.Clips[1] = temp;                // put the stored value into slot 13
 
 
-            aud.PlayLoop(aud.Clips[12]);
-            source.volume = 0.5f;
-            
+            AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
+            AudioManager.Instance.audLoop.volume = 0.5f;
+
+
+            shake.enabled = false;
+            consistentQuake.enabled = false;
+            consistentQuake.PauseQuakes();
+
+
             wall.SetActive(true);
 
         }

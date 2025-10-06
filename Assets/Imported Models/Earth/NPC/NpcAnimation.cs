@@ -8,7 +8,6 @@ public class NpcAnimation : MonoBehaviour
     public Animator npcAnimator;
     public float disappearDelay = 5f;
     public GameObject npcModel;
-    public AudioManager aud;
     public HeartSys heart;
     public GameObject GreenFlashEffect, blueFlashEffect;
     public PanicMeterScript panicMeter;
@@ -49,17 +48,17 @@ public class NpcAnimation : MonoBehaviour
             if (score == 3)
             {
                 npcAnimator.SetTrigger("Victory");
-                aud.PlaySFX(0);
+                  AudioManager.Instance.PlaySFX(11);
             }
             else if (score == 0)
             {
                 npcAnimator.SetTrigger("Death");
-                aud.PlaySFX(2);
+                 AudioManager.Instance.PlaySFX(9);
             }
             else if (score == 1 || score == 2)
             {
                 npcAnimator.SetTrigger("Clap");
-                aud.PlaySFX(3);
+                  AudioManager.Instance.PlaySFX(10);
             }
         }
         else
@@ -67,7 +66,7 @@ public class NpcAnimation : MonoBehaviour
             if (score != 0 && currentNpcId >= 6 && currentNpcId <= 8)
             {
                 heart.Heal(1);
-                aud.PlaySFX(19);
+                  AudioManager.Instance.PlaySFX(19);
                 GreenFlashEffect.SetActive(true);
                 StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
             }
@@ -75,7 +74,7 @@ public class NpcAnimation : MonoBehaviour
             else if (score != 0 && (currentNpcId >= 9 || currentNpcId <= 11))
             {
                 panicMeter.currHealth -= 20;
-                aud.PlaySFX(18);
+                  AudioManager.Instance.PlaySFX(18);
                 blueFlashEffect.SetActive(true);
                 StartCoroutine(FlashFade(blueFlashEffect.GetComponent<CanvasGroup>(), 1f));
             }
