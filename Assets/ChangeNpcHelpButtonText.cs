@@ -5,7 +5,6 @@ using UnityEngine;
 public class ChangeNpcHelpButtonText : MonoBehaviour
 {
     public TMP_Text BtnText;
-    public HeartSys heart;
     public NPC_GiveId nPC_GiveId;
     void Start()
     {
@@ -18,11 +17,14 @@ public class ChangeNpcHelpButtonText : MonoBehaviour
         switch (nPC_GiveId.NpcId)
         {
             case 9: BtnText.text = "Drink water"; break;
-            case 8: BtnText.text = "Drink water"; break;
+            case 11: BtnText.text = "Drink water"; break;
+            case 10: BtnText.text = "Drink water"; break;
+            case 8: BtnText.text = "Use medkit"; break;
             case 7: BtnText.text = "Use medkit"; break;
             case 6: BtnText.text = "Use medkit"; break;
-         }
 
+            default: BtnText.text = "Help"; break;
+         }
     }
 
 

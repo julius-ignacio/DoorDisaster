@@ -1,15 +1,17 @@
-    using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using MilkShake;
 
 public class QuizScript : MonoBehaviour
 {
 
     public GameObject helpBtn; //opens quiz panel
     public GameObject quizUI; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
+    public GameObject hud; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
 
 
     [Header("UI")]
@@ -25,6 +27,12 @@ public class QuizScript : MonoBehaviour
 
     [Header("Npc icons")]
     public NpcsSaved npcsaved;
+
+    [Header("Disable movements and quake whent taking quiz")]
+    public Movements movements;
+    public ConsistentQuake consistentQuake;
+    public Shaker shake;
+
 
 
     private List<QuizQuestion> currentQuestions; // Rereference to current quiz questions
@@ -77,11 +85,16 @@ public class QuizScript : MonoBehaviour
             case 5: questions = QuizDatabase.NPC5; break;
             case 6: questions = QuizDatabase.Medkit; break;
             case 7: questions = QuizDatabase.Medkit2; break;
-            case 8: questions = QuizDatabase.Water1; break;
-            case 9: questions = QuizDatabase.Water2; break;
+            case 8: questions = QuizDatabase.Medkit3; break;
+            case 9: questions = QuizDatabase.Water1; break;
+            case 10: questions = QuizDatabase.Water2; break;
+            case 11: questions = QuizDatabase.Water3; break;
+
         }
 
         BeginQuiz(questions);
+
+
 
     }
 
@@ -99,6 +112,17 @@ public class QuizScript : MonoBehaviour
     //Is called when the player clicks the BUTTON in the other script 
     public void BeginQuiz(List<QuizQuestion> questions)
     {
+        movements.enabled = false;
+
+        shake.enabled = false;
+        consistentQuake.enabled = false;
+
+        hud.SetActive(false);
+
+
+        consistentQuake.PauseQuakes();
+
+
         if (questions == null || questions.Count == 0)
         {
             Debug.LogWarning("BeginQuiz called with empty question list.");
@@ -218,16 +242,16 @@ public class QuizScript : MonoBehaviour
         // bool correct = (choiceIndex == q.correctIndex);
 
 
-     if (correct)
-{
-    score++;
-    Debug.Log($"Correct answer for NPC {currentNpcId}");
+        if (correct)
+        {
+            score++;
+            Debug.Log($"Correct answer for NPC {currentNpcId}");
 
-    // ✅ Only track GLOBAL score here
-    DataManager.Instance.quizScore++;
+            // ✅ Only track GLOBAL score here
+            DataManager.Instance.quizScore++;
 
 
-}
+        }
 
 
         // disable buttons
@@ -289,43 +313,56 @@ public class QuizScript : MonoBehaviour
         DataManager.Instance.totalQuestionsAnswered++; // current question index (1-based)
     }
 
-    
 
-void EndQuiz(int idToDisableTriggers)
-{
-    Debug.Log($"Quiz finished. NPC {currentNpcId}, Score={score}");
 
-    // ✅ Save this NPC's score
-    DataManager.Instance.npcScores[currentNpcId] = score;
+    void EndQuiz(int idToDisableTriggers)
+    {
+        Debug.Log($"Quiz finished. NPC {currentNpcId}, Score={score}");
 
-    disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
-    npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+        // ✅ Save this NPC's score
+        DataManager.Instance.npcScores[currentNpcId] = score;
 
-    gameObject.SetActive(false);
-    helpBtn.SetActive(false);
+        disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
+        npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+
+        gameObject.SetActive(false);
+        helpBtn.SetActive(false);
 
         if (score > 0)
         {
             if (currentNpcId > 0 && currentNpcId <= 5)
             {
                 gameNotifier.EarnedPoints(score);
-                aud.PlaySFX(9);
+                aud.PlaySFX(9); //points
 
                 if (npcsaved != null) { npcsaved.makeIconActive(); }
             }
 
-            else if (currentNpcId == 6 && currentNpcId == 7)
+            else if (currentNpcId >= 6 && currentNpcId <= 8)
             {
-                aud.PlaySFX(19);
+                aud.PlaySFX(19); //medkit
             }
 
-              else if (currentNpcId == 8 && currentNpcId == 9)
+            else if (currentNpcId >= 9 && currentNpcId <= 11)
             {
-                aud.PlaySFX(18);
+                aud.PlaySFX(18); //drink water
             }
-        
+
+        }
+
+
+        consistentQuake.enabled = true;
+consistentQuake.ResumeQuakes();
+
+
+
+
+        hud.SetActive(true);
+
+        shake.enabled = true;
+        movements.enabled = true;
+
     }
-}
 
 
 }

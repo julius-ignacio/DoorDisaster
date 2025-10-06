@@ -265,12 +265,20 @@ public class MakeObjectsMove : MonoBehaviour
                         locker[37].GetComponent<CeilingFall>().Fall();
                     }
                     break;
-                    
 
-                                     case "CeilingTrigger99 (3)":
+
+                case "CeilingTrigger99 (3)":
                     {
 
                         locker[38].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                case "StartLibRack":
+                    {
+
+                        locker[39].GetComponent<RackFall>().Fall();
                     }
                     break;
 

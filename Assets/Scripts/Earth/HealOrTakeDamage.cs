@@ -16,6 +16,8 @@ public class HealOrTakeDamage : MonoBehaviour
     private Color originalColor;
     private bool hasDealtDamage = false; // ✅ track if this locker has already hurt the player
 
+    public int damage;
+
     public int hitsound = 5;
 
     private void Start()
@@ -36,7 +38,7 @@ public class HealOrTakeDamage : MonoBehaviour
             Debug.Log("Player hit by locker during quake! Taking damage...");
              aud.PlaySFX(hitsound); // play locker hit sound
 
-            heartSys.TakeDamage(1);
+            heartSys.TakeDamage(damage);
             aud.PlaySFX(4);
 
             if (takeDamageImage != null)

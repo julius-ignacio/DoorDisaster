@@ -3,17 +3,21 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class GameStart : MonoBehaviour  //, IPointerClickHandler
 {
     public GameObject Header1, Header2, Body1, Body2, Bg, IntroPanel, HeaderLine,
     FooterLine, Lines, QuakeIcon, SlowIcon,
-    NextBtn, PrevBtn, PanicMeter, HUD, PauseBtn;
+    NextBtn, PrevBtn, PanicMeter, HUD, PauseBtn, startPanelUI;
 
 
     public GameObject GamestartNarration; //Game start player narration /talking
     public int currentBatchIndex = 0;
     public Movements PlayerMovements; //disables the player from moving until the intro is done/intro panel is closed
+
+    public PanicMeterScript panicMeterScript;
+    public ConsistentQuake consistentQuake;
 
     private bool isVisible = false; // tracks if tips are currently shown
 
@@ -32,6 +36,10 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
         FooterLine.SetActive(true);
         HUD.SetActive(false);
         PauseBtn.SetActive(false);
+        startPanelUI.SetActive(false);
+        panicMeterScript.enabled = false;
+        consistentQuake.enabled = false;
+
 
         GamestartNarration.SetActive(false);
 
@@ -53,35 +61,38 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
             Lines.SetActive(true);
             QuakeIcon.SetActive(true);
             SlowIcon.SetActive(true);
-            
 
             Bg.SetActive(true); // show background if you want
             PrevBtn.SetActive(true);
         }
         else
         {
-            IntroPanel.SetActive(false); // hide intro panel
+            // hide intro
+            IntroPanel.SetActive(false);
 
-
-            // add here setting joysticks to enable!!!!
-            HUD.SetActive(true);
-
-
-            //enable player movments
-            PlayerMovements.speed = 3f;
-            PlayerMovements.jumpHeight = 1f;
-
-            //pausebtn active
-        PauseBtn.SetActive(true);
-
-
-            //player talks
-            GamestartNarration.SetActive(true);
+            // show tap-to-start black screen
+            startPanelUI.SetActive(true);
         }
-
         isVisible = !isVisible; // flip state
     }
 
+
+    public void StartGame()
+    {
+
+        // hide the black start panel
+        startPanelUI.SetActive(false);
+        panicMeterScript.enabled = true;
+        consistentQuake.enabled = true;
+        // enable game HUD
+        HUD.SetActive(true);
+        PauseBtn.SetActive(true);
+        GamestartNarration.SetActive(true);
+
+        // enable player movement
+        PlayerMovements.speed = 3f;
+        PlayerMovements.jumpHeight = 1f;
+    }
 
 
     public void Prev()

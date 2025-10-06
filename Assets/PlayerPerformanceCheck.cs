@@ -13,7 +13,7 @@ public class PlayerPerformanceCheck : MonoBehaviour
 
     void OnTriggerEnter()
     {
-        if (DataManager.Instance.quizScore != 0 || DataManager.Instance.factsDiscovered >= 3)
+        if (DataManager.Instance.quizScore != 0 && DataManager.Instance.factsDiscovered >= 2)
         {
             barrier.SetActive(false);
         }
@@ -23,5 +23,4 @@ public class PlayerPerformanceCheck : MonoBehaviour
         }
     }
 
-    
 }

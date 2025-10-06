@@ -64,21 +64,22 @@ public class NpcAnimation : MonoBehaviour
         }
         else
         {
-            if (score != 0 && currentNpcId == 6 || currentNpcId == 7)
+            if (score != 0 && currentNpcId >= 6 && currentNpcId <= 8)
             {
                 heart.Heal(1);
                 aud.PlaySFX(19);
                 GreenFlashEffect.SetActive(true);
-               StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+                StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
             }
 
-            else if (score != 0 && currentNpcId == 8 || currentNpcId == 9)
+            else if (score != 0 && (currentNpcId >= 9 || currentNpcId <= 11))
             {
                 panicMeter.currHealth -= 20;
                 aud.PlaySFX(18);
                 blueFlashEffect.SetActive(true);
                 StartCoroutine(FlashFade(blueFlashEffect.GetComponent<CanvasGroup>(), 1f));
             }
+
         }
 
 

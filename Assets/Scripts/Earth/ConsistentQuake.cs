@@ -4,29 +4,75 @@ using System.Collections;
 
 public class ConsistentQuake : MonoBehaviour
 {
+    [Header("References")]
     public GameObject quakeIcon;
     public Shaker shaker;
-    private ShakeInstance currentShake;
-
-    public Camera coverCam;
     public ShakePreset shakePreset;
+    public Camera coverCam;
     public PanicMeterScript panicMeterScript;
-
     public GameObject[] LockerNoises;
 
-    private AudioSource audi;
-
+    [Header("Settings")]
     public float quakeInterval = 15f;  // cooldown between quakes
-    public float quakeDuration = 10f;   // how long quake lasts
+    public float quakeDuration = 10f;  // how long quake lasts
 
+    private AudioSource audi;
+    private ShakeInstance currentShake;
+    private Coroutine quakeRoutine;
+
+    private bool isPaused = false; // ✅ NEW — used to pause/resume
     public bool IsQuakeActive { get; private set; } = false;
-
 
     void Start()
     {
         quakeIcon.SetActive(false);
         audi = GetComponent<AudioSource>();
-        StartCoroutine(QuakeRoutine());
+        quakeRoutine = StartCoroutine(QuakeRoutine());
+    }
+
+    // ✅ Call this to PAUSE quake (used during quiz)
+    public void PauseQuakes()
+    {
+        isPaused = true;
+
+        // stop shake visuals/audio temporarily
+        if (currentShake != null)
+            currentShake.Pause(0);
+
+        foreach (GameObject obj in LockerNoises)
+        {
+            if (obj != null)
+            {
+                AudioSource lockerAudio = obj.GetComponent<AudioSource>();
+                if (lockerAudio != null && lockerAudio.isPlaying)
+                    lockerAudio.Pause();
+            }
+        }
+
+        audi?.Pause();
+        Debug.Log("🌙 Quakes paused.");
+    }
+
+    // ✅ Call this to RESUME quake after quiz
+    public void ResumeQuakes()
+    {
+        isPaused = false;
+
+        if (currentShake != null)
+            currentShake.Resume(0);
+
+        foreach (GameObject obj in LockerNoises)
+        {
+            if (obj != null)
+            {
+                AudioSource lockerAudio = obj.GetComponent<AudioSource>();
+                if (lockerAudio != null)
+                    lockerAudio.UnPause();
+            }
+        }
+
+        audi?.UnPause();
+        Debug.Log("☀️ Quakes resumed.");
     }
 
     IEnumerator QuakeRoutine()
@@ -39,10 +85,7 @@ public class ConsistentQuake : MonoBehaviour
             {
                 currentShake = Shaker.ShakeAll(shakePreset);
                 quakeIcon.SetActive(true);
-
-                Debug.Log("Earthquake started!");
-
-
+                Debug.Log("🌋 Earthquake started!");
 
                 foreach (GameObject obj in LockerNoises)
                 {
@@ -50,54 +93,71 @@ public class ConsistentQuake : MonoBehaviour
                     {
                         AudioSource lockerAudio = obj.GetComponent<AudioSource>();
                         if (lockerAudio != null)
-                        {
                             lockerAudio.Play();
-                        }
                     }
                 }
             }
 
             IsQuakeActive = true;
 
-            // Panic increase during quake
+            // ⏱ Shake duration
             float elapsed = 0f;
             while (elapsed < quakeDuration)
             {
+                // ⏸ Wait while paused
+                if (isPaused)
+                {
+                    yield return null;
+                    continue;
+                }
+
                 if (!coverCam.enabled && panicMeterScript != null)
-                    panicMeterScript.currHealth += Time.deltaTime * 2f; // adjust rate
+                    panicMeterScript.currHealth += Time.deltaTime * 2f;
 
                 elapsed += Time.deltaTime;
-                yield return null; // wait 1 frame
+                yield return null;
             }
 
-            // 🛑 Stop quake
-            if (currentShake != null)
+            // 🛑 Stop quake visuals
+            StopActiveQuake();
+
+            // ⏳ Wait before next quake
+            float wait = 0f;
+            while (wait < quakeInterval)
             {
-                currentShake.Stop(0, true);
-                currentShake = null;
-                quakeIcon.SetActive(false);
-
-                Debug.Log("Earthquake ended!");
-
-                    foreach (GameObject obj in LockerNoises)
+                if (isPaused)
                 {
-                    if (obj != null)
-                    {
-                        AudioSource lockerAudio = obj.GetComponent<AudioSource>();
-                        if (lockerAudio != null)
-                        {
-                            lockerAudio.Stop();
-                        }
-                    }
+                    yield return null;
+                    continue;
                 }
+
+                wait += Time.deltaTime;
+                yield return null;
             }
-            audi?.Stop();
-
-            IsQuakeActive = false;
-
-            // ⏳ Wait cooldown before next quake
-            yield return new WaitForSeconds(quakeInterval);
         }
     }
 
+    private void StopActiveQuake()
+    {
+        if (currentShake != null)
+        {
+            currentShake.Stop(0, true);
+            currentShake = null;
+        }
+
+        foreach (GameObject obj in LockerNoises)
+        {
+            if (obj != null)
+            {
+                AudioSource lockerAudio = obj.GetComponent<AudioSource>();
+                if (lockerAudio != null) lockerAudio.Stop();
+            }
+        }
+
+        audi?.Stop();
+        quakeIcon.SetActive(false);
+        IsQuakeActive = false;
+
+        Debug.Log("🛑 Earthquake ended!");
+    }
 }
