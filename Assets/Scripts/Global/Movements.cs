@@ -17,6 +17,7 @@ public class Movements : MonoBehaviour
     public float runStepInterval = 0.35f;   // faster for running
     private float stepTimer;
     public bool footstepsEnabled = true;
+    public GameObject signalSwitchFootstepsSfx;
 
 
     void Start()
@@ -77,15 +78,15 @@ void HandleFootsteps(Vector3 move)
 
             if (stepTimer <= 0f)
             {
-                if (  AudioManager.Instance.Clips.Length > 4)
+                if ( signalSwitchFootstepsSfx != null)
                 {
                     // play random footstep clip
-                      AudioManager.Instance.PlaySFX(2); // index for footsteps in your Clips array
+                      AudioManager.Instance.PlaySFX(1); // index for footsteps in your Clips array
                     
                 }
                 else
                 {
-                      AudioManager.Instance.PlaySFX(0); // fallback sound if no footsteps assigned
+                      AudioManager.Instance.PlaySFX(2); // fallback sound if no footsteps assigned
                 }
              
 
