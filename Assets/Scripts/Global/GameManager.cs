@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     public HeartSys hearts;
     public Movements movementscript;
 
+    public static GameManager Instance;
+
 
     public bool isPaused = false;
 
@@ -22,6 +24,20 @@ public class GameManager : MonoBehaviour
         [Header("HUD Handling")]
     public CanvasGroup hudCanvasGroup; // assign the HUD's CanvasGroup he
 
+
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
 
     void Start()
@@ -86,6 +102,9 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         isPaused = true;
 
+         AudioListener.pause = true; // 🔇 Pause ALL audio in the scene
+
+
         if (resumeBtn != null) resumeBtn.SetActive(true);
         if (ExitBtn != null) ExitBtn.SetActive(true);
         if (RestartBtn != null) RestartBtn.SetActive(true);
@@ -113,6 +132,9 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         isPaused = false;
+
+        AudioListener.pause = false; // 🔊 Resume ALL audio
+
 
         if (resumeBtn != null) resumeBtn.SetActive(false);
         if (ExitBtn != null) ExitBtn.SetActive(false);

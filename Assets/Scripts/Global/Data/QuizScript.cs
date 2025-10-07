@@ -25,8 +25,6 @@ public class QuizScript : MonoBehaviour
     public Color wrongColor = new Color(0.9f, 0.3f, 0.3f); // red
     public float feedbackDelay = 1f;                       // seconds to show color. Delay to each after quiz question
 
-    [Header("Npc icons")]
-    public NpcsSaved npcsaved;
 
     [Header("Disable movements and quake whent taking quiz")]
     public Movements movements;
@@ -45,8 +43,6 @@ public class QuizScript : MonoBehaviour
     public int currentNpcId; // To track which NPC is being helped
     public NpcAnimation[] npcAnimation; // Reference to NpcAnimation script
 
-
-    public GameNotifier gameNotifier; // Reference to GameNotifier script
 
 
     void Start()
@@ -88,6 +84,7 @@ public class QuizScript : MonoBehaviour
             case 9: questions = QuizDatabase.Water1; break;
             case 10: questions = QuizDatabase.Water2; break;
             case 11: questions = QuizDatabase.Water3; break;
+            case 12: questions = QuizDatabase.Whistle1; break;
 
         }
 
@@ -327,27 +324,45 @@ public class QuizScript : MonoBehaviour
         gameObject.SetActive(false);
         helpBtn.SetActive(false);
 
-        if (score > 0)
-        {
-            if (currentNpcId > 0 && currentNpcId <= 5)
-            {
-                gameNotifier.EarnedPoints(score);
-                AudioManager.Instance.PlaySFX(8); //points
 
-                if (npcsaved != null) { npcsaved.makeIconActive(); }
-            }
+       ///////////////////// npcAnimation[currentNpcId - 1].ReactToScore(score);
 
-            else if (currentNpcId >= 6 && currentNpcId <= 8)
-            {
-             AudioManager.Instance.PlaySFX(19); //medkit
-            }
+        // if (score > 0)
+        // {
+        //     if (currentNpcId > 0 && currentNpcId <= 5)
+        //     {
+        //         gameNotifier.EarnedPoints(score);
+        //         AudioManager.Instance.PlaySFX(8); //points
 
-            else if (currentNpcId >= 9 && currentNpcId <= 11)
-            {
-             AudioManager.Instance.PlaySFX(18); //drink water
-            }
+        //         if (npcsaved != null) { npcsaved.makeIconActive(); }
+        //     }
 
-        }
+        //     else if (currentNpcId >= 6 && currentNpcId <= 8)
+        //     {
+        //         AudioManager.Instance.PlaySFX(19); //medkit
+        //         AudioManager.Instance.PlaySFX(8); //points
+        //         gameNotifier.EarnedPoints(score);
+
+
+        //     }
+
+        //     else if (currentNpcId >= 9 && currentNpcId <= 11)
+        //     {
+        //         AudioManager.Instance.PlaySFX(18); //drink water
+        //         AudioManager.Instance.PlaySFX(8); //points
+        //         gameNotifier.EarnedPoints(score);
+
+
+        //     }
+
+
+        //     else if (currentNpcId >= 12)
+        //     {
+        //         gameNotifier.ObtainedItem(2, "Whistle");
+        //         AudioManager.Instance.PlaySFX(8); //points
+        //     }
+
+        // }
 
 
         consistentQuake.enabled = true;

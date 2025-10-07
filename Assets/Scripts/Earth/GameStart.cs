@@ -7,9 +7,8 @@ using Unity.VisualScripting;
 
 public class GameStart : MonoBehaviour  //, IPointerClickHandler
 {
-    public GameObject Header1, Header2, Body1, Body2, Bg, IntroPanel, HeaderLine,
-    FooterLine, Lines, QuakeIcon, SlowIcon,
-    NextBtn, PrevBtn, PanicMeter, HUD, PauseBtn, startPanelUI;
+    public GameObject Body1, Body2, Body3, Bg, IntroPanel,
+    NextBtn, PrevBtn, HUD, PauseBtn, startPanelUI, whistleSkill;
 
 
     public GameObject GamestartNarration; //Game start player narration /talking
@@ -19,26 +18,26 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
     public PanicMeterScript panicMeterScript;
     public ConsistentQuake consistentQuake;
 
+
     private bool isVisible = false; // tracks if tips are currently shown
+
+    [SerializeField] private List<GameObject> pages;
+private int currentPage = 0;
 
 
     void Start()
     {
-        Header2.SetActive(false);
-        Header1.SetActive(true);
+
         Body2.SetActive(false);
         Body1.SetActive(true);
-        QuakeIcon.SetActive(false);
-        SlowIcon.SetActive(false);
-        PanicMeter.SetActive(false);
-        Lines.SetActive(false);
-        HeaderLine.SetActive(true);
-        FooterLine.SetActive(true);
+        Body3.SetActive(false);
         HUD.SetActive(false);
         PauseBtn.SetActive(false);
+        PrevBtn.SetActive(false);
         startPanelUI.SetActive(false);
         panicMeterScript.enabled = false;
         consistentQuake.enabled = false;
+        whistleSkill.SetActive(false);
 
 
         GamestartNarration.SetActive(false);
@@ -47,34 +46,42 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
         PlayerMovements.jumpHeight = 0f;
     }
 
-    public void Next()
+
+public void NextPage()
+{
+    if (currentPage < pages.Count - 1)
     {
-        if (!isVisible)
-        {
-            Header2.SetActive(true);
-            Header1.SetActive(false);
-            HeaderLine.SetActive(false);
-            FooterLine.SetActive(false);
-            PanicMeter.SetActive(true);
-            Body2.SetActive(true);
-            Body1.SetActive(false);
-            Lines.SetActive(true);
-            QuakeIcon.SetActive(true);
-            SlowIcon.SetActive(true);
-
-            Bg.SetActive(true); // show background if you want
-            PrevBtn.SetActive(true);
-        }
-        else
-        {
-            // hide intro
-            IntroPanel.SetActive(false);
-
-            // show tap-to-start black screen
-            startPanelUI.SetActive(true);
-        }
-        isVisible = !isVisible; // flip state
+        pages[currentPage].SetActive(false);
+        currentPage++;
+        pages[currentPage].SetActive(true);
     }
+    else
+    {
+        // Last page reached — show start panel
+        IntroPanel.SetActive(false);
+        startPanelUI.SetActive(true);
+    }
+
+    UpdateButtons();
+}
+
+public void PrevPage()
+{
+    if (currentPage > 0)
+    {
+        pages[currentPage].SetActive(false);
+        currentPage--;
+        pages[currentPage].SetActive(true);
+    }
+
+    UpdateButtons();
+}
+
+private void UpdateButtons()
+{
+    PrevBtn.SetActive(currentPage > 0);
+   // NextBtn.SetActive(currentPage < pages.Count - 1);
+}
 
 
     public void StartGame()
@@ -94,44 +101,5 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
         PlayerMovements.jumpHeight = 1f;
     }
 
-
-    public void Prev()
-    {
-        if (isVisible)
-        {
-            // Switch back headers
-            Header1.SetActive(true);
-            Header2.SetActive(false);
-            HeaderLine.SetActive(true);
-            FooterLine.SetActive(true);
-
-            // Switch back bodies
-            Body1.SetActive(true);
-            Body2.SetActive(false);
-
-            // Hide icons
-            QuakeIcon.SetActive(false);
-            SlowIcon.SetActive(false);
-
-            // Optionally hide background
-            Bg.SetActive(true);
-
-            PanicMeter.SetActive(false);
-            Lines.SetActive(false);
-
-            // Hide prev button if we're back at first batch
-            PrevBtn.SetActive(false);
-        }
-        else
-        {
-            // If already at intro, you might want to reopen it or do nothing
-            IntroPanel.SetActive(true);
-
-            // disable joysticks again if needed
-        }
-
-        // Flip the state
-        isVisible = !isVisible;
-    }
 
 }

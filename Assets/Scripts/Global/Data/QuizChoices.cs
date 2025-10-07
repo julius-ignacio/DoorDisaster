@@ -200,6 +200,20 @@ public static class QuizDatabase
 
 };
 
+public static List<QuizQuestion> Whistle1 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "Why is carrying a whistle important during an emergency or disaster?",
+        choices = new string[] {
+            "It helps rescuers locate you by sound even if you're trapped or out of sight",
+            "It can be used to scare away wild animals or intruders",
+            "It's a convenient tool for giving commands to others"
+        },
+        correctIndex = 0
+    }
+};
+
+
 
 
 

@@ -12,6 +12,7 @@ public class DataManager : MonoBehaviour
     public int quizScore;
     public int factsDiscovered;
     public int totalQuestionsAnswered;
+    public int Npcs_saved;
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
 

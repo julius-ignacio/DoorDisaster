@@ -18,11 +18,22 @@ public class GameNotifier : MonoBehaviour
     {
         StartCoroutine(ShowNotificationCoroutine($"+{points} Points Earned!", duration));
     }
+    
+        public void ObtainedItem(int points, string itemName, float duration = 3f)
+    {
+        StartCoroutine(ShowNotificationCoroutine($"{itemName} obtained. You earned {points} point!", duration));
+    }
 
 public void PanicWarning(float duration = 3f)
-{
-    StartCoroutine(ShowNotificationCoroutine("Panic meter critical! Stay calm — you've got this!", duration));
-}
+    {
+        StartCoroutine(ShowNotificationCoroutine("Panic meter critical! Stay calm — you've got this!", duration));
+    }
+
+
+    public void BarrierRemoved(float duration = 5f)
+    {
+        StartCoroutine(ShowNotificationCoroutine("Objectives completed. You can now get through the barrier and reach the exit.", duration));
+    }
 
 
 
