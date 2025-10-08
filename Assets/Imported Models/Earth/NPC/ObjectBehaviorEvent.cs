@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class NpcAnimation : MonoBehaviour
+public class ObjectBehaviorEvent : MonoBehaviour
 {
     public Animator npcAnimator;
     public float disappearDelay = 5f;

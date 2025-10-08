@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using Unity.VisualScripting;
+using System.Collections;
 
 public class WordPuzzle : MonoBehaviour
 {
@@ -15,10 +18,11 @@ public class WordPuzzle : MonoBehaviour
 
     private string currentWord = "";
 
-    public GameObject quizPanel;
+    public GameObject quizPanel, barrier, quizButton;
 
     void Start()
     {
+        quizButton.SetActive(false);
         quizPanel.SetActive(false);
         feedbackText.text = "";
         foreach (Button btn in letterButtons)
@@ -28,16 +32,27 @@ public class WordPuzzle : MonoBehaviour
         }
     }
 
+
+    public void OpenQuiz()
+    {
+        quizPanel.SetActive(true);
+        quizButton.SetActive(false);
+        ResetWord();
+        feedbackText.text = "";
+    }
+
     public void OnLetterClick(string letter)
     {
         currentWord += letter;
         currentWordText.text = currentWord;
+
 
         // Check if player reached word length
         if (currentWord.Length == correctWord.Length)
         {
             CheckAnswer();
         }
+
     }
 
     void CheckAnswer()
@@ -47,6 +62,8 @@ public class WordPuzzle : MonoBehaviour
             feedbackText.text = "✅ Correct!";
             // You can trigger next question or scene here
             DisableButtons();
+
+            StartCoroutine(CorrectAnswer(1.5f));
         }
         else
         {
@@ -73,5 +90,15 @@ public class WordPuzzle : MonoBehaviour
         quizPanel.SetActive(false);
         ResetWord();
         feedbackText.text = "";
+    }
+
+
+    private IEnumerator CorrectAnswer(float duration)
+    {
+        currentWordText.color = Color.green;
+        yield return new WaitForSeconds(duration);
+        quizPanel.SetActive(false);
+        barrier.SetActive(false);
+        AudioManager.Instance.PlaySFX(22);
     }
 }

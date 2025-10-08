@@ -41,7 +41,7 @@ public class QuizScript : MonoBehaviour
 
 
     public int currentNpcId; // To track which NPC is being helped
-    public NpcAnimation[] npcAnimation; // Reference to NpcAnimation script
+    public ObjectBehaviorEvent[] objectBehaviorEvent; // Reference to NpcAnimation script
 
 
 
@@ -319,7 +319,7 @@ public class QuizScript : MonoBehaviour
         DataManager.Instance.npcScores[currentNpcId] = score;
 
         disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
-        npcAnimation[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+        objectBehaviorEvent[currentNpcId - 1].PlayAndDisappear(currentNpcId);
 
         gameObject.SetActive(false);
         helpBtn.SetActive(false);
