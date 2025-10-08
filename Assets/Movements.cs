@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using PinePie.SimpleJoystick; // Import the namespace
 
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
@@ -12,10 +13,10 @@ public class Movements : MonoBehaviour
     public float groundDistance = 0.2f;
     public LayerMask groundMask;
 
-    [Header("Mouse Look Settings")]
-    public float mouseSensitivity = 2f;
+    [Header("Camera Settings")]
     public Transform playerBody;
     public Camera firstPersonCamera;
+    public float lookSensitivity = 2f;
 
     [Header("Audio")]
     public AudioSource footstepAudioSource;
@@ -27,8 +28,15 @@ public class Movements : MonoBehaviour
     public int currentHealth;
     public Slider healthBar;
 
-    [Header("Inventory/Items")]
+    [Header("Inventory / Items")]
     public bool hasTowel = false;
+
+    [Header("Mobile Controls")]
+    public bool isMobile = false;
+    public JoystickController movementJoystick;  // Left joystick for movement
+    public JoystickController lookJoystick;      // Right joystick for camera (optional)
+    public Button jumpButton;                     // Jump button
+    public float mobileLookSensitivity = 0.5f;   // Separate sensitivity for mobile
 
     private CharacterController controller;
     private Vector3 velocity;
@@ -41,58 +49,35 @@ public class Movements : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
 
-        Cursor.lockState = CursorLockMode.Locked;
-
         if (firstPersonCamera == null)
-        {
-            Camera foundCamera = GetComponentInChildren<Camera>();
-            if (foundCamera != null)
-                firstPersonCamera = foundCamera;
-        }
+            firstPersonCamera = GetComponentInChildren<Camera>();
 
         if (playerBody == null)
             playerBody = transform;
 
-        // Initialize health system
         currentHealth = maxHealth;
         if (healthBar != null)
         {
             healthBar.maxValue = maxHealth;
             healthBar.value = currentHealth;
-
-            // Force fill color update
-            Image fillImage = healthBar.fillRect?.GetComponent<Image>();
-            if (fillImage != null)
-            {
-                fillImage.color = Color.green;
-            }
-
-            Debug.Log("Health bar initialized - Value: " + currentHealth + "/" + maxHealth);
         }
 
-        Debug.Log("Camera found: " + (firstPersonCamera != null));
-        Debug.Log("Player body: " + (playerBody != null));
+        // Add jump button listener for mobile
+        if (isMobile && jumpButton != null)
+            jumpButton.onClick.AddListener(Jump);
+
+        // Lock cursor for PC
+        if (!isMobile)
+            Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        // DEBUG: Check controller state
-        if (!controller.enabled)
-        {
-            Debug.Log("Controller is DISABLED! Player probably died.");
-            return;
-        }
-
         HandleGroundCheck();
         HandleMovement();
         HandleJump();
+        HandleLook();
         HandleFootsteps();
-        HandleCursorToggle();
-    }
-
-    void LateUpdate()
-    {
-        HandleMouseLook();
     }
 
     void HandleGroundCheck()
@@ -101,56 +86,114 @@ public class Movements : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheckPos, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; // Keep grounded
-        }
+            velocity.y = -2f;
     }
 
     void HandleMovement()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        float x = 0f;
+        float z = 0f;
 
-        // DEBUG: Check input
-        if (x != 0 || z != 0)
-            Debug.Log("Input detected - X: " + x + ", Z: " + z + ", IsGrounded: " + isGrounded);
+        if (isMobile && movementJoystick != null)
+        {
+            // Get input from mobile joystick
+            Vector2 dir = movementJoystick.InputDirection;
+            x = dir.x;
+            z = dir.y;
+        }
+        else
+        {
+            // PC input
+            x = Input.GetAxis("Horizontal");
+            z = Input.GetAxis("Vertical");
+        }
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        // Running only on PC (shift key)
+        float speed = (!isMobile && Input.GetKey(KeyCode.LeftShift)) ? runSpeed : walkSpeed;
 
         controller.Move(move * speed * Time.deltaTime);
-
         isMoving = move.magnitude > 0.1f && isGrounded;
     }
 
-    void HandleMouseLook()
+    void HandleLook()
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (isMobile)
+        {
+            // Option 1: Using a look joystick (recommended)
+            if (lookJoystick != null)
+            {
+                Vector2 lookDir = lookJoystick.InputDirection;
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+                if (lookDir.magnitude > 0.1f) // Only rotate if joystick is being used
+                {
+                    float mouseX = lookDir.x * mobileLookSensitivity;
+                    float mouseY = lookDir.y * mobileLookSensitivity;
 
-        playerBody.Rotate(Vector3.up * mouseX);
+                    playerBody.Rotate(Vector3.up * mouseX);
 
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+                    xRotation -= mouseY;
+                    xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        if (firstPersonCamera != null)
+                    firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+                }
+            }
+            // Option 2: Using touch on right side of screen (fallback)
+            else if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                // Only use touch on right side of screen for looking
+                if (touch.position.x > Screen.width / 2 && touch.phase == TouchPhase.Moved)
+                {
+                    float mouseX = touch.deltaPosition.x * mobileLookSensitivity * 0.1f;
+                    float mouseY = touch.deltaPosition.y * mobileLookSensitivity * 0.1f;
+
+                    playerBody.Rotate(Vector3.up * mouseX);
+
+                    xRotation -= mouseY;
+                    xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+                    firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+                }
+            }
+        }
+        else
+        {
+            // PC mouse look
+            float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
+            float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
+
+            playerBody.Rotate(Vector3.up * mouseX);
+
+            xRotation -= mouseY;
+            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
             firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        }
     }
 
     void HandleJump()
     {
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
+        // PC jump
+        if (!isMobile && Input.GetButtonDown("Jump") && isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
 
+        ApplyGravity();
+    }
+
+    // Mobile jump (called by button)
+    void Jump()
+    {
+        if (isGrounded)
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    }
+
+    void ApplyGravity()
+    {
         if (!isGrounded)
-        {
             velocity.y += gravity * Time.deltaTime;
-        }
 
         controller.Move(velocity * Time.deltaTime);
     }
@@ -163,68 +206,35 @@ public class Movements : MonoBehaviour
 
             if (footstepTimer <= 0f)
             {
-                int randomIndex = Random.Range(0, footstepSounds.Length);
-                footstepAudioSource.PlayOneShot(footstepSounds[randomIndex]);
+                int index = Random.Range(0, footstepSounds.Length);
+                footstepAudioSource.PlayOneShot(footstepSounds[index]);
 
-                float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
-                footstepTimer = footstepInterval * (walkSpeed / currentSpeed);
+                float speed = isMobile ? walkSpeed : (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed);
+                footstepTimer = footstepInterval * (walkSpeed / speed);
             }
         }
     }
 
-    void HandleCursorToggle()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (Cursor.lockState == CursorLockMode.Locked)
-                Cursor.lockState = CursorLockMode.None;
-            else
-                Cursor.lockState = CursorLockMode.Locked;
-        }
-    }
-
-    // =====================
-    // Health System Methods
-    // =====================
+    // ===================== Health System =====================
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        if (healthBar != null) healthBar.value = currentHealth;
 
-        if (healthBar != null)
-            healthBar.value = currentHealth;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
     }
 
-    public void Die()
+    void Die()
     {
-        Debug.Log("Player is dead");
-        controller.enabled = false; // disable movement when dead
-
-        // Trigger Game Over
-        GameOverManager.TriggerDeath(
-            "HEALTH DEPLETED",
-            "You were burned by the fire! Remember to plan your escape early."
-        );
+        controller.enabled = false;
+        Debug.Log("Player died!");
+        GameOverManager.TriggerDeath("HEALTH DEPLETED", "You were burned by the fire!");
     }
 
-
-    // =====================
-    // Inventory/Item Methods
-    // =====================
-    public bool HasTowel()
-    {
-        return hasTowel;
-    }
-
-    public void SetTowel(bool value)
-    {
-        hasTowel = value;
-    }
+    // ===================== Inventory / Items =====================
+    public bool HasTowel() => hasTowel;
+    public void SetTowel(bool value) => hasTowel = value;
 
     public void PickupTowel()
     {
@@ -238,30 +248,22 @@ public class Movements : MonoBehaviour
         {
             hasTowel = false;
             Debug.Log("Used towel!");
-            // Add towel usage logic here
         }
-        else
-        {
-            Debug.Log("No towel to use!");
-        }
+        else Debug.Log("No towel to use!");
     }
 
-    // Existing helper methods
-    public bool IsGrounded() => isGrounded;
-    public bool IsMoving() => isMoving;
-    public float GetCurrentSpeed() => Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
-
-    // Emergency method for testing
     public void ForceEnable()
     {
         controller.enabled = true;
         Debug.Log("Movement force enabled!");
     }
 
+    public bool IsGrounded() => isGrounded;
+    public bool IsMoving() => isMoving;
+
     void OnDrawGizmosSelected()
     {
         if (controller == null) return;
-
         Vector3 groundCheckPos = controller.bounds.center - new Vector3(0, controller.bounds.extents.y, 0);
         Gizmos.color = isGrounded ? Color.green : Color.red;
         Gizmos.DrawWireSphere(groundCheckPos, groundDistance);

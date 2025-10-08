@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using UnityEngine;
 
 public class CatPickup : MonoBehaviour
@@ -5,8 +6,12 @@ public class CatPickup : MonoBehaviour
     [Header("References")]
     public GameObject cat;
     public SubtitleManager subtitleManager;
-    public TowelPickup towelPickup; // Direct reference instead of FindObjectOfType
-    public FireSafetyQuiz quizManager; // Add quiz manager reference
+    public TowelPickup towelPickup;
+    public FireSafetyQuiz quizManager;
+
+    [Header("Teleport Settings")]
+    public Transform player;
+    public Transform houseASpawnPoint; // Drag empty GameObject in House A
 
     private bool hasPickedUp = false;
 
@@ -16,7 +21,6 @@ public class CatPickup : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.E))
             {
-                // Check if player has towel using direct reference
                 if (towelPickup != null && towelPickup.HasPickedUpTowel())
                 {
                     hasPickedUp = true;
@@ -31,28 +35,34 @@ public class CatPickup : MonoBehaviour
                     subtitleManager.ShowCustomMessage(
                         "The cat is now safe! Let's get out of here!",
                         3f,
-                        () => {
+                        () =>
+                        {
                             // AFTER subtitle ends, show quiz
                             QuizQuestion quiz = QuizDatabase.GetQuiz("pet_hiding");
                             if (quiz != null && quizManager != null)
                             {
-                                quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () => {
-                                    // After quiz completes, show objective
-                                    subtitleManager.ShowObjective("Find the nearest exit to escape the fire");
-                                });
+                                quizManager.ShowQuiz(
+                                    quiz.question,
+                                    quiz.answers,
+                                    quiz.correctAnswerIndex,
+                                    () =>
+                                    {
+                                        // After quiz completes → teleport back to House A
+                                        StartCoroutine(TeleportBackToHouseA());
+                                    }
+                                );
                             }
                             else
                             {
                                 Debug.LogError("Quiz 'pet_hiding' not found or quizManager not assigned!");
-                                // Fallback: show objective without quiz
-                                subtitleManager.ShowObjective("Find the nearest exit to escape the fire");
+                                // Fallback → teleport back without quiz
+                                StartCoroutine(TeleportBackToHouseA());
                             }
                         }
                     );
                 }
                 else
                 {
-                    // Show message that towel is needed first
                     subtitleManager.ShowCustomMessage(
                         "I need to get the wet towel first before I can save the cat!",
                         2f
@@ -62,7 +72,21 @@ public class CatPickup : MonoBehaviour
         }
     }
 
-    // Method to check if cat was picked up
+    private IEnumerator TeleportBackToHouseA()
+    {
+        // Optional: fade out screen or play sound
+        yield return new WaitForSeconds(1f);
+
+        if (player != null && houseASpawnPoint != null)
+        {
+            player.position = houseASpawnPoint.position; // Teleport back to House A
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        subtitleManager.ShowObjective("Find the nearest exit to escape the fire");
+    }
+
     public bool HasPickedUpCat()
     {
         return hasPickedUp;
