@@ -10,7 +10,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
     public GameObject npcModel;
     public HeartSys heart;
     public UseWhistle useWhistle;
-    public GameObject GreenFlashEffect, blueFlashEffect;
+    public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
     public PanicMeterScript panicMeter;
     public GameNotifier gameNotifier;
     public Objectives objectives;
@@ -29,7 +29,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
 
         GreenFlashEffect.SetActive(false);
-        blueFlashEffect.SetActive(false);
+        BlueFlashEffect.SetActive(false);
+        YellowFlashEffect.SetActive(false);
 
         // if (aud == null)
         // aud = FindObjectOfType<AudioManager>();
@@ -117,8 +118,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 gameNotifier.EarnedPoints(score);
 
 
-                blueFlashEffect.SetActive(true);
-                StartCoroutine(FlashFade(blueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+                BlueFlashEffect.SetActive(true);
+                StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
             }
 
             else if (score != 0 && currentNpcId == 12)
@@ -133,6 +134,9 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 AudioManager.Instance.PlaySFX(8); //points
                 heart.HelmetUsed();
                 gameNotifier.ObtainedItem(score, "Safety helmet");
+
+                YellowFlashEffect.SetActive(true);
+                StartCoroutine(FlashFade(YellowFlashEffect.GetComponent<CanvasGroup>(), 1f));
             }
 
         }

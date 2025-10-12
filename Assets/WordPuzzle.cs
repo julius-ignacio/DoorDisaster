@@ -100,5 +100,6 @@ public class WordPuzzle : MonoBehaviour
         quizPanel.SetActive(false);
         barrier.SetActive(false);
         AudioManager.Instance.PlaySFX(22);
+        DataManager.Instance.factsDiscovered ++;
     }
 }

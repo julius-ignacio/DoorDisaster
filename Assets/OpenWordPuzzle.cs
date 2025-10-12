@@ -8,8 +8,7 @@ using System.Collections;
 
 public class OpenWordPuzzle : MonoBehaviour
 {
-    public GameObject quizButton;
-    public int Id;
+    public GameObject quizButton, quizPanel;
 
     void Start()
     {
@@ -30,6 +29,7 @@ public class OpenWordPuzzle : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             quizButton.SetActive(false);
+            quizPanel.SetActive(false);
         }
     }
 }

@@ -35,7 +35,7 @@ public void PanicWarning(float duration = 3f)
         StartCoroutine(ShowNotificationCoroutine("Objectives completed. You can now get through the barrier and reach the exit.", duration));
     }
 
-public void HelmetBreak(float duration = 4f)
+public void HelmetBreak(float duration = 10f)
 {
     StartCoroutine(ShowNotificationCoroutine(
         "⚠️ Your safety helmet has broken! Stay alert — falling debris can be dangerous.",

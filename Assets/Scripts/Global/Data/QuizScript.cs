@@ -90,18 +90,7 @@ public class QuizScript : MonoBehaviour
         }
 
         BeginQuiz(questions);
-
-
-
     }
-
-
-
-
-
-
-
-
 
 
 
