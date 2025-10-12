@@ -200,7 +200,7 @@ public static class QuizDatabase
 
 };
 
-public static List<QuizQuestion> Whistle1 = new List<QuizQuestion>
+    public static List<QuizQuestion> Whistle1 = new List<QuizQuestion>
 {
     new QuizQuestion {
         question = "Why is carrying a whistle important during an emergency or disaster?",
@@ -212,6 +212,20 @@ public static List<QuizQuestion> Whistle1 = new List<QuizQuestion>
         correctIndex = 0
     }
 };
+
+public static List<QuizQuestion> SafetyHelmet = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "Why is wearing a safety helmet important during an earthquake?",
+        choices = new string[] {
+            "It makes you look prepared and professional during emergencies",
+            "It helps you move faster when evacuating a building",
+            "It protects your head from falling debris and other hazards"
+        },
+        correctIndex = 2
+    }
+};
+
 
 
 

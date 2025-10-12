@@ -19,6 +19,7 @@ public class ChangeNpcHelpButtonText : MonoBehaviour
             case 9: BtnText.text = "Drink water"; break;
             case 11: BtnText.text = "Drink water"; break;
             case 12: BtnText.text = "Get whistle"; break;
+            case 13: BtnText.text = "Get safety helmet"; break;
             case 10: BtnText.text = "Drink water"; break;
             case 8: BtnText.text = "Use medkit"; break;
             case 7: BtnText.text = "Use medkit"; break;

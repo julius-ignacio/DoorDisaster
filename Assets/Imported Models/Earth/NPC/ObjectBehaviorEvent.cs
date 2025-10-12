@@ -89,7 +89,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
                 gameNotifier.EarnedPoints(score);
                 if (npcsaved != null) { npcsaved.makeIconActive(); }
-                
+
                 objectives.UpdateObjectives();
 
 
@@ -126,6 +126,13 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 AudioManager.Instance.PlaySFX(8); //points
                 useWhistle.ButtonSkill.SetActive(true);
                 gameNotifier.ObtainedItem(score, "Whistle");
+            }
+            
+                      else if (score != 0 && currentNpcId == 13)
+            {
+                AudioManager.Instance.PlaySFX(8); //points
+                heart.HelmetUsed();
+                gameNotifier.ObtainedItem(score, "Safety helmet");
             }
 
         }

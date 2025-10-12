@@ -37,7 +37,6 @@ public class HealOrTakeDamage : MonoBehaviour
             AudioManager.Instance.PlaySFX(hitsound); // play locker hit sound
 
             heartSys.TakeDamage(damage);
-             AudioManager.Instance.PlaySFX(16);
 
             if (takeDamageImage != null)
                 StartCoroutine(FlashDamage());
