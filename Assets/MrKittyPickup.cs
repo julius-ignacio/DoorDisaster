@@ -73,7 +73,11 @@ public class MrKittyPickup : MonoBehaviour
 
             if (rb != null)
             {
+<<<<<<< HEAD
                 rb.velocity = Vector3.zero;
+=======
+                rb.linearVelocity = Vector3.zero;
+>>>>>>> 47c3962 (Quiz script changes)
                 rb.angularVelocity = Vector3.zero;
             }
 
@@ -134,7 +138,24 @@ public class MrKittyPickup : MonoBehaviour
             subtitleManager.ShowCustomMessage(
                 "I need to escape now!",
                 2f,
+<<<<<<< HEAD
                 () => subtitleManager.ShowObjective("Find the nearest exit to escape the fire")
+=======
+                () =>
+                {
+                    // Start the packing objective
+                    ObjectiveManager objManager = FindObjectOfType<ObjectiveManager>();
+                    if (objManager != null)
+                    {
+                        objManager.StartPackingObjective();
+                    }
+                    else
+                    {
+                        Debug.LogError("ObjectiveManager not found in scene!");
+                        subtitleManager.ShowObjective("Find the nearest exit to escape the fire");
+                    }
+                }
+>>>>>>> 47c3962 (Quiz script changes)
             );
         }
     }
