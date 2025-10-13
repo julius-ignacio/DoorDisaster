@@ -77,25 +77,16 @@ public class WakeUpController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-<<<<<<< HEAD
-        // Set initial rotations - lying down (90 degrees)
-        Quaternion startRotation = Quaternion.Euler(90f, 0f, 0f);
-=======
         // Set initial rotation - looking up while lying down (-60 degrees pitch = looking up)
         // Set final rotation - looking forward at eye level (0 degrees pitch)
         Quaternion startRotation = Quaternion.Euler(-60f, 0f, 0f);
->>>>>>> 47c3962 (Quiz script changes)
         Quaternion endRotation = Quaternion.Euler(0f, 0f, 0f);
 
         if (mainCamera != null)
         {
             // Preserve the Y rotation (left/right look)
             float currentYRotation = mainCamera.localEulerAngles.y;
-<<<<<<< HEAD
-            startRotation = Quaternion.Euler(90f, currentYRotation, 0f);
-=======
             startRotation = Quaternion.Euler(-60f, currentYRotation, 0f);
->>>>>>> 47c3962 (Quiz script changes)
             endRotation = Quaternion.Euler(0f, currentYRotation, 0f);
 
             mainCamera.localRotation = startRotation;

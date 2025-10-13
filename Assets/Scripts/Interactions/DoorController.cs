@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 using System.Collections;
->>>>>>> 47c3962 (Quiz script changes)
 using UnityEngine;
 
 public class DoorController : MonoBehaviour
@@ -11,16 +8,11 @@ public class DoorController : MonoBehaviour
     public float openSpeed = 2f;
     public float interactionDistance = 4f;
 
-<<<<<<< HEAD
-    private bool isOpen = false;
-    private bool isPlayerNear = false;
-=======
     [Header("Item inside Cabinet")]
     public ItemPickup item; // assign the object inside
 
     private bool isOpen = false;
     private bool isAnimating = false;
->>>>>>> 47c3962 (Quiz script changes)
     private Transform playerTransform;
     private Quaternion closedRotation;
     private Quaternion openRotation;
@@ -30,51 +22,14 @@ public class DoorController : MonoBehaviour
         closedRotation = transform.rotation;
         openRotation = closedRotation * Quaternion.Euler(0, openAngle, 0);
 
-<<<<<<< HEAD
-=======
         if (item != null)
             item.SetInteractable(false);
 
->>>>>>> 47c3962 (Quiz script changes)
         playerTransform = GameObject.FindWithTag("Player").transform;
     }
 
     void Update()
     {
-<<<<<<< HEAD
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        isPlayerNear = distanceToPlayer <= interactionDistance;
-
-        if (isPlayerNear && !isOpen)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                ToggleDoor();
-            }
-        }
-        else if (isPlayerNear && isOpen)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                ToggleDoor();
-            }
-        }
-
-        if (isOpen)
-        {
-            transform.rotation = Quaternion.Lerp(transform.rotation, openRotation, openSpeed * Time.deltaTime);
-        }
-        else
-        {
-            transform.rotation = Quaternion.Lerp(transform.rotation, closedRotation, openSpeed * Time.deltaTime);
-        }
-    }
-
-    void ToggleDoor()
-    {
-        isOpen = !isOpen;
-        Debug.Log(isOpen ? "Door Opened" : "Door Closed");
-=======
         if (isAnimating) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
@@ -116,7 +71,6 @@ public class DoorController : MonoBehaviour
 
         isOpen = opening;
         isAnimating = false;
->>>>>>> 47c3962 (Quiz script changes)
     }
 
     void OnDrawGizmosSelected()
@@ -124,8 +78,4 @@ public class DoorController : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, interactionDistance);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 47c3962 (Quiz script changes)

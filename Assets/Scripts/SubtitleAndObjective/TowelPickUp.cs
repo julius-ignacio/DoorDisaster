@@ -73,11 +73,7 @@ public class TowelPickup : MonoBehaviour
 
             if (rb != null)
             {
-<<<<<<< HEAD
-                rb.velocity = Vector3.zero;
-=======
                 rb.linearVelocity = Vector3.zero;
->>>>>>> 47c3962 (Quiz script changes)
                 rb.angularVelocity = Vector3.zero;
             }
 

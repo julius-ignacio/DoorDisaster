@@ -1,24 +1,12 @@
 ﻿using UnityEngine;
 using TMPro;
-<<<<<<< HEAD
-using UnityEngine.UI; // for Image
-=======
 using System.Collections;
 using UnityEngine.UI;
->>>>>>> 47c3962 (Quiz script changes)
 
 public class WindowEscape : MonoBehaviour
 {
     [Header("References")]
     public SubtitleManager subtitleManager;
-<<<<<<< HEAD
-    public GameObject heavyObject; // Lamp or chair
-    public DoorFireTrigger doorFireTrigger; // Reference to previous step
-
-    [Header("Ending Screen")]
-    public GameObject fadePanel; // UI Panel (Image) that covers screen
-    public TextMeshProUGUI endingText; // Ending text
-=======
     public GameObject heavyObject;
     public DoorFireTrigger doorFireTrigger;
 
@@ -26,7 +14,6 @@ public class WindowEscape : MonoBehaviour
     public GameObject fadePanel;
     public TextMeshProUGUI endingText;
     public TextMeshProUGUI scoreText;
->>>>>>> 47c3962 (Quiz script changes)
     public float fadeDuration = 2f;
 
     private bool hasHeavyObject = false;
@@ -40,10 +27,6 @@ public class WindowEscape : MonoBehaviour
 
     void Start()
     {
-<<<<<<< HEAD
-        // Add CanvasGroup to fadePanel if missing
-=======
->>>>>>> 47c3962 (Quiz script changes)
         if (fadePanel != null)
         {
             fadeCanvasGroup = fadePanel.GetComponent<CanvasGroup>();
@@ -63,28 +46,22 @@ public class WindowEscape : MonoBehaviour
             endingText.gameObject.SetActive(false);
             textCanvasGroup.alpha = 0;
         }
-<<<<<<< HEAD
-=======
 
         if (scoreText != null)
         {
             scoreText.gameObject.SetActive(false);
         }
->>>>>>> 47c3962 (Quiz script changes)
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasEscaped && !isFading && !promptShown)
         {
-<<<<<<< HEAD
-=======
             if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
             {
                 return;
             }
 
->>>>>>> 47c3962 (Quiz script changes)
             promptShown = true;
             subtitleManager.ShowCustomMessage(
                 "Let's try to open this window...",
@@ -98,14 +75,11 @@ public class WindowEscape : MonoBehaviour
     {
         if (other.CompareTag("Player") && !hasEscaped && !isFading)
         {
-<<<<<<< HEAD
-=======
             if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
             {
                 return;
             }
 
->>>>>>> 47c3962 (Quiz script changes)
             if (Input.GetKeyDown(KeyCode.E))
             {
                 if (hasHeavyObject)
@@ -135,10 +109,6 @@ public class WindowEscape : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
-    // Called by HeavyObjectPickup script
-=======
->>>>>>> 47c3962 (Quiz script changes)
     public void PickupHeavyObject()
     {
         hasHeavyObject = true;
@@ -177,8 +147,6 @@ public class WindowEscape : MonoBehaviour
             StartCoroutine(FadeCanvas(textCanvasGroup, 0f, 1f, fadeDuration));
         }
 
-<<<<<<< HEAD
-=======
         if (scoreText != null)
         {
             DataManager dataManager = FindObjectOfType<DataManager>();
@@ -195,7 +163,6 @@ public class WindowEscape : MonoBehaviour
             scoreText.gameObject.SetActive(true);
         }
 
->>>>>>> 47c3962 (Quiz script changes)
         StartCoroutine(FadeOutAndEnd());
     }
 
@@ -221,12 +188,5 @@ public class WindowEscape : MonoBehaviour
         yield return new WaitForSeconds(fadeDuration + 1f);
 
         Debug.Log("Game Complete!");
-<<<<<<< HEAD
-        // SceneManager.LoadScene("MainMenu");
-        // Application.Quit();
     }
 }
-=======
-    }
-}
->>>>>>> 47c3962 (Quiz script changes)
