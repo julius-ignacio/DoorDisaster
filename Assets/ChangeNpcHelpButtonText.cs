@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 
@@ -8,8 +7,7 @@ public class ChangeNpcHelpButtonText : MonoBehaviour
     public NPC_GiveId nPC_GiveId;
     void Start()
     {
-        BtnText.text = "Help";
-    }
+        BtnText.text = "Help"; }
 
 
     void OnTriggerEnter(Collider other)
