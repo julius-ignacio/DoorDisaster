@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
-using System.IO;
-using System.Collections.Generic;
+using System.Collections;
+using UnityEngine.Networking;
 
 [System.Serializable]
 public class EarthquakeInfo
@@ -17,20 +17,29 @@ public class Eq_info_loader : MonoBehaviour
     public Transform dateTimeColumn;
     public Transform magnitudeColumn;
     public Transform locationColumn;
-    public GameObject textPrefab; // A TextMeshProUGUI prefab for each row
+    public GameObject textPrefab; // TextMeshProUGUI prefab
 
     void Start()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "earthquake_data.json");
-        if (File.Exists(path))
+        StartCoroutine(LoadEarthquakeData());
+    }
+
+    IEnumerator LoadEarthquakeData()
+    {
+        string path = System.IO.Path.Combine(Application.streamingAssetsPath, "earthquake_data.json");
+
+        UnityWebRequest request = UnityWebRequest.Get(path);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
         {
-            string json = File.ReadAllText(path);
-            EarthquakeInfo[] quakes = JsonHelper.FromJson<EarthquakeInfo>(json);
-            DisplayTop10(quakes);
+            Debug.LogWarning($"Failed to load earthquake_data.json: {request.error}");
         }
         else
         {
-            Debug.LogWarning("No earthquake_data.json found!");
+            string json = request.downloadHandler.text;
+            EarthquakeInfo[] quakes = JsonHelper.FromJson<EarthquakeInfo>(json);
+            DisplayTop10(quakes);
         }
     }
 
@@ -53,7 +62,7 @@ public class Eq_info_loader : MonoBehaviour
     }
 }
 
-// Utility for array JSON
+// JSON Helper
 public static class JsonHelper
 {
     public static T[] FromJson<T>(string json)
