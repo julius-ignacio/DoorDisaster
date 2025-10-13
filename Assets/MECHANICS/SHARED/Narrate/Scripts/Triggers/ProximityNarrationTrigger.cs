@@ -24,9 +24,12 @@ namespace Narrate {
         public float timeInProximityToTrigger = 0;//ADDED
         public bool timeMustBeConsecutive = false;
         private float delayTimer;//tracks how much time has been spent inside the area ADDED
-                                 /// <summary>
-                                 /// Logs a warning if there are no triggered-by objects and disables this
-                                 /// </summary>
+
+        public int OnTriggered { get; internal set; }
+
+        /// <summary>
+        /// Logs a warning if there are no triggered-by objects and disables this
+        /// </summary>
         void Awake() {
             if (triggeredBy == null) {
                 Debug.LogWarning("ProximityNarrationTrigger Warning: " + this.gameObject.name +
