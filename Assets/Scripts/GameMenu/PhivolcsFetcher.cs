@@ -36,8 +36,16 @@ public class PhivolcsFetcher : MonoBehaviour
             else
             {
                 string json = request.downloadHandler.text;
-                PhivolcsData data = JsonUtility.FromJson<PhivolcsData>(json);
-                Debug.Log($"Latest EQ: M{data.latest_earthquake.magnitude} - {data.latest_earthquake.location}");
+                EarthquakeData[] quakes = JsonHelper.FromJson<EarthquakeData>(json);
+                if (quakes.Length > 0)
+                {
+                    Debug.Log($"Latest EQ: M{quakes[0].magnitude} - {quakes[0].location}");
+                }
+                else
+                {
+                    Debug.LogWarning("No earthquake data found.");
+                }
+
             }
         }
     }
