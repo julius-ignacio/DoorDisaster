@@ -33,6 +33,15 @@ public class WordPuzzle : MonoBehaviour
     }
 
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            ResetWord();
+        }
+    }
+
+
     public void OpenQuiz()
     {
         quizPanel.SetActive(true);
