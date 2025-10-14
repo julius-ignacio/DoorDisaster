@@ -27,8 +27,12 @@ public class Eq_info_loader : MonoBehaviour
     IEnumerator LoadEarthquakeData()
     {
         string path = System.IO.Path.Combine(Application.streamingAssetsPath, "earthquake_data.json");
-
-        UnityWebRequest request = UnityWebRequest.Get(path);
+#if UNITY_ANDROID && !UNITY_EDITOR
+        string uri = path;
+#else
+        string uri = "file://" + path;
+#endif
+        UnityWebRequest request = UnityWebRequest.Get(uri);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
