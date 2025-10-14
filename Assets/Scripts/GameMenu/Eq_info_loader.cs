@@ -19,6 +19,9 @@ public class Eq_info_loader : MonoBehaviour
     public Transform locationColumn;
     public GameObject textPrefab; // TextMeshProUGUI prefab
 
+    // Remote JSON URL
+    private string remoteUrl = "https://eqdatajson.tiiny.site/earthquake_data.json";
+
     void Start()
     {
         StartCoroutine(LoadEarthquakeData());
@@ -26,24 +29,39 @@ public class Eq_info_loader : MonoBehaviour
 
     IEnumerator LoadEarthquakeData()
     {
-        string path = System.IO.Path.Combine(Application.streamingAssetsPath, "earthquake_data.json");
-#if UNITY_ANDROID && !UNITY_EDITOR
-        string uri = path;
-#else
-        string uri = "file://" + path;
-#endif
-        UnityWebRequest request = UnityWebRequest.Get(uri);
+        UnityWebRequest request = UnityWebRequest.Get(remoteUrl);
         yield return request.SendWebRequest();
+        
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogWarning($"Failed to load earthquake_data.json: {request.error}");
+            
+            Debug.LogWarning($"❌ Failed to load remote JSON: {request.error}");
         }
         else
         {
             string json = request.downloadHandler.text;
-            EarthquakeInfo[] quakes = JsonHelper.FromJson<EarthquakeInfo>(json);
+            Debug.Log($"Raw JSON: {json}");
+
+            EarthquakeInfo[] quakes;
+            Debug.Log($"Raw JSON: {json}");
+
+
+if (json.TrimStart().StartsWith("["))
+{
+    quakes = JsonHelper.FromJson<EarthquakeInfo>(json);
+}
+else
+            {
+    Debug.Log($"Raw JSON: {json}");
+
+    // Parse single object
+    EarthquakeInfo single = JsonUtility.FromJson<EarthquakeInfo>(json);
+    quakes = new EarthquakeInfo[] { single };
+}
+
             DisplayTop10(quakes);
+            Debug.Log($"✅ Successfully fetched {quakes.Length} earthquake entries from web");
         }
     }
 
@@ -71,11 +89,15 @@ public static class JsonHelper
 {
     public static T[] FromJson<T>(string json)
     {
-        string wrapped = "{\"Items\":" + json + "}";
+        string wrapped = "{\"Items\":" + json + "}";  // 👈 wrap it
         Wrapper<T> w = JsonUtility.FromJson<Wrapper<T>>(wrapped);
         return w.Items;
     }
 
     [System.Serializable]
-    private class Wrapper<T> { public T[] Items; }
+    private class Wrapper<T>
+    {
+        public T[] Items;
+    }
 }
+
