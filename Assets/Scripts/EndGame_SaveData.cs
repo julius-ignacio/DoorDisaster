@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EndGame_SaveData : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class EndGame_SaveData : MonoBehaviour
 
     public void Save()
     {
+            SceneManager.LoadScene("Temple");
+
         if (DataManager.Instance == null)
         {
             Debug.LogError("❌ DataManager is missing in scene!");
@@ -55,6 +58,8 @@ public class EndGame_SaveData : MonoBehaviour
             FirebaseAuth.UserLocalId,
             DataManager.Instance.playerData
         ));
+
+            //SceneManager.LoadScene("Temple");
 
         Debug.Log("✅ Stage data saved for Trial " + DataManager.Instance.currentTrial + " Stage " +  DataManager.Instance.currentStage);
     }

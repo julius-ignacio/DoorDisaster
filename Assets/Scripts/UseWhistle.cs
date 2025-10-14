@@ -13,25 +13,23 @@ public class UseWhistle : MonoBehaviour
     private bool isUsingWhistle = false;
     public GameObject ButtonSkill;
 
-    void Update()
-    {
-        if (Input.GetKeyDown(whistleKey) && !isUsingWhistle)
-        {
-            StartCoroutine(ShowOutlinesTemporarily());
-        }
-    }
+ 
 
-    public void whistle()
+    public void Whistle()
     {
-        StartCoroutine(ShowOutlinesTemporarily());
-        ButtonSkill.SetActive(false);
+        if (!isUsingWhistle)
+        {
+                 StartCoroutine(ShowOutlinesTemporarily());
+       ButtonSkill.transform.localScale = new Vector3(-50, -50, -50);
+
+        }
+       
     }
 
     private IEnumerator ShowOutlinesTemporarily()
     {
         isUsingWhistle = true;
-        AudioManager.Instance.PlaySFX(21); // index for footsteps in your Clips array
-
+        AudioManager.Instance.PlaySFX(21); // plays the whistle sound
 
         // Enable silhouette outlines for all objects
         foreach (GameObject obj in outlinedObjects)
@@ -39,23 +37,29 @@ public class UseWhistle : MonoBehaviour
             Outline outline = obj.GetComponent<Outline>();
             if (outline != null)
             {
+                outline.enabled = true;
                 outline.OutlineMode = Outline.Mode.SilhouetteOnly; // show through walls
-                outline.OutlineWidth = 8f;                         // make visible
+                outline.OutlineWidth = 8f;
             }
         }
 
         yield return new WaitForSeconds(outlineDuration);
 
-        // Return outlines to normal (hidden)
+
+        // Turn outlines back to normal or hide them
         foreach (GameObject obj in outlinedObjects)
         {
+
             Outline outline = obj.GetComponent<Outline>();
-            if (outline != null)
-            {
-                outline.OutlineMode = Outline.Mode.OutlineAll;
-            }
+                              outline.enabled = true;
+
+                outline.OutlineWidth = 3f;
+            outline.OutlineMode = Outline.Mode.OutlineAll;
+        
         }
 
         isUsingWhistle = false;
+
+        ButtonSkill.SetActive(false);
     }
 }
