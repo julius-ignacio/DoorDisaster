@@ -23,6 +23,8 @@ public class FireSafetyQuiz : MonoBehaviour
 
     private int correctAnswerIndex;
     private System.Action onQuizComplete;
+    public GameNotifier gameNotifier;
+
 
     void Start()
     {
@@ -117,7 +119,7 @@ public class FireSafetyQuiz : MonoBehaviour
         if (selectedIndex == correctAnswerIndex)
         {
             Debug.Log("Correct answer selected!");
-            numberOfCorrectAnswers++;
+            numberOfCorrectAnswers++; //////////////////////////////////////////////////////////////////////////////////////
 
     
             Image btnImage = answerButtons[selectedIndex].GetComponent<Image>();
@@ -153,7 +155,9 @@ public class FireSafetyQuiz : MonoBehaviour
 
         if (numberOfCorrectAnswers != 0)
         {
-        DataManager.Instance.quizScore++;
+            DataManager.Instance.quizScore += numberOfCorrectAnswers;
+            AudioManager.Instance.PlaySFX(8);
+            gameNotifier.EarnedPoints(numberOfCorrectAnswers, 3f);//////////////////////////////////////////////////
             
         }
 
