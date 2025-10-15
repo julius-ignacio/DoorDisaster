@@ -5,7 +5,7 @@ using Terresquall;
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
 {
-    public float speed = 20f;
+    public float speed = 3f;
     public float gravity = -9.81f;
     public float jumpHeight = 7f;
 

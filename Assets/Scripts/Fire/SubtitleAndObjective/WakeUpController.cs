@@ -15,7 +15,7 @@ public class WakeUpController : MonoBehaviour
 
     [Header("References")]
     public Transform mainCamera; // Drag your MainCamera here
-    public MonoBehaviour playerMovementScript; // Drag your movement script here
+    public Movements2 movements; // Drag your movement script here
 
     [Header("Audio (Optional)")]
     public AudioSource audioSource;
@@ -67,15 +67,14 @@ public class WakeUpController : MonoBehaviour
         Debug.Log("Starting wake up animation...");
 
         // Disable player movement
-        if (playerMovementScript != null)
+        if (movements != null)
         {
-            playerMovementScript.enabled = false;
+            movements.enabled = false;
             Debug.Log("Player movement disabled");
         }
 
-        // Lock cursor during animation
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+
+    
 
         // Set initial rotation - looking up while lying down (-60 degrees pitch = looking up)
         // Set final rotation - looking forward at eye level (0 degrees pitch)
@@ -142,9 +141,9 @@ public class WakeUpController : MonoBehaviour
         }
 
         // Re-enable movement
-        if (playerMovementScript != null)
+        if (movements != null)
         {
-            playerMovementScript.enabled = true;
+            movements.enabled = true;
             Debug.Log("Player movement re-enabled");
         }
 

@@ -1,27 +1,25 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using PinePie.SimpleJoystick; // Import the namespace
+using Terresquall;
+
 
 [RequireComponent(typeof(CharacterController))]
 public class Movements2 : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    public float walkSpeed = 5f;
-    public float runSpeed = 10f;
-    public float jumpHeight = 2f;
+    public float speed = 3f;
     public float gravity = -9.81f;
-    public float groundDistance = 0.2f;
-    public LayerMask groundMask;
+    public float jumpHeight = 7f;
 
-    [Header("Camera Settings")]
-    public Transform playerBody;
-    public Camera firstPersonCamera;
-    public float lookSensitivity = 2f;
+    private CharacterController controller;
+    public Vector3 velocity;
+    public bool isGrounded;
 
-    [Header("Audio")]
-    public AudioSource footstepAudioSource;
-    public AudioClip[] footstepSounds;
-    public float footstepInterval = 0.5f;
+    public float walkStepInterval = 0.6f;   // time between footsteps
+    public float runStepInterval = 0.35f;   // faster for running
+    private float stepTimer;
+    public bool footstepsEnabled = true;
+  //  public GameObject signalSwitchFootstepsSfx;
+
 
     [Header("Health System")]
     public int maxHealth = 100;
@@ -31,189 +29,84 @@ public class Movements2 : MonoBehaviour
     [Header("Inventory / Items")]
     public bool hasTowel = false;
 
-    [Header("Mobile Controls")]
-    public bool isMobile = false;
-    public JoystickController movementJoystick;  // Left joystick for movement
-    public JoystickController lookJoystick;      // Right joystick for camera (optional)
-    public Button jumpButton;                     // Jump button
-    public float mobileLookSensitivity = 0.5f;   // Separate sensitivity for mobile
 
-    private CharacterController controller;
-    private Vector3 velocity;
-    private bool isGrounded;
-    private float xRotation = 0f;
-    private float footstepTimer;
-    private bool isMoving;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
+    }
 
-        if (firstPersonCamera == null)
-            firstPersonCamera = GetComponentInChildren<Camera>();
-
-        if (playerBody == null)
-            playerBody = transform;
-
-        currentHealth = maxHealth;
-        if (healthBar != null)
+    void Awake()
+    {
+        GameObject[] Cubes = GameObject.FindGameObjectsWithTag("Cube");
+        foreach (GameObject Cube in Cubes)
         {
-            healthBar.maxValue = maxHealth;
-            healthBar.value = currentHealth;
+            Cube.GetComponent<Renderer>().material.color = Color.red;
         }
-
-        // Add jump button listener for mobile
-        if (isMobile && jumpButton != null)
-            jumpButton.onClick.AddListener(Jump);
-
-        // Lock cursor for PC
-        if (!isMobile)
-            Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        HandleGroundCheck();
-        HandleMovement();
-        HandleJump();
-        HandleLook();
-        HandleFootsteps();
-    }
 
-    void HandleGroundCheck()
-    {
-        Vector3 groundCheckPos = controller.bounds.center - new Vector3(0, controller.bounds.extents.y, 0);
-        isGrounded = Physics.CheckSphere(groundCheckPos, groundDistance, groundMask);
-
+        // Check if on ground
+        isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0)
+        {
             velocity.y = -2f;
-    }
-
-    void HandleMovement()
-    {
-        float x = 0f;
-        float z = 0f;
-
-        if (isMobile && movementJoystick != null)
-        {
-            // Get input from mobile joystick
-            Vector2 dir = movementJoystick.InputDirection;
-            x = dir.x;
-            z = dir.y;
-        }
-        else
-        {
-            // PC input
-            x = Input.GetAxis("Horizontal");
-            z = Input.GetAxis("Vertical");
         }
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        // Movement inputs
+        float x = VirtualJoystick.GetAxis("Horizontal") + Input.GetAxis("Horizontal");
+        float z = VirtualJoystick.GetAxis("Vertical") + Input.GetAxis("Vertical");
 
-        // Running only on PC (shift key)
-        float speed = (!isMobile && Input.GetKey(KeyCode.LeftShift)) ? runSpeed : walkSpeed;
+        Vector3 move = new Vector3(x, 0, z);
 
-        controller.Move(move * speed * Time.deltaTime);
-        isMoving = move.magnitude > 0.1f && isGrounded;
-    }
+        if (move.magnitude > 1f) move.Normalize();
 
-    void HandleLook()
-    {
-        if (isMobile)
+        // Apply movement
+        controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
+
+        // Jump
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            // Option 1: Using a look joystick (recommended)
-            if (lookJoystick != null)
-            {
-                Vector2 lookDir = lookJoystick.InputDirection;
-
-                if (lookDir.magnitude > 0.1f) // Only rotate if joystick is being used
-                {
-                    float mouseX = lookDir.x * mobileLookSensitivity;
-                    float mouseY = lookDir.y * mobileLookSensitivity;
-
-                    playerBody.Rotate(Vector3.up * mouseX);
-
-                    xRotation -= mouseY;
-                    xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-                    firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-                }
-            }
-            // Option 2: Using touch on right side of screen (fallback)
-            else if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-
-                // Only use touch on right side of screen for looking
-                if (touch.position.x > Screen.width / 2 && touch.phase == TouchPhase.Moved)
-                {
-                    float mouseX = touch.deltaPosition.x * mobileLookSensitivity * 0.1f;
-                    float mouseY = touch.deltaPosition.y * mobileLookSensitivity * 0.1f;
-
-                    playerBody.Rotate(Vector3.up * mouseX);
-
-                    xRotation -= mouseY;
-                    xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-                    firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-                }
-            }
-        }
-        else
-        {
-            // PC mouse look
-            float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
-            float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
-
-            playerBody.Rotate(Vector3.up * mouseX);
-
-            xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-            firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        }
-    }
-
-    void HandleJump()
-    {
-        // PC jump
-        if (!isMobile && Input.GetButtonDown("Jump") && isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
 
-        ApplyGravity();
-    }
-
-    // Mobile jump (called by button)
-    void Jump()
-    {
-        if (isGrounded)
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-    }
-
-    void ApplyGravity()
-    {
-        if (!isGrounded)
-            velocity.y += gravity * Time.deltaTime;
-
+        // Gravity
+        velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // --- Footsteps ---
+        HandleFootsteps(move);
     }
 
-    void HandleFootsteps()
+    void HandleFootsteps(Vector3 move)
     {
-        if (isMoving && footstepAudioSource != null && footstepSounds.Length > 0)
+        if (!footstepsEnabled) return; // 🚫 disable footsteps entirely
+        if (isGrounded && move.magnitude > 0.1f)
         {
-            footstepTimer -= Time.deltaTime;
+            stepTimer -= Time.deltaTime;
 
-            if (footstepTimer <= 0f)
+            if (stepTimer <= 0f)
             {
-                int index = Random.Range(0, footstepSounds.Length);
-                footstepAudioSource.PlayOneShot(footstepSounds[index]);
+                         AudioManager.Instance.PlaySFX(2); // fallback sound if no footsteps assigned
 
-                float speed = isMobile ? walkSpeed : (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed);
-                footstepTimer = footstepInterval * (walkSpeed / speed);
+
+
+                stepTimer = walkStepInterval;
             }
         }
+        else
+        {
+            stepTimer = 0f; // reset
+        }
     }
+
+
+
+
+
+   
 
     // ===================== Health System =====================
     public void TakeDamage(int damage)
@@ -257,16 +150,5 @@ public class Movements2 : MonoBehaviour
     {
         controller.enabled = true;
         Debug.Log("Movement force enabled!");
-    }
-
-    public bool IsGrounded() => isGrounded;
-    public bool IsMoving() => isMoving;
-
-    void OnDrawGizmosSelected()
-    {
-        if (controller == null) return;
-        Vector3 groundCheckPos = controller.bounds.center - new Vector3(0, controller.bounds.extents.y, 0);
-        Gizmos.color = isGrounded ? Color.green : Color.red;
-        Gizmos.DrawWireSphere(groundCheckPos, groundDistance);
     }
 }

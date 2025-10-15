@@ -7,7 +7,7 @@ public class StopDropRoll : MonoBehaviour
     [Header("References")]
     public Camera playerCamera;        // FPS camera
     public CharacterController controller; // Player CharacterController
-    public Movements movementsScript;  // Your Movements component
+    public Movements2 movementsScript;  // Your Movements component
     public Image fireOverlay;          // Fire overlay UI
     public TMP_Text centerPromptText;  // Centered Stop, Drop, Roll prompt
     public SubtitleManager2 subtitleManager; // Reference to hide objectives

@@ -173,8 +173,7 @@ public class FireSafetyQuiz : MonoBehaviour
             Debug.Log("Player movement re-enabled");
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
         Debug.Log("Cursor locked again");
 
         if (healthBar != null)
