@@ -19,6 +19,8 @@ public class FireSafetyQuiz : MonoBehaviour
     public GameObject healthBar;
     public GameObject oxygenBar;
 
+    private int numberOfCorrectAnswers = 0;
+
     private int correctAnswerIndex;
     private System.Action onQuizComplete;
 
@@ -115,10 +117,9 @@ public class FireSafetyQuiz : MonoBehaviour
         if (selectedIndex == correctAnswerIndex)
         {
             Debug.Log("Correct answer selected!");
+            numberOfCorrectAnswers++;
 
-            // Add 1 point for correct answer
-            DataManager.Instance.quizScore++;
-
+    
             Image btnImage = answerButtons[selectedIndex].GetComponent<Image>();
             if (btnImage != null)
                 btnImage.color = Color.green;
@@ -147,6 +148,22 @@ public class FireSafetyQuiz : MonoBehaviour
     {
         Debug.Log("Starting close quiz delay: " + delay + " seconds");
         yield return new WaitForSeconds(delay);
+
+
+
+        if (numberOfCorrectAnswers != 0)
+        {
+        DataManager.Instance.quizScore++;
+            
+        }
+
+        
+        
+
+
+
+
+        
 
         Debug.Log("Closing quiz now");
 

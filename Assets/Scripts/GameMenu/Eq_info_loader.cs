@@ -20,7 +20,7 @@ public class Eq_info_loader : MonoBehaviour
     public GameObject textPrefab; // TextMeshProUGUI prefab
 
     // Remote JSON URL
-    private string remoteUrl = "https://eqdatajson.tiiny.site/earthquake_data.json";
+    private string remoteUrl = "https://raw.githubusercontent.com/julius-ignacio/EqDataJson/refs/heads/main/earthquake_data.json";
 
     void Start()
     {
