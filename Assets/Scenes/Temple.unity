@@ -23071,6 +23071,7 @@ GameObject:
   - component: {fileID: 681221835}
   - component: {fileID: 681221838}
   - component: {fileID: 681221839}
+  - component: {fileID: 681221840}
   m_Layer: 0
   m_Name: FireTrigger
   m_TagString: Fire
@@ -23194,6 +23195,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedTheme: 5
   stopLoopSignal: {fileID: 217666545}
+--- !u!114 &681221840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681221833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d54e7c70f74ce47948b6706c673e2835, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionButton1: {fileID: 700223931}
+  actionButton2: {fileID: 955659314}
+  actionButtons: {fileID: 1803201279}
+  sceneToLoad:
+  - FireLevel
+  trialIndex: 0
 --- !u!1 &682322685
 GameObject:
   m_ObjectHideFlags: 0
@@ -24688,8 +24707,8 @@ MonoBehaviour:
   actionButton2: {fileID: 955659314}
   actionButtons: {fileID: 1803201279}
   sceneToLoad:
-  - DoorOfEarth1
-  - DoorOfEarth2
+  - FireLevel
+  - FireLevel
   trialIndex: 0
 --- !u!114 &727434911
 MonoBehaviour:

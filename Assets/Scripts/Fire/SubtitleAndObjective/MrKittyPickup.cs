@@ -17,10 +17,13 @@ public class MrKittyPickup : MonoBehaviour
     public Image fadeOverlay;
     public float fadeDuration = 1f;
 
+    public AudioSource audioo;
+
     private bool hasTriggered = false;
 
     void Start()
     {
+        audioo.Stop();
         // Ensure fade overlay starts invisible
         if (fadeOverlay != null)
         {
@@ -57,7 +60,8 @@ public class MrKittyPickup : MonoBehaviour
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
-            yield return StartCoroutine(Fade(0f, 1f));
+            yield return StartCoroutine(Fade(0f, 1f)); ////////////////////////////////////////////////////////////////////////////
+            audioo.Play();
         }
 
         // 2️⃣ Teleport player back to House A
@@ -131,6 +135,7 @@ public class MrKittyPickup : MonoBehaviour
     {
         if (subtitleManager != null)
         {
+            audioo.Stop();
             subtitleManager.ShowCustomMessage(
                 "I need to escape now!",
                 2f,

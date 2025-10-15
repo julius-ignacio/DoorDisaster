@@ -8,6 +8,8 @@ public class DoorController : MonoBehaviour
     public float openSpeed = 2f;
     public float interactionDistance = 4f;
 
+    public GameObject doorOpenBtn;
+
     [Header("Item inside Cabinet")]
     public ItemPickup item; // assign the object inside
 
@@ -19,6 +21,7 @@ public class DoorController : MonoBehaviour
 
     void Start()
     {
+        doorOpenBtn.SetActive(false);
         closedRotation = transform.rotation;
         openRotation = closedRotation * Quaternion.Euler(0, openAngle, 0);
 
@@ -43,6 +46,15 @@ public class DoorController : MonoBehaviour
                 StartCoroutine(AnimateDoor(!isOpen));
             }
         }
+    }
+
+    public void OpenDoor()
+    {
+            // Only toggle the door if player is not interacting with the item
+            if (item == null || !item.HasBeenPickedUp())
+            {
+                StartCoroutine(AnimateDoor(!isOpen));
+            }
     }
 
     private IEnumerator AnimateDoor(bool opening)
