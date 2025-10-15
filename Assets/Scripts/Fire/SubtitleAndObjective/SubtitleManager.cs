@@ -66,8 +66,6 @@ public class SubtitleManager2 : MonoBehaviour
         if (oxygenBar != null)
             oxygenBar.SetActive(false);
 
-        // Disable movement during story
-        Cursor.lockState = CursorLockMode.None;
 
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
@@ -91,8 +89,8 @@ public class SubtitleManager2 : MonoBehaviour
         }
 
         // ✅ FIXED: Enable movement after story
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
+ 
 
         // ✅ Force enable player movement
         Movements2 player = FindObjectOfType<Movements2>();

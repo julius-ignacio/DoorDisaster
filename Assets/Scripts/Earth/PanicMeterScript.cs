@@ -37,6 +37,7 @@ public class PanicMeterScript : MonoBehaviour
         {
             Debug.LogWarning("No Depth of Field override found in this Volume profile!");
         }
+
     }
 
     void Update()
