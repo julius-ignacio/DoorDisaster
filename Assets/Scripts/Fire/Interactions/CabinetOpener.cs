@@ -38,14 +38,18 @@ public class CabinetOpener : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                // Prevent closing if player is interacting with item
-                if (item != null && item.HasBeenPickedUp())
-                    return;
-
-                StartCoroutine(AnimateCabinet(!isOpen));
+  
             }
         }
     }
+
+
+    public void openCabinet(){         
+        
+                if (item != null && item.HasBeenPickedUp())
+                    return;
+
+                StartCoroutine(AnimateCabinet(!isOpen));}
 
     private IEnumerator AnimateCabinet(bool opening)
     {

@@ -7,7 +7,7 @@ using System;
 public class GameNotifier : MonoBehaviour
 {
     public GameObject gameTextNotify;
-    public QuizScript quizScript; // assign in Inspector
+    //public QuizScript quizScript; // assign in Inspector
     void Start()
     {
         gameTextNotify.SetActive(false);
