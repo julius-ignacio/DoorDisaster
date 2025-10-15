@@ -17,6 +17,7 @@ public class FireExtinguisher : MonoBehaviour
     [Header("Spray Settings")]
     public float sprayRange = 5f;
     public float extinguishDelay = 2f;
+    private bool isSpraySoundPlaying = false;
 
     [Header("References")]
     public FireSafetyQuiz quizManager;
@@ -39,27 +40,36 @@ public class FireExtinguisher : MonoBehaviour
 
     void Update()
     {
-        if (canSpray && heldInstance != null)
-        {
-            if (Input.GetKey(KeyCode.F))
-            {
-                if (sprayParticleSystem != null && !sprayParticleSystem.isPlaying)
-                {
-                    sprayParticleSystem.Play();
-                }
+if (Input.GetKey(KeyCode.F))
+{
+    if (sprayParticleSystem != null && !sprayParticleSystem.isPlaying)
+    {
+        sprayParticleSystem.Play();
+    }
 
-                ExtinguishFiresInRange();
-            }
-            else
-            {
-                if (sprayParticleSystem != null && sprayParticleSystem.isPlaying)
-                {
-                    sprayParticleSystem.Stop();
-                }
-            }
+    if (!isSpraySoundPlaying)
+    {
+        AudioManager.Instance.PlaySFX(33);
+        isSpraySoundPlaying = true;
+    }
 
-            CheckIfAllFiresOut();
-        }
+    ExtinguishFiresInRange();
+}
+else
+{
+    if (sprayParticleSystem != null && sprayParticleSystem.isPlaying)
+    {
+        sprayParticleSystem.Stop();
+    }
+
+    if (isSpraySoundPlaying)
+    {
+        AudioManager.Instance.audClip.Stop();
+        isSpraySoundPlaying = false;
+    }
+}
+
+
     }
 
     void PickupAndStartQuizzes(GameObject player)

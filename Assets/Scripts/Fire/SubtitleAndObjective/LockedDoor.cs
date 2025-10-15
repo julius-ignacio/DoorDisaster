@@ -78,7 +78,7 @@ public class LockedDoor : MonoBehaviour
             {
                 if (!hasKey)
                 {
-
+                    AudioManager.Instance.PlaySFX(32);
 
                     // Step 2: run sequence (pause → subs → timer)
                     StartCoroutine(ShowLockedSequence());
