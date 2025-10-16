@@ -27,7 +27,7 @@ public class Eq_info_loader : MonoBehaviour
         StartCoroutine(LoadEarthquakeData());
     }
 
-    IEnumerator LoadEarthquakeData()
+   public IEnumerator LoadEarthquakeData()
     {
         UnityWebRequest request = UnityWebRequest.Get(remoteUrl);
         yield return request.SendWebRequest();
