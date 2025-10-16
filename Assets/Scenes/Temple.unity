@@ -3960,7 +3960,7 @@ PrefabInstance:
       objectReference: {fileID: 217666545}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -197.4
+      value: -184.77
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3968,7 +3968,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -56.51
+      value: -89.31
       objectReference: {fileID: 0}
     - target: {fileID: 5415639993041644299, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5389,6 +5389,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18352be10a6b7dfcea58902f9df6af44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentTrial: 0
+  currentStage: 0
 --- !u!64 &396562210
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -5472,8 +5474,8 @@ Transform:
   m_GameObject: {fileID: 396562208}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -191.97, y: 0.47000027, z: -51.59}
-  m_LocalScale: {x: 5.08, y: 16.82, z: 1.5699999}
+  m_LocalPosition: {x: -189.0952, y: 0.47, z: -45.0487}
+  m_LocalScale: {x: 5.654675, y: 16.82, z: 0.2617914}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -15802,9 +15804,7 @@ GameObject:
   - component: {fileID: 681221837}
   - component: {fileID: 681221836}
   - component: {fileID: 681221835}
-  - component: {fileID: 681221838}
   - component: {fileID: 681221839}
-  - component: {fileID: 681221840}
   m_Layer: 0
   m_Name: FireTrigger
   m_TagString: Fire
@@ -15902,20 +15902,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 681221833}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &681221838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 681221833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbcf11f2b5a3a29a497f6c11ba6b8451, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popupButton: {fileID: 0}
-  trialId: 1
 --- !u!114 &681221839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15930,19 +15916,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedTheme: 5
   stopLoopSignal: {fileID: 217666545}
---- !u!114 &681221840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 681221833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30be0d07765c7ba64bef2ab5e32dd528, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneName: 
 --- !u!1 &682322685
 GameObject:
   m_ObjectHideFlags: 0
@@ -17187,9 +17160,7 @@ GameObject:
   - component: {fileID: 727434908}
   - component: {fileID: 727434907}
   - component: {fileID: 727434906}
-  - component: {fileID: 727434909}
   - component: {fileID: 727434911}
-  - component: {fileID: 727434912}
   m_Layer: 0
   m_Name: EarthTrigger
   m_TagString: Earth
@@ -17287,20 +17258,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 727434904}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &727434909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727434904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbcf11f2b5a3a29a497f6c11ba6b8451, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popupButton: {fileID: 0}
-  trialId: 0
 --- !u!114 &727434911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17315,19 +17272,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedTheme: 3
   stopLoopSignal: {fileID: 217666545}
---- !u!114 &727434912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727434904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30be0d07765c7ba64bef2ab5e32dd528, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneName: 
 --- !u!21 &741254447
 Material:
   serializedVersion: 8

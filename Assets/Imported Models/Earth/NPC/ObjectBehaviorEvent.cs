@@ -125,6 +125,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
             else if (score != 0 && currentNpcId == 12)
             {
                 AudioManager.Instance.PlaySFX(8); //points
+                Debug.Log($"[DEBUG] heart={heart}, useWhistle={useWhistle}, gameNotifier={gameNotifier}, objectives={objectives}");
+
                 useWhistle.ButtonSkill.SetActive(true);
                 gameNotifier.ObtainedItem(score, "Whistle");
             }
