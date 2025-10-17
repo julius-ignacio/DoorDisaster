@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class ResetDataManager : MonoBehaviour
 {
-    public int currentTrial;
-    public int currentStage;
 
     public void OnTriggerEnter(Collider other)
     {

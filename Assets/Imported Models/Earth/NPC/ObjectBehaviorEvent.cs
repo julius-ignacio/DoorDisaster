@@ -98,19 +98,29 @@ public class ObjectBehaviorEvent : MonoBehaviour
         }
         else
         {
-            if (score != 0 && currentNpcId >= 6 && currentNpcId <= 8)
+            if (score != 0 && currentNpcId >= 6 && currentNpcId <= 8) //medkit
             {
-                heart.Heal(1);
-                AudioManager.Instance.PlaySFX(19);
-                AudioManager.Instance.PlaySFX(8); //points
-                gameNotifier.EarnedPoints(score);
+                if (heart.currentHearts < 8 && heart.isHelmetUsed == false)
+                {
+                    heart.Heal(1);
+                    AudioManager.Instance.PlaySFX(19);
+                    AudioManager.Instance.PlaySFX(8); //points
+                    gameNotifier.EarnedPoints(score);
 
 
-                GreenFlashEffect.SetActive(true);
-                StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+                    GreenFlashEffect.SetActive(true);
+                    StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+                }
+                else
+                {
+                    gameNotifier.cantHeal_FullHealth();
+                }
+
+                
+
             }
 
-            else if (score != 0 && currentNpcId >= 9 && currentNpcId <= 11)
+            else if (score != 0 && currentNpcId >= 9 && currentNpcId <= 11) //waterbottle
             {
                 panicMeter.currHealth -= 20;
                 AudioManager.Instance.PlaySFX(18);
@@ -130,8 +140,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 useWhistle.ButtonSkill.SetActive(true);
                 gameNotifier.ObtainedItem(score, "Whistle");
             }
-            
-                      else if (score != 0 && currentNpcId == 13)
+
+            else if (score != 0 && currentNpcId == 13) //helmet
             {
                 AudioManager.Instance.PlaySFX(8); //points
                 heart.HelmetUsed();
@@ -169,26 +179,26 @@ public class ObjectBehaviorEvent : MonoBehaviour
     }
 
 
-// public void ReactToScore(int score)
-// {
-//     if (score == 3)
-//     {
-//         npcAnimator.SetTrigger("Victory");
-//         AudioManager.Instance.PlaySFX(11);
-//     }
-//     else if (score == 0)
-//     {
-//         npcAnimator.SetTrigger("Death");
-//         AudioManager.Instance.PlaySFX(9);
-//     }
-//     else
-//     {
-//         npcAnimator.SetTrigger("Clap");
-//         AudioManager.Instance.PlaySFX(10);
-//     }
+    // public void ReactToScore(int score)
+    // {
+    //     if (score == 3)
+    //     {
+    //         npcAnimator.SetTrigger("Victory");
+    //         AudioManager.Instance.PlaySFX(11);
+    //     }
+    //     else if (score == 0)
+    //     {
+    //         npcAnimator.SetTrigger("Death");
+    //         AudioManager.Instance.PlaySFX(9);
+    //     }
+    //     else
+    //     {
+    //         npcAnimator.SetTrigger("Clap");
+    //         AudioManager.Instance.PlaySFX(10);
+    //     }
 
-//     // other conditions based on npcId
-// }
+    //     // other conditions based on npcId
+    // }
 
 
 }
