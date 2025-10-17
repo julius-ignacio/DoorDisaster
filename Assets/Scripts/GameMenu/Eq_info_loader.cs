@@ -20,7 +20,7 @@ public class Eq_info_loader : MonoBehaviour
     public GameObject textPrefab; // TextMeshProUGUI prefab
 
     // Remote JSON URL
-    private string remoteUrl = "https://yellow-carrie-71.tiiny.site/earthquake_data.json";
+    private string remoteUrl = "https://eqdata.tiiny.site/earthquake_data.json";
 
     void Start()
     {

@@ -9,16 +9,18 @@ public class PlayDisasterThemeSFX : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // Play the selected disaster theme based on the selectedTheme variable
-        AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[selectedTheme]); // play looped theme
+        // Stop any currently playing loop before starting a new one
+        AudioManager.Instance.audLoop.Stop();
 
-        if (stopLoopSignal == null) return;
-         AudioManager.Instance.audLoop.Stop();
-         
+        // Play the selected disaster theme loop
+        AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[selectedTheme]);
     }
 
     void OnTriggerExit(Collider other)
     {
-         AudioManager.Instance.audLoop.Stop();
+        if (!other.CompareTag("Player")) return;
+
+        // Stop playing when the player leaves the area
+        AudioManager.Instance.audLoop.Stop();
     }
 }
