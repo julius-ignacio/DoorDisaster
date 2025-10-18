@@ -98,7 +98,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
         }
         else
         {
-            if (score != 0 && currentNpcId >= 6 && currentNpcId <= 8) //medkit
+            if (score != 0 && currentNpcId >= 6 && currentNpcId <= 9) //medkit
             {
                 if (heart.currentHearts < 8 && heart.isHelmetUsed == false)
                 {
@@ -120,7 +120,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
             }
 
-            else if (score != 0 && currentNpcId >= 9 && currentNpcId <= 11) //waterbottle
+            else if (score != 0 && currentNpcId >= 10 && currentNpcId <= 13) //waterbottle
             {
                 panicMeter.currHealth -= 20;
                 AudioManager.Instance.PlaySFX(18);
@@ -132,7 +132,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
             }
 
-            else if (score != 0 && currentNpcId == 12)
+            else if (score != 0 && currentNpcId == 14)
             {
                 AudioManager.Instance.PlaySFX(8); //points
                 Debug.Log($"[DEBUG] heart={heart}, useWhistle={useWhistle}, gameNotifier={gameNotifier}, objectives={objectives}");
@@ -141,7 +141,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 gameNotifier.ObtainedItem(score, "Whistle");
             }
 
-            else if (score != 0 && currentNpcId == 13) //helmet
+            else if (score != 0 && currentNpcId == 15) //helmet
             {
                 AudioManager.Instance.PlaySFX(8); //points
                 heart.HelmetUsed();

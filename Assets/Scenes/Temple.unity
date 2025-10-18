@@ -4053,6 +4053,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 584738389482406501, guid: 126156515876bbad9babb674369475f2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3537421507729576742, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_CameraType
       value: 0
@@ -4140,6 +4144,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5580301475011209447, guid: 126156515876bbad9babb674369475f2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1199416045}
+    - targetCorrespondingSourceObject: {fileID: 5580301475011209447, guid: 126156515876bbad9babb674369475f2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1199416046}
   m_SourcePrefab: {fileID: 100100000, guid: 126156515876bbad9babb674369475f2, type: 3}
 --- !u!1 &291563350
 GameObject:
@@ -25023,6 +25030,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1199416046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199416029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e92d141f6c5aaa49af082af24c1963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivity: 0.2
 --- !u!1 &1209331145 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 102700, guid: 2ac2e515cfc05514a83b8ef083430da7, type: 3}
