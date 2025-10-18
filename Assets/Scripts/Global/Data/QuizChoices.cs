@@ -155,6 +155,19 @@ public static class QuizDatabase
     }
 };
 
+    public static List<QuizQuestion> Medkit4 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "In which situation would a medkit be most valuable during a disaster?",
+        choices = new string[] {
+            "When someone suffers a minor injury and immediate care is needed before professionals arrive",
+            "When you need food and water during a prolonged evacuation",
+            "When trying to predict when rescuers will arrive"
+        },
+        correctIndex = 0
+    }
+};
+
     public static List<QuizQuestion> Water1 = new List<QuizQuestion>
 {
     new QuizQuestion {
@@ -200,6 +213,24 @@ public static class QuizDatabase
 
 };
 
+    public static List<QuizQuestion> Water4 = new List<QuizQuestion>
+{
+    new QuizQuestion {
+        question = "If you have a limited number of water bottles during an evacuation, what should be your top priority for their use?",
+        choices = new string[] {
+            "Drinking, since staying hydrated is critical for survival",
+            "Washing clothes to stay clean",
+            "Putting out small fires"
+        },
+        correctIndex = 0
+    }
+
+
+
+
+
+};
+
     public static List<QuizQuestion> Whistle1 = new List<QuizQuestion>
 {
     new QuizQuestion {
@@ -213,7 +244,7 @@ public static class QuizDatabase
     }
 };
 
-public static List<QuizQuestion> SafetyHelmet = new List<QuizQuestion>
+    public static List<QuizQuestion> SafetyHelmet = new List<QuizQuestion>
 {
     new QuizQuestion {
         question = "Why is wearing a safety helmet important during an earthquake?",

@@ -46,4 +46,11 @@ public class AudioManager : MonoBehaviour
     {
         audLoop.Stop();
     }
+
+
+        public void StopAll()
+    {
+        foreach (var src in GetComponents<AudioSource>())
+            src.Stop();
+    }
 }

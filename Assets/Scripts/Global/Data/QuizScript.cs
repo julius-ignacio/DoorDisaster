@@ -81,11 +81,13 @@ public class QuizScript : MonoBehaviour
             case 6: questions = QuizDatabase.Medkit; break;
             case 7: questions = QuizDatabase.Medkit2; break;
             case 8: questions = QuizDatabase.Medkit3; break;
-            case 9: questions = QuizDatabase.Water1; break;
-            case 10: questions = QuizDatabase.Water2; break;
-            case 11: questions = QuizDatabase.Water3; break;
-            case 12: questions = QuizDatabase.Whistle1; break;
-            case 13: questions = QuizDatabase.SafetyHelmet; break;
+            case 9: questions = QuizDatabase.Medkit4; break;
+            case 10: questions = QuizDatabase.Water1; break;
+            case 11: questions = QuizDatabase.Water2; break;
+            case 12: questions = QuizDatabase.Water3; break;
+            case 13: questions = QuizDatabase.Water4; break;
+            case 14: questions = QuizDatabase.Whistle1; break;
+            case 15: questions = QuizDatabase.SafetyHelmet; break;
 
         }
 
