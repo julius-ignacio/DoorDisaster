@@ -13,6 +13,8 @@ public class UseWhistle : MonoBehaviour
     private bool isUsingWhistle = false;
     public GameObject ButtonSkill;
 
+    private int uses = 2;
+
  
 
     public void Whistle()

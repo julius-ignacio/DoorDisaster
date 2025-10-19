@@ -5,8 +5,9 @@ public class PlayIsabellaLullabyOST_StopQuake : MonoBehaviour
 {
     public ConsistentQuake consistentQuake;
     public Shaker shake;
-    public GameObject wall;
     public PanicMeterScript panicMeterScript;
+
+    
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player"))
@@ -34,9 +35,5 @@ public class PlayIsabellaLullabyOST_StopQuake : MonoBehaviour
         {
             panicMeterScript.currHealth = 0;
         }
-
-        // Safely enable wall
-        if (wall != null)
-            wall.SetActive(true);
     }
 }

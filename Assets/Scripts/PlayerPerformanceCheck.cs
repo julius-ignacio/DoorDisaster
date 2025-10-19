@@ -15,7 +15,7 @@ public class PlayerPerformanceCheck : MonoBehaviour
 
     void Update()
     {
-        if (DataManager.Instance.Npcs_saved == 5 && DataManager.Instance.factsDiscovered >= 3)
+        if (DataManager.Instance.Npcs_saved >= 3 && DataManager.Instance.factsDiscovered >= 5)
         {
             isObjectivesCompleted = true;
         }
