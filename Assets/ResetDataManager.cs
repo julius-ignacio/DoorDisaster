@@ -7,17 +7,28 @@ public class ResetDataManager : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            DataManager.Instance.quizScore = 0;
-            DataManager.Instance.factsDiscovered = 0;
-            DataManager.Instance.totalQuestionsAnswered = 0;
-
-            if (DataManager.Instance.playerData != null) // ✅ FIXED HERE
+            if (DataManager.Instance.playerData != null)
             {
-                DataManager.Instance.playerData.totalQuestionsAnswered = 0; // ✅ FIXED
-                DataManager.Instance.playerData.overallTotalScore = 0;       // ✅ FIXED
+                var data = DataManager.Instance.playerData;
+                data.totalQuestionsAnswered = 0;
+                data.overallTotalScore = 0;
+
+                foreach (var trial in data.trials)
+                {
+                    if (trial == null) continue;
+                    foreach (var stage in trial.stages)
+                    {
+                        if (stage == null) continue;
+                        stage.factsDiscovered = 0;
+                        stage.questionsAnswered = 0;
+                        stage.quizScore = 0;
+                        stage.totalScore = 0;
+                    }
+                }
+
+                Debug.Log("✅ Player data fully reset, including trials and stages!");
             }
 
-            Debug.Log("✅ Player data reset successfully!");
         }
     }
 }

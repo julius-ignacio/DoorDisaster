@@ -14,11 +14,18 @@ public class ChangeNpcHelpButtonText : MonoBehaviour
     {
         switch (nPC_GiveId.NpcId)
         {
-            case 9: BtnText.text = "Drink water"; break;
-            case 11: BtnText.text = "Drink water"; break;
-            case 12: BtnText.text = "Get whistle"; break;
-            case 13: BtnText.text = "Get safety helmet"; break;
+            case 14: BtnText.text = "Get whistle"; break;
+            case 15: BtnText.text = "Get safety helmet"; break;
+
+
             case 10: BtnText.text = "Drink water"; break;
+            case 11: BtnText.text = "Drink water"; break;
+            case 12: BtnText.text = "Drink water"; break;
+            case 13: BtnText.text = "Drink water"; break;
+
+
+
+            case 9: BtnText.text = "Use medkit"; break;
             case 8: BtnText.text = "Use medkit"; break;
             case 7: BtnText.text = "Use medkit"; break;
             case 6: BtnText.text = "Use medkit"; break;
