@@ -2,10 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MrKittyPickup : MonoBehaviour
+public class MrKittyPickup : MonoBehaviour, IPickupable
 {
     [Header("References")]
-    public GameObject cat;  // Keep for reference, but don't disable it
+    public GameObject cat;
     public SubtitleManager2 subtitleManager;
     public FireSafetyQuiz quizManager;
 
@@ -17,13 +17,11 @@ public class MrKittyPickup : MonoBehaviour
     public Image fadeOverlay;
     public float fadeDuration = 1f;
 
-    public AudioSource audioo;
-
     private bool hasTriggered = false;
+    private bool playerInRange = false;
 
     void Start()
     {
-        audioo.Stop();
         // Ensure fade overlay starts invisible
         if (fadeOverlay != null)
         {
@@ -34,24 +32,38 @@ public class MrKittyPickup : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasTriggered)
         {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                hasTriggered = true;
-
-                subtitleManager.HideObjective();
-
-                // Start the sequence - cat stays visible
-                subtitleManager.ShowCustomMessage(
-                    "Come on Mr. Kitty, let's get you to safety!",
-                    2f,
-                    () => StartCoroutine(FadeTeleportSequence())
-                );
-            }
+            playerInRange = true;
+            GenericPickupButton.Instance.ShowPickupPrompt(this, "Rescue Mr. Kitty");
         }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!playerInRange || hasTriggered) return;
+
+        hasTriggered = true;
+        subtitleManager.HideObjective();
+        GenericPickupButton.Instance.HidePickupPrompt();
+
+        // Start the sequence - cat stays visible
+        subtitleManager.ShowCustomMessage(
+            "Come on Mr. Kitty, let's get you to safety!",
+            2f,
+            () => StartCoroutine(FadeTeleportSequence())
+        );
     }
 
     private IEnumerator FadeTeleportSequence()
@@ -60,8 +72,7 @@ public class MrKittyPickup : MonoBehaviour
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
-            yield return StartCoroutine(Fade(0f, 1f)); ////////////////////////////////////////////////////////////////////////////
-            audioo.Play();
+            yield return StartCoroutine(Fade(0f, 1f));
         }
 
         // 2️⃣ Teleport player back to House A
@@ -135,7 +146,6 @@ public class MrKittyPickup : MonoBehaviour
     {
         if (subtitleManager != null)
         {
-            audioo.Stop();
             subtitleManager.ShowCustomMessage(
                 "I need to escape now!",
                 2f,

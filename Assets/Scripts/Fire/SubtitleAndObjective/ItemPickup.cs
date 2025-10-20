@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class ItemPickup : MonoBehaviour
+public class ItemPickup : MonoBehaviour, IPickupable
 {
     [Header("Item Settings")]
     public bool isEssential = false;
@@ -10,67 +10,101 @@ public class ItemPickup : MonoBehaviour
     [Header("References")]
     public SubtitleManager2 subtitleManager;
     private ObjectiveManager objectiveManager;
+    public CabinetOpener cabinetOpener;
 
-    [Header("Outline Settings (URP)")]
-    public Material outlineMaterial;   // Assign your URP Outline material in Inspector
-    private Material originalMaterial; // To restore original
-    private Renderer rend;
+    [Header("Outline Settings")]
+    private Outline outline;
 
     [Header("Fade Settings")]
     public float fadeDuration = 0.5f;
 
     private bool hasBeenPickedUp = false;
+    private bool playerInRange = false;
 
     void Start()
     {
-        rend = GetComponent<Renderer>();
-        if (rend != null)
-        {
-            originalMaterial = rend.material;
-        }
+        outline = GetComponent<Outline>();
+        if (outline != null)
+            outline.enabled = false;
 
         objectiveManager = FindObjectOfType<ObjectiveManager>();
-
-        DisableOutline(); // start without glow
     }
 
     void Update()
     {
-        if (objectiveManager == null || hasBeenPickedUp) return;
+        if (objectiveManager == null || hasBeenPickedUp || outline == null) return;
 
         int stage = objectiveManager.GetObjectiveStage();
 
-        // ✅ Only glow during collecting essentials
-        if (stage >= 2 && isEssential)
+        // Show outline for all essential items once backpack is picked up (stage >= 3)
+        if (isEssential && stage >= 3)
         {
-            EnableOutline();
+            outline.enabled = true;
         }
         else
         {
-            DisableOutline();
+            outline.enabled = false;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !hasBeenPickedUp)
+        {
+            playerInRange = true;
+            int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
+
+            // If item is in a cabinet, only show button if cabinet is open
+            if (cabinetOpener != null && !cabinetOpener.IsCabinetOpen())
+                return;
+
+            // Only show pickup prompt if at the right stage
+            if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
         }
     }
 
     void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player") && !hasBeenPickedUp)
+        // If cabinet just opened, show the button
+        if (other.CompareTag("Player") && !hasBeenPickedUp && playerInRange && cabinetOpener != null && cabinetOpener.IsCabinetOpen())
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
+            if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
             {
-                int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
-
-                if (stage >= 2)
-                {
-                    if (isEssential)
-                        PickupItem();
-                    else
-                        ShowNonEssentialMessage();
-                }
-                else
-                {
-                    subtitleManager?.ShowCustomMessage("I should focus on packing first...", 1.5f, null);
-                }
+                GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
             }
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!playerInRange || hasBeenPickedUp) return;
+
+        int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
+
+        if (itemName == "Backpack" && stage >= 2)
+        {
+            PickupItem();
+        }
+        else if (isEssential && stage >= 3)
+        {
+            PickupItem();
+        }
+        else
+        {
+            subtitleManager?.ShowCustomMessage("I should focus on packing first...", 1.5f, null);
         }
     }
 
@@ -85,36 +119,12 @@ public class ItemPickup : MonoBehaviour
             1.5f, null
         );
 
-        DisableOutline(); // remove glow when picked
+        if (outline != null)
+            outline.enabled = false;
 
-        // Fade out then hide
         StartCoroutine(FadeOutAndHide());
 
         objectiveManager?.OnItemPickedUp(itemName, isEssential);
-    }
-
-    private void ShowNonEssentialMessage()
-    {
-        subtitleManager?.ShowCustomMessage(
-            $"You don't need that... {itemName} can stay behind.",
-            2f, null
-        );
-    }
-
-    private void EnableOutline()
-    {
-        if (rend != null && outlineMaterial != null && rend.material != outlineMaterial)
-        {
-            rend.material = outlineMaterial;
-        }
-    }
-
-    private void DisableOutline()
-    {
-        if (rend != null && originalMaterial != null && rend.material != originalMaterial)
-        {
-            rend.material = originalMaterial;
-        }
     }
 
     private IEnumerator FadeOutAndHide()
@@ -139,7 +149,6 @@ public class ItemPickup : MonoBehaviour
         finalColor.a = 0f;
         renderer.material.color = finalColor;
 
-        // Hide object
         gameObject.SetActive(false);
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
@@ -150,15 +159,13 @@ public class ItemPickup : MonoBehaviour
         return hasBeenPickedUp;
     }
 
-    // ✅ New method to enable/disable interaction (for cabinet)
     public void SetInteractable(bool canInteract)
     {
         Collider col = GetComponent<Collider>();
         if (col != null)
             col.enabled = canInteract;
 
-        // Optional: remove outline when disabled
-        if (!canInteract)
-            DisableOutline();
+        if (!canInteract && outline != null)
+            outline.enabled = false;
     }
 }

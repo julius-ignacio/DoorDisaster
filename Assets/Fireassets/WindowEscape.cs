@@ -3,7 +3,7 @@ using TMPro;
 using System.Collections;
 using UnityEngine.UI;
 
-public class WindowEscape : MonoBehaviour
+public class WindowEscape : MonoBehaviour, IPickupable
 {
     [Header("References")]
     public SubtitleManager2 subtitleManager;
@@ -12,7 +12,7 @@ public class WindowEscape : MonoBehaviour
     public Transform player;
 
     [Header("Teleport Settings")]
-    public Transform hallwaySpawnPoint; // Assign your hallway spawn point
+    public Transform hallwaySpawnPoint;
 
     [Header("Fade Settings")]
     public Image fadeOverlay;
@@ -21,7 +21,7 @@ public class WindowEscape : MonoBehaviour
     private bool hasHeavyObject = false;
     private bool hasEscaped = false;
     private bool promptShown = false;
-    private bool quizDone = false;
+    private bool playerInRange = false;
 
     void Start()
     {
@@ -36,56 +36,62 @@ public class WindowEscape : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !hasEscaped && !promptShown)
-        {
-            if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
-                return;
-
-            promptShown = true;
-            subtitleManager.ShowCustomMessage(
-                "Let's try to open this window...",
-                2f,
-                () => subtitleManager.ShowObjective("Press E to try opening the window")
-            );
-        }
-    }
-
-    void OnTriggerStay(Collider other)
-    {
         if (other.CompareTag("Player") && !hasEscaped)
         {
+            // ✅ Wait until the SDR message (doorFireTrigger) has been shown
             if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
                 return;
 
-            if (Input.GetKeyDown(KeyCode.E))
+            playerInRange = true;
+
+            // ✅ Always show the button when player is near
+            GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
+
+            // ✅ Only show subtitle/objective once (the first time)
+            if (!promptShown)
             {
-                if (hasHeavyObject)
-                {
-                    StartEscape();
-                }
-                else if (!quizDone)
-                {
-                    subtitleManager.ShowCustomMessage(
-                        "Oh no, it's stuck!",
-                        2f,
-                        () =>
-                        {
-                            quizDone = true;
-                            subtitleManager.ShowObjective("Find a heavy object - try the lamp near the bed");
-                        }
-                    );
-                }
-                else
-                {
-                    subtitleManager.ShowCustomMessage(
-                        "I need something heavy to break this open!",
-                        2f
-                    );
-                }
+                promptShown = true;
+                subtitleManager.ShowCustomMessage(
+                    "Let's try to open this window...",
+                    2f,
+                    () => subtitleManager.ShowObjective("Try the window")
+                );
             }
         }
     }
 
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!playerInRange || hasEscaped) return;
+
+        if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
+            return;
+
+        // 🚪 Window is locked, need heavy object
+        if (!hasHeavyObject)
+        {
+            subtitleManager.ShowCustomMessage(
+                "Oh no, it's stuck! I need something heavy to break this open!",
+                2f,
+                () => subtitleManager.ShowObjective("Find a heavy object - try the lamp near the bed")
+            );
+        }
+        else
+        {
+            StartEscape();
+        }
+    }
+
+    // ✅ Called by HeavyObjectPickup after the player picks up the object
     public void PickupHeavyObject()
     {
         hasHeavyObject = true;
@@ -97,14 +103,24 @@ public class WindowEscape : MonoBehaviour
         subtitleManager.ShowCustomMessage(
             "Got it! This should break the window!",
             2f,
-            () => subtitleManager.ShowObjective("Use the heavy object to break the bedroom window")
+            () =>
+            {
+                subtitleManager.ShowObjective("Use the heavy object to break the bedroom window");
+
+                // ✅ Show the button again if player is near the window
+                if (playerInRange)
+                {
+                    GenericPickupButton.Instance.ShowPickupPrompt(this, "Break Window");
+                }
+            }
         );
     }
 
-    void StartEscape()
+    private void StartEscape()
     {
         hasEscaped = true;
         subtitleManager.HideObjective();
+        GenericPickupButton.Instance.HidePickupPrompt();
 
         subtitleManager.ShowCustomMessage(
             "I broke the window! Time to get out!",
@@ -130,18 +146,10 @@ public class WindowEscape : MonoBehaviour
 
             if (cc != null) cc.enabled = false;
 
-            // Set upright and slightly above floor
             player.position = hallwaySpawnPoint.position;
-            player.rotation = Quaternion.Euler(0f, 270f, 0f); // upright, facing left
-
-
+            player.rotation = Quaternion.Euler(0f, 270f, 0f);
 
             if (cc != null) cc.enabled = true;
-        }
-        else
-        {
-            Debug.LogError("Teleport failed: Player or Hallway Spawn Point not assigned!");
-            yield break;
         }
 
         yield return new WaitForSeconds(0.2f);
@@ -153,14 +161,14 @@ public class WindowEscape : MonoBehaviour
             fadeOverlay.gameObject.SetActive(false);
         }
 
-        // 4️⃣ Show new objective
+        // 4️⃣ Show next objective
         subtitleManager.ShowCustomMessage(
             "I made it out! Now I need to find the exit.",
             3f,
             () => subtitleManager.ShowObjective("Find the exit door")
         );
 
-        // Save stage data
+        // 5️⃣ Save progress
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SaveStageData(DataManager.Instance.currentTrial, DataManager.Instance.currentStage);
@@ -184,5 +192,10 @@ public class WindowEscape : MonoBehaviour
         }
 
         fadeOverlay.color = new Color(c.r, c.g, c.b, endAlpha);
+    }
+
+    public bool HasHeavyObject()
+    {
+        return hasHeavyObject;
     }
 }

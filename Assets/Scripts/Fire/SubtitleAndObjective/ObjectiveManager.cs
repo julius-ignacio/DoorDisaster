@@ -35,7 +35,7 @@ public class ObjectiveManager : MonoBehaviour
                 2f,
                 () =>
                 {
-                    subtitleManager.ShowObjective("Pick up the backpack and collect essential items");
+                    subtitleManager.ShowObjective("Pick up the backpack from the bedroom");
                 }
             );
         }
@@ -54,7 +54,7 @@ public class ObjectiveManager : MonoBehaviour
                     2f,
                     () =>
                     {
-                        subtitleManager.ShowObjective("Pick up the backpack");
+                        subtitleManager.ShowObjective("Pick up the backpack from the bedroom");
                     }
                 );
             }
