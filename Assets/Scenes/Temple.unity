@@ -20623,6 +20623,7 @@ GameObject:
   - component: {fileID: 956879948}
   - component: {fileID: 956879947}
   - component: {fileID: 956879950}
+  - component: {fileID: 956879951}
   m_Layer: 0
   m_Name: TempleTerrain
   m_TagString: Untagged
@@ -20718,6 +20719,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceType: 1
+--- !u!65 &956879951
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956879946}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 233.97778, y: 75.91374, z: 434.02527}
+  m_Center: {x: 493.71887, y: 19.071877, z: 216.51263}
 --- !u!1001 &975278407
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20817,15 +20839,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8834734169634807593, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 1.09
       objectReference: {fileID: 0}
     - target: {fileID: 8834734169634807593, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 1.09
       objectReference: {fileID: 0}
     - target: {fileID: 8834734169634807593, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 1.09
       objectReference: {fileID: 0}
     - target: {fileID: 8834734169634807593, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -25056,7 +25078,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e92d141f6c5aaa49af082af24c1963, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 0.2
+  sensitivity: 0.1
+  smoothSpeed: 10
 --- !u!1 &1209331145 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 102700, guid: 2ac2e515cfc05514a83b8ef083430da7, type: 3}
