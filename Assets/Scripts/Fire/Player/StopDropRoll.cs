@@ -5,45 +5,64 @@ using TMPro;
 public class StopDropRoll : MonoBehaviour
 {
     [Header("References")]
-    public Camera playerCamera;        // FPS camera
-    public CharacterController controller; // Player CharacterController
-    public Movements2 movementsScript;  // Your Movements component
-    public Image fireOverlay;          // Fire overlay UI
-    public TMP_Text centerPromptText;  // Centered Stop, Drop, Roll prompt
-    public SubtitleManager2 subtitleManager; // Reference to hide objectives
-    public GameObject healthBar;       // Health bar to hide
-    public GameObject oxygenBar;       // Oxygen bar to hide
+    public Camera playerCamera;
+    public CharacterController controller;
+    public Movements2 movementsScript;
+    public Image fireOverlay;
+    public TMP_Text centerPromptText;
+    public SubtitleManager2 subtitleManager;
+    public GameObject healthBar;
+    public GameObject oxygenBar;
 
     [Header("Roll Settings")]
-    public float rollStrength = 120f;   // Degrees per press (120° = 3 presses for full 360°)
-    public float rollSpeed = 360f;      // Speed of camera rotation (degrees per second)
-    public int pressesRequired = 3;     // Number of SPACE presses to finish
+    public float rollStrength = 120f;
+    public float rollSpeed = 360f;
+    public int rollsRequired = 3;
 
     [Header("Drop Settings")]
     public float dropAmount = 1.5f;
     public float dropSpeed = 3f;
-    public float warningDuration = 2f;  
+    public float warningDuration = 2f;
+
+    [Header("Swipe Settings")]
+    public float minSwipeDistance = 100f;
+    public float circleTolerance = 0.6f;
+    public float swipeSensitivity = 0.5f;
+
+    // ✅ Added event callback
+    public System.Action OnSDRComplete;
 
     private bool isOnFire = false;
-    private int presses = 0;
+    private int rollsCompleted = 0;
     private float rollAngle = 0;
     private Vector3 originalCameraPos;
     private Vector3 targetCameraPos;
+    private Quaternion originalCameraRotation;
     private bool isDropping = false;
     private bool hasDropped = false;
 
+    // Swipe tracking
+    private Vector2 swipeStartPos;
+    private Vector2 lastSwipePos;
+    private float swipeStartTime;
+    private bool isCurrentlyTracking = false;
+    private Vector2[] swipePositions = new Vector2[60];
+    private int positionCount = 0;
+
     void Start()
     {
-        // Store original camera position
         if (playerCamera != null)
+        {
             originalCameraPos = playerCamera.transform.localPosition;
+            originalCameraRotation = playerCamera.transform.localRotation;
+        }
     }
 
     void Update()
     {
         if (!isOnFire) return;
 
-        // Handle camera dropping animation
+        // Handle camera dropping
         if (isDropping && !hasDropped)
         {
             playerCamera.transform.localPosition = Vector3.Lerp(
@@ -52,36 +71,21 @@ public class StopDropRoll : MonoBehaviour
                 dropSpeed * Time.deltaTime
             );
 
-            // Check if drop is complete
             if (Vector3.Distance(playerCamera.transform.localPosition, targetCameraPos) < 0.1f)
             {
                 hasDropped = true;
                 isDropping = false;
 
-                // Update text to show rolling instructions
                 if (centerPromptText != null)
-                    centerPromptText.text = $"Press SPACE repeatedly to ROLL! ({pressesRequired} times)";
+                    centerPromptText.text = $"Swipe in a CIRCLE to ROLL! ({rollsRequired} times)";
             }
         }
 
         // Only allow rolling after dropping
         if (!hasDropped) return;
 
-        // Detect SPACE presses for rolling
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            presses++;
-            rollAngle += rollStrength; // Add 120 degrees per press
-
-            // Update prompt with remaining presses
-            if (centerPromptText != null)
-                centerPromptText.text = $"Keep ROLLING! Press SPACE {pressesRequired - presses} more times!";
-
-            if (presses >= pressesRequired)
-            {
-                EndStopDropRoll();
-            }
-        }
+        // Handle input - works for both mouse and touch
+        HandleSwipeInput();
 
         // Smooth camera roll animation
         if (rollAngle > 0)
@@ -92,94 +96,207 @@ public class StopDropRoll : MonoBehaviour
         }
     }
 
-    // Triggered when player enters fire
+    private void HandleSwipeInput()
+    {
+        // Touch input
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                StartSwipeTracking(touch.position);
+            }
+            else if (touch.phase == TouchPhase.Moved)
+            {
+                TrackSwipePosition(touch.position);
+            }
+            else if (touch.phase == TouchPhase.Ended)
+            {
+                EndSwipeTracking(touch.position);
+            }
+        }
+        // Mouse input (for PC testing)
+        else if (Input.GetMouseButtonDown(0))
+        {
+            StartSwipeTracking(Input.mousePosition);
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            TrackSwipePosition(Input.mousePosition);
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            EndSwipeTracking(Input.mousePosition);
+        }
+    }
+
+    private void StartSwipeTracking(Vector2 startPos)
+    {
+        swipeStartPos = startPos;
+        lastSwipePos = startPos;
+        swipeStartTime = Time.time;
+        isCurrentlyTracking = true;
+        positionCount = 0;
+    }
+
+    private void TrackSwipePosition(Vector2 currentPos)
+    {
+        if (!isCurrentlyTracking) return;
+
+        // Store position for analysis
+        if (positionCount < swipePositions.Length)
+        {
+            swipePositions[positionCount] = currentPos;
+            positionCount++;
+        }
+
+        // Rotate camera in real-time while swiping
+        Vector2 swipeDelta = currentPos - lastSwipePos;
+        float rotationAmount = swipeDelta.magnitude * swipeSensitivity;
+        playerCamera.transform.Rotate(Vector3.forward, rotationAmount);
+
+        lastSwipePos = currentPos;
+    }
+
+    private void EndSwipeTracking(Vector2 endPos)
+    {
+        if (!isCurrentlyTracking) return;
+
+        isCurrentlyTracking = false;
+
+        // Analyze if this was a circular motion
+        if (IsCircularMotion(endPos))
+        {
+            CompleteRoll();
+        }
+
+        positionCount = 0;
+    }
+
+    private bool IsCircularMotion(Vector2 endPos)
+    {
+        float totalDistance = Vector2.Distance(swipeStartPos, endPos);
+        if (totalDistance < minSwipeDistance)
+            return false;
+
+        Vector2 center = (swipeStartPos + endPos) / 2f;
+        float averageRadius = 0f;
+        float radiusVariance = 0f;
+
+        for (int i = 0; i < positionCount; i++)
+        {
+            float distance = Vector2.Distance(swipePositions[i], center);
+            averageRadius += distance;
+        }
+        averageRadius /= positionCount;
+
+        for (int i = 0; i < positionCount; i++)
+        {
+            float distance = Vector2.Distance(swipePositions[i], center);
+            radiusVariance += Mathf.Abs(distance - averageRadius);
+        }
+        radiusVariance /= positionCount;
+
+        float circleScore = 1f - (radiusVariance / averageRadius);
+        Debug.Log($"Circle Score: {circleScore}, Distance: {totalDistance}");
+        return circleScore >= circleTolerance;
+    }
+
+    private void CompleteRoll()
+    {
+        rollsCompleted++;
+        rollAngle += rollStrength;
+
+        if (centerPromptText != null)
+        {
+            int remaining = rollsRequired - rollsCompleted;
+            if (remaining > 0)
+                centerPromptText.text = $"Good! {remaining} more swipes!";
+            else
+                centerPromptText.text = "Perfect!";
+        }
+
+        Debug.Log($"Roll {rollsCompleted}/{rollsRequired} completed!");
+
+        if (rollsCompleted >= rollsRequired)
+        {
+            EndStopDropRoll();
+        }
+    }
+
     public void TriggerOnFire()
     {
         if (isOnFire) return;
 
         isOnFire = true;
-        presses = 0;
+        rollsCompleted = 0;
         rollAngle = 0;
-        isDropping = false; // Don't start dropping yet
+        isDropping = false;
         hasDropped = false;
 
-        // Store original position and calculate drop target
         originalCameraPos = playerCamera.transform.localPosition;
+        originalCameraRotation = playerCamera.transform.localRotation;
         targetCameraPos = originalCameraPos - Vector3.up * dropAmount;
 
-        // Disable movement
         if (controller != null) controller.enabled = false;
         if (movementsScript != null) movementsScript.enabled = false;
 
-        // Hide UI elements
         if (subtitleManager != null) subtitleManager.HideObjective();
         if (healthBar != null) healthBar.SetActive(false);
         if (oxygenBar != null) oxygenBar.SetActive(false);
 
-        // Show overlay
         if (fireOverlay != null) fireOverlay.gameObject.SetActive(true);
 
-        // Show initial fire warning (player stays standing for 2 seconds)
         if (centerPromptText != null)
         {
             centerPromptText.text = "YOU'RE ON FIRE!\nSTOP! DROP! Get ready to ROLL!";
             centerPromptText.enabled = true;
         }
 
-        // Start dropping after 2 seconds
         Invoke("StartDropping", warningDuration);
-
         Debug.Log("Stop, Drop, and Roll sequence started!");
     }
 
-    // Called after warning duration to start the drop
     private void StartDropping()
     {
         isDropping = true;
         Debug.Log("Starting drop animation");
     }
 
-    // Ends the rolling sequence
     private void EndStopDropRoll()
     {
         isOnFire = false;
         isDropping = false;
         hasDropped = false;
 
-        // Reset camera position and rotation
         if (playerCamera != null)
         {
             playerCamera.transform.localPosition = originalCameraPos;
-            playerCamera.transform.rotation = Quaternion.Euler(
-                playerCamera.transform.rotation.eulerAngles.x,
-                playerCamera.transform.rotation.eulerAngles.y,
-                0f // Reset Z rotation to 0
-            );
+            playerCamera.transform.localRotation = originalCameraRotation;
+            rollAngle = 0f;
         }
 
-        // Re-enable movement
         if (controller != null) controller.enabled = true;
         if (movementsScript != null) movementsScript.enabled = true;
 
-        // Show UI elements again
         if (healthBar != null) healthBar.SetActive(true);
         if (oxygenBar != null) oxygenBar.SetActive(true);
 
-        // Hide overlay
         if (fireOverlay != null) fireOverlay.gameObject.SetActive(false);
 
-        // Show completion message briefly
         if (centerPromptText != null)
         {
             centerPromptText.text = "Fire extinguished! You're safe!";
-            // Hide after 2 seconds - SDRTrigger will handle quiz/objective
             Invoke("HideCenterText", 2f);
         }
 
-        Debug.Log("Stop, Drop, and Roll complete - fire extinguished!");
+        Debug.Log("Stop, Drop, and Roll complete!");
+
+        // ✅ Notify SDRTrigger that SDR is done
+        OnSDRComplete?.Invoke();
     }
 
-    // Just hide the center text
     private void HideCenterText()
     {
         if (centerPromptText != null)

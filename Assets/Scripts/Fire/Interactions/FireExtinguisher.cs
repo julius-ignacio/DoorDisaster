@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class FireExtinguisher : MonoBehaviour
 {
@@ -8,6 +9,11 @@ public class FireExtinguisher : MonoBehaviour
     public GameObject worldExtinguisher;
     public Transform extinguisherHolder;
     public GameObject heldExtinguisherPrefab;
+    public GameObject pickupButton; // 👈 assign the pickup UI button here
+    public GameObject sprayButton;  // 👈 assign the spray UI button here
+
+    [Header("Dependencies")]
+    public TowelPickup towelPickup; // 👈 Assign in Inspector to prevent early pickup
 
     [Header("Held Position")]
     public Vector3 heldPosition = new Vector3(0.5f, -0.3f, 1.5f);
@@ -26,52 +32,109 @@ public class FireExtinguisher : MonoBehaviour
     private GameObject heldInstance;
     private bool hasExtinguisher = false;
     private bool canSpray = false;
+    private bool isSpraying = false;
     private ParticleSystem sprayParticleSystem;
 
     private Dictionary<SpreadFire, Coroutine> firesBeingExtinguished = new Dictionary<SpreadFire, Coroutine>();
 
+    // -------------------------------
+    // 🎬  START
+    // -------------------------------
+    void Start()
+    {
+        if (pickupButton != null)
+            pickupButton.SetActive(false); // Hide extinguisher button at start
+    }
+
+    // -------------------------------
+    // 🚪  TRIGGER ENTER/EXIT
+    // -------------------------------
     void OnTriggerStay(Collider other)
     {
-        if (!hasExtinguisher && other.CompareTag("Player") && Input.GetKeyDown(KeyCode.E))
+        if (!hasExtinguisher && other.CompareTag("Player"))
         {
-            PickupAndStartQuizzes(other.gameObject);
+            // Don't show button until towel is picked up
+            if (towelPickup != null && !towelPickup.HasPickedUpTowel())
+                return;
+
+            if (pickupButton != null && !pickupButton.activeSelf)
+                pickupButton.SetActive(true);
         }
     }
 
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            if (pickupButton != null && pickupButton.activeSelf)
+                pickupButton.SetActive(false);
+        }
+    }
+
+    // -------------------------------
+    // 🔘  UI BUTTON PICKUP
+    // -------------------------------
+    public void OnPickupButtonClicked()
+    {
+        if (!hasExtinguisher)
+        {
+            PickupAndStartQuizzes(GameObject.FindGameObjectWithTag("Player"));
+            if (pickupButton != null)
+                pickupButton.SetActive(false);
+        }
+    }
+
+    // -------------------------------
+    // 🧯  UPDATE LOOP (Spraying)
+    // -------------------------------
     void Update()
     {
-if (Input.GetKey(KeyCode.F))
-{
-    if (sprayParticleSystem != null && !sprayParticleSystem.isPlaying)
+        // Only allow spraying after quizzes
+        if (!canSpray) return;
+
+        if (isSpraying || Input.GetKey(KeyCode.F))
+        {
+            if (sprayParticleSystem != null && !sprayParticleSystem.isPlaying)
+                sprayParticleSystem.Play();
+
+            if (!isSpraySoundPlaying)
+            {
+                AudioManager.Instance.PlaySFX(33);
+                isSpraySoundPlaying = true;
+            }
+
+            ExtinguishFiresInRange();
+            CheckIfAllFiresOut();
+        }
+        else
+        {
+            if (sprayParticleSystem != null && sprayParticleSystem.isPlaying)
+                sprayParticleSystem.Stop();
+
+            if (isSpraySoundPlaying)
+            {
+                AudioManager.Instance.audClip.Stop();
+                isSpraySoundPlaying = false;
+            }
+        }
+    }
+
+    // -------------------------------
+    // 🖱️  SPRAY BUTTON FUNCTIONS
+    // -------------------------------
+    public void OnSprayButtonHold()
     {
-        sprayParticleSystem.Play();
+        isSpraying = true;
     }
 
-    if (!isSpraySoundPlaying)
+    public void OnSprayButtonRelease()
     {
-        AudioManager.Instance.PlaySFX(33);
-        isSpraySoundPlaying = true;
+        isSpraying = false;
     }
 
-    ExtinguishFiresInRange();
-}
-else
-{
-    if (sprayParticleSystem != null && sprayParticleSystem.isPlaying)
-    {
-        sprayParticleSystem.Stop();
-    }
-
-    if (isSpraySoundPlaying)
-    {
-        AudioManager.Instance.audClip.Stop();
-        isSpraySoundPlaying = false;
-    }
-}
-
-
-    }
-
+    // -------------------------------
+    // 🔧  PICKUP LOGIC
+    // -------------------------------
     void PickupAndStartQuizzes(GameObject player)
     {
         hasExtinguisher = true;
@@ -89,13 +152,17 @@ else
 
         sprayParticleSystem = heldInstance.GetComponentInChildren<ParticleSystem>();
         if (sprayParticleSystem != null)
-        {
             sprayParticleSystem.Stop();
-        }
+
+        if (sprayButton != null)
+            sprayButton.SetActive(false); // Hide spray button initially
 
         StartCoroutine(ShowQuizzesSequentially());
     }
 
+    // -------------------------------
+    // 📚  QUIZ SEQUENCE
+    // -------------------------------
     IEnumerator ShowQuizzesSequentially()
     {
         string[] quizIDs = {
@@ -110,12 +177,10 @@ else
             QuizQuestion2 quiz = QuizDatabase2.GetQuiz(quizIDs[i]);
             if (quiz != null)
             {
-                // Tell quiz manager if this is the last question
                 quizManager.SetLastQuestion(i == quizIDs.Length - 1);
 
                 bool quizDone = false;
                 quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () => quizDone = true);
-
                 yield return new WaitUntil(() => quizDone);
             }
             else
@@ -126,16 +191,22 @@ else
 
         canSpray = true;
 
+        if (sprayButton != null)
+            sprayButton.SetActive(true); // ✅ show spray button after quizzes
+
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
-                "Good! Now use the fire extinguisher to put out the fires. Press and hold F to spray!",
+                "Good! Now use the fire extinguisher to put out the fires. Press and hold F or the Spray button!",
                 4f,
                 null
             );
         }
     }
 
+    // -------------------------------
+    // 🔥  EXTINGUISH FIRE LOGIC
+    // -------------------------------
     void ExtinguishFiresInRange()
     {
         if (sprayParticleSystem == null) return;
@@ -148,7 +219,6 @@ else
             if (fire.IsActive())
             {
                 float distance = Vector3.Distance(sprayTransform.position, fire.transform.position);
-
                 if (distance <= sprayRange)
                 {
                     Vector3 directionToFire = (fire.transform.position - sprayTransform.position).normalized;
@@ -179,11 +249,12 @@ else
         }
 
         if (firesBeingExtinguished.ContainsKey(fire))
-        {
             firesBeingExtinguished.Remove(fire);
-        }
     }
 
+    // -------------------------------
+    // ✅  CHECK IF ALL FIRES OUT
+    // -------------------------------
     void CheckIfAllFiresOut()
     {
         SpreadFire[] allFires = FindObjectsOfType<SpreadFire>();
@@ -209,9 +280,7 @@ else
     IEnumerator OnAllFiresExtinguished()
     {
         if (sprayParticleSystem != null && sprayParticleSystem.isPlaying)
-        {
             sprayParticleSystem.Stop();
-        }
 
         yield return new WaitForSeconds(0.5f);
 
@@ -226,5 +295,8 @@ else
                 () => subtitleManager.ShowObjective("Rescue Mr. Kitty in the bedroom")
             );
         }
+
+        if (sprayButton != null)
+            sprayButton.SetActive(false);
     }
 }

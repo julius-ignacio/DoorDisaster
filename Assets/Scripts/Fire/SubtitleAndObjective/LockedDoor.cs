@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using TMPro;
 
-public class LockedDoor : MonoBehaviour
+public class LockedDoor : MonoBehaviour, IPickupable
 {
     [Header("References")]
     public GameObject keyObject;
@@ -16,16 +16,22 @@ public class LockedDoor : MonoBehaviour
     public Transform safeHouseSpawn;
     public GameOverManager gameOverManager;
 
+    [Header("Door Settings")]
+    public float openAngle = 90f;
+    public float openSpeed = 2f;
+
+    [Header("Audio")]
+    public int doorOpenSoundIndex = -1;
+
     private bool hasKey = false;
     private bool doorUnlocked = false;
     private bool timerRunning = false;
     private float currentTime;
+    private bool playerInRange = false;
 
     private Quaternion closedRotation;
     private Quaternion openRotation;
     private bool isDoorOpen = false;
-    public float openAngle = 90f;
-    public float openSpeed = 2f;
 
     void Start()
     {
@@ -70,40 +76,52 @@ public class LockedDoor : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !doorUnlocked)
         {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                if (!hasKey)
-                {
-                    AudioManager.Instance.PlaySFX(32);
+            playerInRange = true;
+            string buttonText = hasKey ? "Unlock Door" : "Try Door";
+            GenericPickupButton.Instance.ShowPickupPrompt(this, buttonText);
+        }
+    }
 
-                    // Step 2: run sequence (pause → subs → timer)
-                    StartCoroutine(ShowLockedSequence());
-                }
-                else
-                {
-                    UnlockDoor();
-                }
-            }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!playerInRange || doorUnlocked) return;
+
+        if (!hasKey)
+        {
+            AudioManager.Instance.PlaySFX(32);
+            StartCoroutine(ShowLockedSequence());
+        }
+        else
+        {
+            UnlockDoor();
         }
     }
 
     private IEnumerator ShowLockedSequence()
     {
-        // Step 1: hide HUD
+        // Hide HUD
         SetUICanvases(false);
 
-        // Step 2: wait a moment so player hears SFX clearly
+        // Wait for SFX to play
         yield return new WaitForSeconds(1.2f);
 
-        // Step 3: show subtitle after pause
+        // Show subtitle
         ShowSubtitle("I need to hurry up and find the key!");
-      
 
-        // Step 4: show timer
+        // Show timer
         currentTime = rescueTime;
         if (timerUI != null) timerUI.SetActive(true);
         timerRunning = true;
@@ -114,12 +132,15 @@ public class LockedDoor : MonoBehaviour
         doorUnlocked = true;
         isDoorOpen = true;
 
+        // Play door opening sound
+        PlaySound(doorOpenSoundIndex);
 
         // Show HUD again
         SetUICanvases(true);
 
         if (timerUI != null) timerUI.SetActive(false);
         timerRunning = false;
+        GenericPickupButton.Instance.HidePickupPrompt();
         ShowSubtitle("The door is open! Save Mr. Kitty!");
     }
 
@@ -128,6 +149,12 @@ public class LockedDoor : MonoBehaviour
         hasKey = true;
         Debug.Log("LockedDoor: Key received!");
         ShowSubtitle("I found the key! Get back to the bedroom door.");
+
+        // Update button text if player is still in range
+        if (playerInRange && GenericPickupButton.Instance != null)
+        {
+            GenericPickupButton.Instance.ShowPickupPrompt(this, "Unlock Door");
+        }
     }
 
     public void PickUpCat()
@@ -152,13 +179,10 @@ public class LockedDoor : MonoBehaviour
 
     private void FailRescue()
     {
-        // Hide the timer when player dies
         if (timerUI != null)
             timerUI.SetActive(false);
 
         timerRunning = false;
-
-        // Show HUD again (optional, depends on your game over screen)
         SetUICanvases(true);
 
         GameOverManager.TriggerDeath(
@@ -182,5 +206,11 @@ public class LockedDoor : MonoBehaviour
             if (canvas != null && canvas != timerUI)
                 canvas.SetActive(state);
         }
+    }
+
+    private void PlaySound(int soundIndex)
+    {
+        if (soundIndex >= 0 && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(soundIndex);
     }
 }

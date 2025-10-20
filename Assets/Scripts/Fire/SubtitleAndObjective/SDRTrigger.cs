@@ -31,8 +31,11 @@ public class SDRTrigger : MonoBehaviour
                 stopDropRollScript.TriggerOnFire();
                 Debug.Log("Player caught fire - SDR sequence started!");
 
-                // Wait for SDR to complete, then show quiz
-                StartCoroutine(WaitForSDRAndShowQuiz());
+                // Listen for SDR completion
+                stopDropRollScript.OnSDRComplete = () =>
+                {
+                    ShowQuizAfterSDR();
+                };
 
                 if (triggerOnce)
                     hasTriggered = true;
@@ -44,17 +47,13 @@ public class SDRTrigger : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator WaitForSDRAndShowQuiz()
+    private void ShowQuizAfterSDR()
     {
-        // Wait until SDR is complete (you could also make StopDropRoll call back here)
-        // For now, estimate based on timings: 2s warning + drop time + 3 rolls + 2s completion message
-        yield return new WaitForSeconds(10f); // Adjust based on your actual SDR duration
-
-        // Show the quiz
         QuizQuestion2 quiz = QuizDatabase2.GetQuiz("stop_drop_roll");
         if (quiz != null && quizManager != null)
         {
-            quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () => {
+            quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () =>
+            {
                 // After quiz completes, show objective
                 if (subtitleManager != null)
                     subtitleManager.ShowObjective("Try the window in the bedroom");

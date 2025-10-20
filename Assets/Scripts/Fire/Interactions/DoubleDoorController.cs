@@ -1,7 +1,7 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
-public class DoubleDoorController : MonoBehaviour
+public class DoubleDoorController : MonoBehaviour, IPickupable
 {
     [Header("Doors")]
     public Transform leftDoor;
@@ -10,14 +10,15 @@ public class DoubleDoorController : MonoBehaviour
     public float openSpeed = 2f;
     public float interactionDistance = 4f;
 
-    [Header("Item inside Cabinet")]
-    public ItemPickup item; // Reference to your ItemPickup
+    [Header("Item Inside Cabinet (Optional)")]
+    public ItemPickup item; // Optional item inside
 
     [Header("Optional")]
     public SubtitleManager2 subtitleManager;
 
     private bool isOpen = false;
     private bool isAnimating = false;
+    private bool playerInRange = false;
     private Transform playerTransform;
 
     private Quaternion leftClosedRotation;
@@ -47,19 +48,38 @@ public class DoubleDoorController : MonoBehaviour
 
     void Update()
     {
-        if (isAnimating) return;
+        if (isAnimating || playerTransform == null) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        bool playerNearby = distanceToPlayer <= interactionDistance;
 
-        if (playerNearby && Input.GetKeyDown(KeyCode.E))
+        if (distanceToPlayer <= interactionDistance && !playerInRange)
         {
-            // Only toggle if player is not interacting with item
-            if (item == null || !item.HasBeenPickedUp())
-            {
-                StartCoroutine(AnimateDoors(!isOpen));
-            }
+            playerInRange = true;
+            if (!isOpen)
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Open Door");
         }
+        else if (distanceToPlayer > interactionDistance && playerInRange)
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (isAnimating) return;
+
+        if (!isOpen)
+        {
+            StartCoroutine(AnimateDoors(true));
+        }
+        else
+        {
+            // If you ever want to allow closing, you can add this:
+            // StartCoroutine(AnimateDoors(false));
+        }
+
+        GenericPickupButton.Instance.HidePickupPrompt();
     }
 
     private IEnumerator AnimateDoors(bool opening)
@@ -92,7 +112,6 @@ public class DoubleDoorController : MonoBehaviour
         leftDoor.localRotation = leftEnd;
         rightDoor.localRotation = rightEnd;
 
-        // Enable or disable the item after animation
         if (item != null)
             item.SetInteractable(opening);
 

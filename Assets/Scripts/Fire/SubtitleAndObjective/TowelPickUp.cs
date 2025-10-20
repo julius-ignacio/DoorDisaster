@@ -2,73 +2,94 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class TowelPickup : MonoBehaviour
+public class TowelPickup : MonoBehaviour, IPickupable
 {
     [Header("References")]
     public GameObject towel;
     public SubtitleManager2 subtitleManager;
     public Transform player;
     public Transform houseBSpawnPoint;
+    public Image fadeOverlay;
 
     [Header("Fade Settings")]
-    public Image fadeOverlay;      // Assign the same fade image used for death/wake-up
     public float fadeDuration = 1f;
 
+    [Header("Cat Audio")]
+    public AudioSource catAudio;
+
+    void Awake()
+    {
+        // Make sure cat audio doesn't play at start
+        if (catAudio != null)
+            catAudio.Stop();
+    }
+
     private bool hasPickedUp = false;
+    private bool playerInRange = false;
 
     void Start()
     {
-        // Ensure fade overlay starts invisible
         if (fadeOverlay != null)
         {
-            fadeOverlay.gameObject.SetActive(true); // keep it active
+            fadeOverlay.gameObject.SetActive(true);
             Color c = fadeOverlay.color;
-            c.a = 0f; // invisible at start
+            c.a = 0f;
             fadeOverlay.color = c;
         }
     }
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasPickedUp)
         {
-            if (Input.GetKey(KeyCode.E))
-            {
-                hasPickedUp = true;
-                towel.SetActive(false);
-                subtitleManager.HideObjective();
-
-                PlayerOxygen oxygen = other.GetComponent<PlayerOxygen>();
-                if (oxygen != null)
-                    oxygen.EquipTowel();
-
-                // Start fade + teleport sequence after first line
-                subtitleManager.ShowCustomMessage(
-                    "Got the wet towel! This will help me breathe.",
-                    2f,
-                    () => StartCoroutine(FadeTeleportSequence())
-                );
-            }
+            playerInRange = true;
+            GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Towel");
         }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!playerInRange || hasPickedUp) return;
+
+        hasPickedUp = true;
+        towel.SetActive(false);
+        subtitleManager.HideObjective();
+        GenericPickupButton.Instance.HidePickupPrompt();
+
+        PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+        if (oxygen != null)
+            oxygen.EquipTowel();
+
+        subtitleManager.ShowCustomMessage(
+            "Got the wet towel! This will help me breathe.",
+            2f,
+            () => StartCoroutine(FadeTeleportSequence())
+        );
     }
 
     private IEnumerator FadeTeleportSequence()
     {
-        // 1️⃣ Fade out
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
             yield return StartCoroutine(Fade(0f, 1f));
         }
 
-        // 2️⃣ Teleport player
         if (player != null && houseBSpawnPoint != null)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
             Rigidbody rb = player.GetComponent<Rigidbody>();
 
             if (cc != null) cc.enabled = false;
-
             player.position = houseBSpawnPoint.position;
 
             if (rb != null)
@@ -85,37 +106,41 @@ public class TowelPickup : MonoBehaviour
             yield break;
         }
 
-        yield return new WaitForSeconds(0.2f); // optional delay for smoothness
+        yield return new WaitForSeconds(0.2f);
 
-        // 3️⃣ Fade in
         if (fadeOverlay != null)
         {
             yield return StartCoroutine(Fade(1f, 0f));
-            fadeOverlay.gameObject.SetActive(false); // hide after fading in
+            fadeOverlay.gameObject.SetActive(false);
         }
 
-        // 4️⃣ Continue subtitle sequence
+        // Play cat audio AFTER player is teleported to House B
+        if (catAudio != null)
+            catAudio.Play();
+
+        // Play cat audio AFTER player is teleported to House B
+        if (catAudio != null)
+            catAudio.Play();
+
         subtitleManager.ShowCustomMessage(
             "Huh..? What just happened? This doesn't look right...",
             3f,
             () =>
             {
-                AudioSource audioSource = GetComponent<AudioSource>();
-                if (audioSource != null) audioSource.Play();
-
-                // Mr. Kitty line
                 subtitleManager.ShowCustomMessage(
                     "Huh? Mr. Kitty? I need to save him!",
                     3f,
                     () =>
                     {
-                        // Fire blocking line
                         subtitleManager.ShowCustomMessage(
                             "But the fire is blocking my way! I should find a way to put it out.",
                             3f,
                             () =>
                             {
-                                // Update objective
+                                // Stop cat audio after subtitles finish
+                                if (catAudio != null)
+                                    catAudio.Stop();
+
                                 subtitleManager.ShowObjective("Find the fire extinguisher");
                             }
                         );
