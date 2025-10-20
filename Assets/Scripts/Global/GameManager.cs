@@ -126,6 +126,37 @@ public class GameManager : MonoBehaviour
 
         // Reload current scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+
+        //reset datamanager
+        if (DataManager.Instance.playerData != null)
+        {
+            var data = DataManager.Instance.playerData;
+            data.totalQuestionsAnswered = 0;
+            data.overallTotalScore = 0;
+
+            foreach (var trial in data.trials)
+            {
+                if (trial == null) continue;
+                foreach (var stage in trial.stages)
+                {
+                    if (stage == null) continue;
+                    stage.factsDiscovered = 0;
+                    stage.questionsAnswered = 0;
+                    stage.quizScore = 0;
+                    stage.totalScore = 0;
+                }
+            }
+
+            Debug.Log("✅ Player data fully reset, including trials and stages!");
+        }
+
+        DataManager.Instance.quizScore = 0;
+        DataManager.Instance.factsDiscovered = 0;
+        DataManager.Instance.totalQuestionsAnswered = 0;
+        DataManager.Instance.Npcs_saved = 0;
+            
+
     }
 
     public void Resume()

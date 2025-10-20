@@ -43,40 +43,41 @@ public class Movements : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        
-        // Check if on ground
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
+void Update()
+{
+    // Ground check
+    isGrounded = controller.isGrounded;
+    if (isGrounded && velocity.y < 0)
+        velocity.y = -2f;
 
-        // Movement inputs
-        float x = VirtualJoystick.GetAxis("Horizontal") + Input.GetAxis("Horizontal");
-        float z = VirtualJoystick.GetAxis("Vertical") + Input.GetAxis("Vertical");
+    // --- Input ---
+    float x = VirtualJoystick.GetAxis("Horizontal");
+    float z = VirtualJoystick.GetAxis("Vertical");
 
-        Vector3 move = new Vector3(x, 0, z);
+#if UNITY_EDITOR || UNITY_STANDALONE
+    x += Input.GetAxis("Horizontal");
+    z += Input.GetAxis("Vertical");
+#endif
 
-        if (move.magnitude > 1f) move.Normalize();
+    Vector3 move = new Vector3(x, 0, z);
+    if (move.magnitude > 1f) move.Normalize();
 
-        // Apply movement
-        controller.Move(transform.TransformDirection(move) * speed * Time.deltaTime);
+    // Apply move relative to camera (optional)
+    Vector3 moveDir = transform.TransformDirection(move);
+    controller.Move(moveDir * speed * Time.deltaTime);
 
-        // Jump
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
+    // --- Jump ---
+    if (isGrounded && Input.GetButtonDown("Jump"))
+        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
-        // Gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+    // --- Gravity ---
+    velocity.y += gravity * Time.deltaTime;
+    controller.Move(velocity * Time.deltaTime);
 
-        // --- Footsteps ---
-        HandleFootsteps(move);
-    }
+    // --- Footsteps ---
+    HandleFootsteps(move);
+}
+
 
 void HandleFootsteps(Vector3 move)
 {
