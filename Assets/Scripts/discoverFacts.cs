@@ -14,7 +14,7 @@ public class discoverFacts : MonoBehaviour
     public Objectives objectives;
 
     [Header("Decipher Slider & Text")]
-    public float fillSpeed = 5f;
+    public float fillSpeed = 7f;
     private Coroutine fillRoutine;
     public TMP_Text DecipherText;
     public Slider DecipherSlider;

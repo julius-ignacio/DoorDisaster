@@ -8,7 +8,7 @@ public class PlayerPerformanceCheck : MonoBehaviour
     void Start()
     {
         barrier.SetActive(true);
-        warning.SetActive(false);
+        warning.SetActive(true);
         DestroyBtn3.SetActive(false);
     }
     
