@@ -25157,10 +25157,10 @@ RectTransform:
   - {fileID: 1842228690}
   m_Father: {fileID: 1507146888}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &398742351
 CanvasGroup:
@@ -25744,7 +25744,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 20, y: -21.3}
+  m_AnchoredPosition: {x: 15.900024, y: -16.400024}
   m_SizeDelta: {x: 332.19995, y: 44.299988}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &456448475
@@ -30660,8 +30660,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.01, y: 0.009, z: 0.0067314883}
-  m_Center: {x: 0.000004457543, y: 4.074536e-10, z: 0.003321652}
+  m_Size: {x: 0.01, y: 0.014247865, z: 0.0067314883}
+  m_Center: {x: 0.000004457616, y: 0.0026239494, z: 0.003321655}
 --- !u!114 &474546325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36409,8 +36409,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.72, y: 0.78, z: 6.25}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 6.72, y: 1.0544327, z: 6.7330194}
+  m_Center: {x: 0, y: 0.13721639, z: -0.24151005}
 --- !u!23 &561552918
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -47931,6 +47931,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: 2cf3d8721078b4a4db4a4f7941a94633, type: 3}
       insertIndex: -1
       addedObject: {fileID: 682312163}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 2cf3d8721078b4a4db4a4f7941a94633, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 682312164}
   m_SourcePrefab: {fileID: 100100000, guid: 2cf3d8721078b4a4db4a4f7941a94633, type: 3}
 --- !u!4 &682312156 stripped
 Transform:
@@ -47963,6 +47966,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 242.62, y: 363.2, z: 368}
   m_Center: {x: 28.9, y: 18.8, z: 104.68}
+--- !u!114 &682312164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682312157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.35572898, b: 0.35572898, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &700703550 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1336309957540940, guid: 288b229db858c114299d1bf70ffc95cd, type: 3}
@@ -53668,7 +53689,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.47, y: 0.64, z: 0.71}
+  m_Size: {x: 0.69, y: 1.12, z: 0.71}
   m_Center: {x: 0.00000006111806, y: 0.09358323, z: -0.023488194}
 --- !u!114 &758441342
 MonoBehaviour:
@@ -55213,7 +55234,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.8027344, y: 4.507324}
+  m_AnchoredPosition: {x: -1.8027344, y: 4.5078125}
   m_SizeDelta: {x: -644.7684, y: -332.0661}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &871805623
@@ -56158,8 +56179,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.09, y: 1.76, z: 1.35}
-  m_Center: {x: -0.71, y: 0.005438015, z: 0}
+  m_Size: {x: 4.707857, y: 1.76, z: 1.3500001}
+  m_Center: {x: -1.518925, y: 0.0054379944, z: 0.0000021980647}
 --- !u!114 &953404421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56433,7 +56454,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 98, y: -13}
+  m_AnchoredPosition: {x: 98, y: -20.3}
   m_SizeDelta: {x: 197.5, y: 9.41}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &961677442
@@ -107924,7 +107945,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 76.9, y: -159.9}
+  m_AnchoredPosition: {x: 76.90039, y: -159.90039}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1548534268
@@ -114178,8 +114199,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.71, y: 1.33, z: 2.11}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.7099998, y: 1.33, z: 2.2341514}
+  m_Center: {x: 0.0000000056485776, y: 9.563314e-11, z: 0.062076446}
 --- !u!114 &1626724803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121495,8 +121516,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0.27, y: 0, z: -0.32}
+  m_Size: {x: 1.0600301, y: 1, z: 1.4116522}
+  m_Center: {x: -0.20566253, y: 0, z: -0.52582586}
 --- !u!114 &1723925071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127776,7 +127797,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -57.6, y: 45}
+  m_AnchoredPosition: {x: -38, y: 45}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1788040958
@@ -128226,7 +128247,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.5830078, y: -75.5625}
+  m_AnchoredPosition: {x: -2.5839844, y: -75.5625}
   m_SizeDelta: {x: 194.83337, y: 334.875}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1819095471
@@ -128553,8 +128574,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.01067215, y: 0.008037315, z: 0.009505892}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.018489797, y: 0.014625575, z: 0.018734599}
+  m_Center: {x: -0.0012109173, y: -0.0032941306, z: 0.004614353}
 --- !u!114 &1825014607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134994,7 +135015,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8834734170784175513, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 195
+      value: 186
       objectReference: {fileID: 0}
     - target: {fileID: 8834734170784175513, guid: 5c2cb823f1af59541974bd4a360355f6, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -136642,6 +136663,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3019568617730713240, guid: 5dd5a1ab6047d4848b7668734815016f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2037772818}
+    - targetCorrespondingSourceObject: {fileID: 3019568617730713240, guid: 5dd5a1ab6047d4848b7668734815016f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2037772819}
   m_SourcePrefab: {fileID: 100100000, guid: 5dd5a1ab6047d4848b7668734815016f, type: 3}
 --- !u!1 &2037772816 stripped
 GameObject:
@@ -136684,6 +136708,24 @@ MonoBehaviour:
   lockedDoor: {fileID: 1562861197}
   keyVisual: {fileID: 2037772816}
   subtitleManager: {fileID: 811595114}
+--- !u!114 &2037772819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037772816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 0.68744415, g: 1, b: 0.23849201, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &2039100751 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1399873515413254263, guid: 2aea0a27aa0f399529de6c9009381980, type: 3}
@@ -147327,8 +147369,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.24, y: 0.93, z: 1.07}
-  m_Center: {x: -0.32, y: 0, z: 0}
+  m_Size: {x: 2.4053288, y: 0.93, z: 1.07}
+  m_Center: {x: -0.40266433, y: 0, z: -0.0000000040477097}
 --- !u!114 &2132241746
 MonoBehaviour:
   m_ObjectHideFlags: 0
