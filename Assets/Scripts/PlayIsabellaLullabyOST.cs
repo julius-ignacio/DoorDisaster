@@ -5,6 +5,7 @@ public class PlayIsabellaLullabyOST_StopQuake : MonoBehaviour
 {
     public ConsistentQuake consistentQuake;
     public Shaker shake;
+    public GameObject panicmeterUI;
     public PanicMeterScript panicMeterScript;
 
     
@@ -34,6 +35,7 @@ public class PlayIsabellaLullabyOST_StopQuake : MonoBehaviour
                if (panicMeterScript != null)
         {
             panicMeterScript.currHealth = 0;
+            panicmeterUI.SetActive(false);
         }
     }
 }

@@ -2,6 +2,13 @@ using MilkShake;
 using UnityEngine;
 using Terresquall;
 
+public enum FootstepSurface
+{
+    Pavement,
+    Grass
+}
+
+
 [RequireComponent(typeof(CharacterController))]
 public class Movements : MonoBehaviour
 {
@@ -17,7 +24,9 @@ public class Movements : MonoBehaviour
     public float runStepInterval = 0.35f;   // faster for running
     private float stepTimer;
     public bool footstepsEnabled = true;
-    public GameObject signalSwitchFootstepsSfx;
+
+    public FootstepSurface currentSurface = FootstepSurface.Pavement;
+
 
 
     void Start()
@@ -71,33 +80,34 @@ public class Movements : MonoBehaviour
 
 void HandleFootsteps(Vector3 move)
 {
-        if (!footstepsEnabled) return; // 🚫 disable footsteps entirely
+    if (!footstepsEnabled) return;
+
     if (isGrounded && move.magnitude > 0.1f)
-        {
-            stepTimer -= Time.deltaTime;
+    {
+        stepTimer -= Time.deltaTime;
 
-            if (stepTimer <= 0f)
+        if (stepTimer <= 0f)
+        {
+            switch (currentSurface)
             {
-                if ( signalSwitchFootstepsSfx != null)
-                {
-                    // play random footstep clip
-                      AudioManager.Instance.PlaySFX(1); // index for footsteps in your Clips array
-                    
-                }
-                else
-                {
-                      AudioManager.Instance.PlaySFX(2); // fallback sound if no footsteps assigned
-                }
-             
-
-                stepTimer = walkStepInterval;
+                case FootstepSurface.Pavement:
+                    AudioManager.Instance.PlaySFX(2); // pavement sound
+                    break;
+                case FootstepSurface.Grass:
+                    AudioManager.Instance.PlaySFX(1); // grass sound
+                    break;
             }
+
+            stepTimer = walkStepInterval;
         }
-        else
-        {
-            stepTimer = 0f; // reset
-        }
+    }
+    else
+    {
+        stepTimer = 0f;
+    }
 }
+
+
 
     }
 

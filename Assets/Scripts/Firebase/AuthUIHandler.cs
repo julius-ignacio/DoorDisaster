@@ -6,6 +6,7 @@ using System.Collections; // for scene loading
 
 public class AuthUIHandler : MonoBehaviour
 {
+    
     public FirebaseAuth firebaseAuth;
 
     public TMP_InputField emailInput, login_emailInput;
@@ -14,6 +15,10 @@ public class AuthUIHandler : MonoBehaviour
     public TMP_InputField ageInput;
     public TMP_InputField gradeLevelInput;
     public TMP_Text feedbackTextlog, feedbackTextReg;
+
+
+    [Header("Panel for switching IF successful")]
+    public GameObject login, register;
 
     public void OnRegisterButton()
     {
@@ -45,6 +50,10 @@ public class AuthUIHandler : MonoBehaviour
                 feedbackTextReg.text = "Register successful!";
                 Debug.Log("Token: " + idToken);
                 Debug.Log("UserID: " + localId);
+
+
+            register.SetActive(false);
+            login.SetActive(true);
             }
             else
             {
