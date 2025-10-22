@@ -11,7 +11,7 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
     NextBtn, PrevBtn, HUD, PauseBtn, startPanelUI, whistleSkill;
 
 
-    public GameObject GamestartNarration; //Game start player narration /talking
+   // public GameObject GamestartNarration; //Game start player narration /talking
     public int currentBatchIndex = 0;
     public Movements PlayerMovements; //disables the player from moving until the intro is done/intro panel is closed
 
@@ -40,7 +40,7 @@ private int currentPage = 0;
         whistleSkill.SetActive(false);
 
 
-        GamestartNarration.SetActive(false);
+    //    GamestartNarration.SetActive(false);
 
         PlayerMovements.speed = 0f;
         PlayerMovements.jumpHeight = 0f;
@@ -94,7 +94,7 @@ private void UpdateButtons()
         // enable game HUD
         HUD.SetActive(true);
         PauseBtn.SetActive(true);
-        GamestartNarration.SetActive(true);
+      //  GamestartNarration.SetActive(true);
 
         // enable player movement
         PlayerMovements.speed = 3f;

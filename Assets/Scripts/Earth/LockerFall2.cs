@@ -12,6 +12,6 @@ public class LockerFall2 : MonoBehaviour
     public void Fall()
     {
         rb.isKinematic = false; // Enable physics
-        rb.AddTorque(Vector3.back * 300f); // Push it over
+        rb.AddTorque(Vector3.back * 400f); // Push it over
     }
 }

@@ -4,7 +4,7 @@ public class RackFall : MonoBehaviour
 {
     public Rigidbody rb;
     public Transform fallTarget; // assign the pink plane or an empty GameObject at its direction
-    public float torqueForce = 300f;
+    public float torqueForce = 400f;
 
     void Start()
     {

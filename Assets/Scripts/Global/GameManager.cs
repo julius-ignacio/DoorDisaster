@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -94,7 +95,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    
+
 
     public void Pause()
     {
@@ -102,7 +103,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         isPaused = true;
 
-         AudioListener.pause = true; // 🔇 Pause ALL audio in the scene
+        AudioListener.pause = true; // 🔇 Pause ALL audio in the scene
 
 
         if (resumeBtn != null) resumeBtn.SetActive(true);
@@ -111,13 +112,16 @@ public class GameManager : MonoBehaviour
         if (pauseBtn != null) pauseBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(true);
         if (hudCanvasGroup != null)
-{
-    hudCanvasGroup.alpha = 0f;
-    hudCanvasGroup.interactable = false;
-    hudCanvasGroup.blocksRaycasts = false;
-}
+        {
+            hudCanvasGroup.alpha = 0f;
+            hudCanvasGroup.interactable = false;
+            hudCanvasGroup.blocksRaycasts = false;
+        }
 
     }
+    
+
+    
 
     public void RestartLevel()
     {
@@ -183,14 +187,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ExitGame()
-    {
-        // If you want to quit the application
-        Application.Quit();
+IEnumerator LoadHubScene()
+{
+    Time.timeScale = 1f;
+    AudioListener.pause = false;
 
-        // Or load back to main menu
-        // SceneManager.LoadScene("MainMenu");
+    CanvasGroup overlayGroup = blackOverlay.GetComponent<CanvasGroup>();
+    blackOverlay.SetActive(true);
+
+    // Gradually fade to black over 0.5 seconds
+    float fadeDuration = 0.5f;
+    float elapsed = 0f;
+
+    while (elapsed < fadeDuration)
+    {
+        elapsed += Time.unscaledDeltaTime;
+        overlayGroup.alpha = Mathf.Clamp01(elapsed / fadeDuration);
+        yield return null;
     }
+
+    SceneManager.LoadScene("Temple");
+}
+
+
+public void ExitGame()
+{
+    StartCoroutine(LoadHubScene());
+}
+
     
 
     public void playerGameOver()
