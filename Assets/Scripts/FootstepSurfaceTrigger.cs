@@ -6,10 +6,11 @@ public class FootstepSurfaceTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var movement = other.GetComponent<Movements>();
+        var movement = other.GetComponentInParent<Movements>();
         if (movement != null)
         {
             movement.currentSurface = surfaceType;
+            Debug.Log($"Player stepped on {surfaceType}");
         }
     }
 }

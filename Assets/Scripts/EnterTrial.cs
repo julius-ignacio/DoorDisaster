@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class EnterTrial : MonoBehaviour
 {
     public string sceneName;
+    public int trialIndex;
 
 
 public void OnTriggerEnter(Collider other)
@@ -15,6 +16,8 @@ public void OnTriggerEnter(Collider other)
             {
                 AudioManager.Instance.StopAll(); // or StopLoop(), depending on your AudioManager
             }
+
+            DataManager.Instance.currentTrial = trialIndex;
             SceneManager.LoadScene(sceneName);
         }
     }

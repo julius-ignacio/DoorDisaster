@@ -13,6 +13,8 @@ public class DataManager : MonoBehaviour
     public int factsDiscovered;
     public int totalQuestionsAnswered;
     public int Npcs_saved;
+
+    public bool isEartFinished, isWaterFinished, isFireFinished;
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
 
