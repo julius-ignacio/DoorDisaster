@@ -8,5 +8,4 @@ public class TrialData
     public int questionsAnswered;
     public int factsDiscovered;
     public int totalScore; // quizScore + factsDiscovered
-     public static TrialData Instance;
 }

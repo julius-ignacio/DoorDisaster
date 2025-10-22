@@ -61,6 +61,6 @@ public class EndGame_SaveData : MonoBehaviour
 
         //SceneManager.LoadScene("Temple");
 
-        Debug.Log("✅ Stage data saved for Trial " + DataManager.Instance.currentTrial + " Stage " + DataManager.Instance.currentStage);
+        Debug.Log("✅ Stage data saved for Trial " + DataManager.Instance.currentTrial + " Stage ");
     }
 }

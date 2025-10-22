@@ -14,13 +14,11 @@ public class DataManager : MonoBehaviour
     public int totalQuestionsAnswered;
     public int Npcs_saved;
 
-    public bool isEartFinished, isWaterFinished, isFireFinished;
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
 
-    [Header("Current Trial and Stage")]
+    [Header("Current Trial")]
     public int currentTrial;
-    public int currentStage;
 
 
     private void Awake()
@@ -58,7 +56,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-
 public void SaveTrialData(int trialIndex)
 {
     var trial = playerData.trials[trialIndex];
@@ -67,18 +64,36 @@ public void SaveTrialData(int trialIndex)
     trial.questionsAnswered = totalQuestionsAnswered;
     trial.factsDiscovered = factsDiscovered;
     trial.totalScore = trial.quizScore + trial.factsDiscovered;
+
+    // ✅ Set the correct finished flag
+    switch (currentTrial)
+    {
+        case 0:
+            playerData.isEarthFinished = true;
+            break;
+
+        case 1:
+            playerData.isWaterFinished = true;
+            break;
+
+        case 2:
+            playerData.isFireFinished = true;
+            break;
+    }
+
     UpdateTotals();
 }
 
 
-private void UpdateTotals()
-{
-    int overall = 0;
-    int totalQuestions = 0;
+
+    private void UpdateTotals()
+    {
+        int overall = 0;
+        int totalQuestions = 0;
 
 
-    playerData.overallTotalScore = overall;
-    playerData.totalQuestionsAnswered = totalQuestions;
-}
+        playerData.overallTotalScore = overall;
+        playerData.totalQuestionsAnswered = totalQuestions;
+    }
 
 }

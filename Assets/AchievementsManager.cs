@@ -10,13 +10,23 @@ public class AchievementsManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+void Update()
+{
+    var playerData = DataManager.Instance.playerData;
+
+    if (playerData != null &&
+        playerData.isEarthFinished &&
+        playerData.isWaterFinished &&
+        playerData.isFireFinished)
     {
-        if (DataManager.Instance.isEartFinished && DataManager.Instance.isWaterFinished && DataManager.Instance.isFireFinished)
-        {
-            AllDoorsCompleted.SetActive(true);
-        }
+        AllDoorsCompleted.SetActive(true);
     }
+        else
+        {
+            AllDoorsCompleted.SetActive(false);
+        }
+}
+
 
 
     public void CloseAlmanac()

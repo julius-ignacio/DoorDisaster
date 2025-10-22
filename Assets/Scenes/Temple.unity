@@ -2429,7 +2429,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: Water Stage 1
-  trialIndex: 2
+  trialIndex: 1
 --- !u!65 &76530930
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4314,7 +4314,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 584738389482406501, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3537421507729576742, guid: 126156515876bbad9babb674369475f2, type: 3}
       propertyPath: m_CameraType
@@ -7572,6 +7572,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectedTheme: 4
   stopLoopSignal: {fileID: 217666545}
+--- !u!1 &516881016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 516881017}
+  - component: {fileID: 516881018}
+  m_Layer: 0
+  m_Name: TrialLockManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &516881017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516881016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -188.28589, y: -1.2485294, z: -32.41545}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &516881018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516881016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee856115980edb660960b414adbceae3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519943866
 GameObject:
   m_ObjectHideFlags: 0
@@ -25959,7 +26003,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1199416029}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56e92d141f6c5aaa49af082af24c1963, type: 3}
   m_Name: 
@@ -27961,7 +28005,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneName: FireLevel
-  trialIndex: 3
+  trialIndex: 2
 --- !u!65 &1396462354
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29147,7 +29191,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1578495302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29167,48 +29211,29 @@ MonoBehaviour:
     age: 0
     gradeLevel: 0
     trials:
-    - stages:
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      trialTotalScore: 0
-    - stages:
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      trialTotalScore: 0
-    - stages:
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      - quizScore: 0
-        questionsAnswered: 0
-        factsDiscovered: 0
-        totalScore: 0
-      trialTotalScore: 0
+    - quizScore: 0
+      questionsAnswered: 0
+      factsDiscovered: 0
+      totalScore: 0
+    - quizScore: 0
+      questionsAnswered: 0
+      factsDiscovered: 0
+      totalScore: 0
+    - quizScore: 0
+      questionsAnswered: 0
+      factsDiscovered: 0
+      totalScore: 0
     overallTotalScore: 0
     totalQuestionsAnswered: 0
     lastPlayedScene: 
+    isEarthFinished: 0
+    isWaterFinished: 0
+    isFireFinished: 0
   quizScore: 0
   factsDiscovered: 0
   totalQuestionsAnswered: 0
   Npcs_saved: 0
-  isEartFinished: 0
-  isWaterFinished: 0
-  isFireFinished: 0
   currentTrial: 0
-  currentStage: 0
 --- !u!4 &1578495303
 Transform:
   m_ObjectHideFlags: 0
@@ -38707,6 +38732,7 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 516881017}
   - {fileID: 288443190}
   - {fileID: 1578495303}
   - {fileID: 368753334}
