@@ -13,4 +13,6 @@ public class PlayerData
     public int overallTotalScore;
     public int totalQuestionsAnswered;
     public string lastPlayedScene;
+
+    public bool isEartFinished, isWaterFinished, isFireFinished;
 }
