@@ -171,7 +171,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
         // 5️⃣ Save progress
         if (DataManager.Instance != null)
         {
-            DataManager.Instance.SaveStageData(DataManager.Instance.currentTrial, DataManager.Instance.currentStage);
+            DataManager.Instance.SaveTrialData(DataManager.Instance.currentTrial);
         }
     }
 

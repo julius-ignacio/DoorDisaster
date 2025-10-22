@@ -26,7 +26,7 @@ public class EndGame_SaveData : MonoBehaviour
 
     public void OnTriggerExit(Collider other)
     {
-               if (other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             SaveBtn.SetActive(false);
         }
@@ -35,7 +35,7 @@ public class EndGame_SaveData : MonoBehaviour
 
     public void Save()
     {
-            SceneManager.LoadScene("Temple");
+        SceneManager.LoadScene("Temple");
 
         if (DataManager.Instance == null)
         {
@@ -50,7 +50,7 @@ public class EndGame_SaveData : MonoBehaviour
         }
 
         // Update structured data from global values
-        DataManager.Instance.SaveStageData(DataManager.Instance.currentTrial, DataManager.Instance.currentStage);
+        DataManager.Instance.SaveTrialData(DataManager.Instance.currentTrial);
 
         // Push to Firebase
         StartCoroutine(firebaseDatabase.SaveData(
@@ -59,8 +59,8 @@ public class EndGame_SaveData : MonoBehaviour
             DataManager.Instance.playerData
         ));
 
-            //SceneManager.LoadScene("Temple");
+        //SceneManager.LoadScene("Temple");
 
-        Debug.Log("✅ Stage data saved for Trial " + DataManager.Instance.currentTrial + " Stage " +  DataManager.Instance.currentStage);
+        Debug.Log("✅ Stage data saved for Trial " + DataManager.Instance.currentTrial + " Stage " + DataManager.Instance.currentStage);
     }
 }

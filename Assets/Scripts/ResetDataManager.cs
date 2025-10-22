@@ -15,15 +15,11 @@ public class ResetDataManager : MonoBehaviour
 
                 foreach (var trial in data.trials)
                 {
-                    if (trial == null) continue;
-                    foreach (var stage in trial.stages)
-                    {
-                        if (stage == null) continue;
-                        stage.factsDiscovered = 0;
-                        stage.questionsAnswered = 0;
-                        stage.quizScore = 0;
-                        stage.totalScore = 0;
-                    }
+                        if (trial == null) continue;
+                        trial.factsDiscovered = 0;
+                        trial.questionsAnswered = 0;
+                        trial.quizScore = 0;
+                        trial.totalScore = 0;
                 }
 
                 Debug.Log("✅ Player data fully reset, including trials and stages!");

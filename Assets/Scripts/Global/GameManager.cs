@@ -123,45 +123,43 @@ public class GameManager : MonoBehaviour
 
     
 
-    public void RestartLevel()
+public void RestartLevel()
+{
+    // Unpause
+    Time.timeScale = 1f;
+
+    // Reload current scene
+    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+    // Reset DataManager
+    if (DataManager.Instance.playerData != null)
     {
-        // Unpause
-        Time.timeScale = 1f;
+        var data = DataManager.Instance.playerData;
+        data.totalQuestionsAnswered = 0;
+        data.overallTotalScore = 0;
 
-        // Reload current scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-
-        //reset datamanager
-        if (DataManager.Instance.playerData != null)
+        foreach (var trial in data.trials)
         {
-            var data = DataManager.Instance.playerData;
-            data.totalQuestionsAnswered = 0;
-            data.overallTotalScore = 0;
+            if (trial == null) continue;
 
-            foreach (var trial in data.trials)
-            {
-                if (trial == null) continue;
-                foreach (var stage in trial.stages)
-                {
-                    if (stage == null) continue;
-                    stage.factsDiscovered = 0;
-                    stage.questionsAnswered = 0;
-                    stage.quizScore = 0;
-                    stage.totalScore = 0;
-                }
-            }
+            // Reset trial-level stats
+            trial.quizScore = 0;
+            trial.questionsAnswered = 0;
+            trial.factsDiscovered = 0;
+            trial.totalScore = 0;
 
-            Debug.Log("✅ Player data fully reset, including trials and stages!");
         }
 
-        DataManager.Instance.quizScore = 0;
-        DataManager.Instance.factsDiscovered = 0;
-        DataManager.Instance.totalQuestionsAnswered = 0;
-        DataManager.Instance.Npcs_saved = 0;
-            
-
+        Debug.Log("✅ Player data fully reset (trials only, no stages)!");
     }
+
+    // Reset quick-access globals
+    DataManager.Instance.quizScore = 0;
+    DataManager.Instance.factsDiscovered = 0;
+    DataManager.Instance.totalQuestionsAnswered = 0;
+    DataManager.Instance.Npcs_saved = 0;
+}
+
 
     public void Resume()
     {

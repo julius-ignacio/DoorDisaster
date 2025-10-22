@@ -40,63 +40,45 @@ public class DataManager : MonoBehaviour
 
 
     public void InitPlayerData()
-{
-    if (playerData == null)
-        playerData = new PlayerData();
-
-    if (string.IsNullOrEmpty(playerData.playerId))
     {
-        playerData.playerId = FirebaseAuth.UserLocalId;
-        playerData.playerName = "Player";
-        playerData.trials = new TrialData[3];
+        if (playerData == null)
+            playerData = new PlayerData();
 
-        for (int i = 0; i < playerData.trials.Length; i++)
+        if (string.IsNullOrEmpty(playerData.playerId))
         {
-            playerData.trials[i] = new TrialData();
-            playerData.trials[i].stages = new StageData[2];
-            for (int j = 0; j < 2; j++)
-                playerData.trials[i].stages[j] = new StageData();
+            playerData.playerId = FirebaseAuth.UserLocalId;
+            playerData.playerName = "Player";
+            playerData.trials = new TrialData[3];
+
+            for (int i = 0; i < playerData.trials.Length; i++)
+            {
+                playerData.trials[i] = new TrialData();
+            }
+
         }
     }
+
+
+public void SaveTrialData(int trialIndex)
+{
+    var trial = playerData.trials[trialIndex];
+
+    trial.quizScore = quizScore;
+    trial.questionsAnswered = totalQuestionsAnswered;
+    trial.factsDiscovered = factsDiscovered;
+    trial.totalScore = trial.quizScore + trial.factsDiscovered;
+    UpdateTotals();
 }
 
 
-    // 🔹 Called when you want to sync global fields into structured DB
-    public void SaveStageData(int trialIndex, int stageIndex)
-    {
-        var stage = playerData.trials[trialIndex].stages[stageIndex];
+private void UpdateTotals()
+{
+    int overall = 0;
+    int totalQuestions = 0;
 
-        stage.quizScore = quizScore;
-        stage.questionsAnswered = totalQuestionsAnswered;
-        stage.totalScore = quizScore + stage.factsDiscovered;
 
-        // Copy per-NPC scores
-        foreach (var kvp in npcScores)
-        {
-            stage.npcScores[kvp.Key] = kvp.Value;
-        }
+    playerData.overallTotalScore = overall;
+    playerData.totalQuestionsAnswered = totalQuestions;
+}
 
-        UpdateTotals();
-    }
-
-    private void UpdateTotals()
-    {
-        int overall = 0;
-        int totalQuestions = 0;
-
-        foreach (var trial in playerData.trials)
-        {
-            int trialSum = 0;
-            foreach (var stage in trial.stages)
-            {
-                trialSum += stage.totalScore;
-                totalQuestions += stage.questionsAnswered;
-            }
-            trial.trialTotalScore = trialSum;
-            overall += trialSum;
-        }
-
-        playerData.overallTotalScore = overall;
-        playerData.totalQuestionsAnswered = totalQuestions;
-    }
 }

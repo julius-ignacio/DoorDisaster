@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+
 
 [System.Serializable]
 public class TrialData
 {
-    public StageData[] stages = new StageData[2]; // 2 stages per trial
-    public int trialTotalScore; // sum of both stages
-    
+    public int quizScore;
+    public int questionsAnswered;
+    public int factsDiscovered;
+    public int totalScore; // quizScore + factsDiscovered
+     public static TrialData Instance;
 }
