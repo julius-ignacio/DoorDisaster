@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 23066751}
   - component: {fileID: 23066750}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: emblem_earth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5798,7 +5798,7 @@ GameObject:
   - component: {fileID: 376489881}
   - component: {fileID: 376489880}
   m_Layer: 0
-  m_Name: Directional Light (3)
+  m_Name: EarthBackLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6682,6 +6682,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
+      propertyPath: m_Name
+      value: Body
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
       propertyPath: m_Name
       value: Fire
@@ -7095,7 +7099,7 @@ GameObject:
   - component: {fileID: 486185567}
   - component: {fileID: 486185573}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: GlowArea_water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7588,7 +7592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &516881017
 Transform:
   m_ObjectHideFlags: 0
@@ -7616,6 +7620,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee856115980edb660960b414adbceae3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InnerTrigger:
+  - {fileID: 1057110674}
+  - {fileID: 76530927}
+  - {fileID: 1396462351}
+  Glow:
+  - {fileID: 1887562411}
+  - {fileID: 486185566}
+  - {fileID: 2037840047}
+  Emblem:
+  - {fileID: 23066748}
+  - {fileID: 1582300493}
+  - {fileID: 1702839830}
+  LockedTrialMaterial: {fileID: 2100000, guid: db726e2f5312a7eebb361a5910f7a6bc, type: 2}
+  Light:
+  - {fileID: 376489879}
+  - {fileID: 1782236414}
+  - {fileID: 1298324759}
 --- !u!1 &519943866
 GameObject:
   m_ObjectHideFlags: 0
@@ -21654,6 +21675,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
+      propertyPath: m_Name
+      value: Body
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
       propertyPath: m_Name
       value: Water
@@ -26684,7 +26709,7 @@ GameObject:
   - component: {fileID: 1298324761}
   - component: {fileID: 1298324760}
   m_Layer: 0
-  m_Name: Directional Light (2)
+  m_Name: FireBackLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29191,7 +29216,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1578495302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29262,7 +29287,7 @@ GameObject:
   - component: {fileID: 1582300496}
   - component: {fileID: 1582300495}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: emblem_water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31977,7 +32002,7 @@ GameObject:
   - component: {fileID: 1702839833}
   - component: {fileID: 1702839832}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: emblem_fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34319,7 +34344,7 @@ GameObject:
   - component: {fileID: 1782236416}
   - component: {fileID: 1782236415}
   m_Layer: 0
-  m_Name: Directional Light (1)
+  m_Name: WaterBackLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35014,6 +35039,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
+      propertyPath: m_Name
+      value: Body
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c3e307e80cc224cf8b7e2cf4f68f1bac, type: 3}
       propertyPath: m_Name
@@ -35788,7 +35817,7 @@ GameObject:
   - component: {fileID: 1887562419}
   - component: {fileID: 1887562418}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: GlowArea_earth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37383,7 +37412,7 @@ GameObject:
   - component: {fileID: 2037840048}
   - component: {fileID: 2037840054}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: GlowArea_fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
