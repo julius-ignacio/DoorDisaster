@@ -5,7 +5,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
     [Header("Audio Sources")]
     public AudioSource audClip;
-    public AudioSource audLoop;
+    public AudioSource audLoop, audLoopSecondary;
 
     [Header("Clips")]
     public AudioClip[] Clips;
@@ -34,17 +34,30 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-        public void PlayLoop(AudioClip clip)
+    public void PlayLoop(AudioClip clip)
     {
         if (audLoop.clip == clip && audLoop.isPlaying) return; // avoid restarting same loop
         audLoop.clip = clip;
         audLoop.loop = true;
         audLoop.Play();
     }
+    
+            public void PlayLoopSecondary(AudioClip clip)
+    {
+        if (audLoopSecondary.clip == clip && audLoopSecondary.isPlaying) return; // avoid restarting same loop
+        audLoopSecondary.clip = clip;
+        audLoopSecondary.loop = true;
+        audLoopSecondary.Play();
+    }
 
     public void StopLoop()
     {
         audLoop.Stop();
+    }
+
+      public void StopLoopSecondary()
+    {
+        audLoopSecondary.Stop();
     }
 
 

@@ -10,6 +10,7 @@ public class DataManager : MonoBehaviour
 
     // 🔹 Legacy/global fields (for quick access in scripts)
     public int quizScore;
+    public int wrongAnswers;
     public int factsDiscovered;
     public int totalQuestionsAnswered;
     public int Npcs_saved;
