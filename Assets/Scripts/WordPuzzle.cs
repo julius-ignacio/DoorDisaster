@@ -49,20 +49,36 @@ public class WordPuzzle : MonoBehaviour
         ResetWord();
         feedbackText.text = "";
     }
+public void OnLetterClick(string letter)
+{
+    // Find which button was clicked (based on letter)
+    Button clickedButton = letterButtons.Find(b => 
+        b.GetComponentInChildren<TextMeshProUGUI>().text == letter && b.interactable);
 
-    public void OnLetterClick(string letter)
+    if (clickedButton != null)
     {
-        currentWord += letter;
-        currentWordText.text = currentWord;
+        // Gray out and disable the clicked button
+        clickedButton.interactable = false;
 
-
-        // Check if player reached word length
-        if (currentWord.Length == correctWord.Length)
-        {
-            CheckAnswer();
-        }
-
+        ColorBlock colors = clickedButton.colors;
+        colors.normalColor = new Color(0.5f, 0.5f, 0.5f); // gray
+        colors.highlightedColor = colors.normalColor;
+        colors.pressedColor = colors.normalColor;
+        colors.selectedColor = colors.normalColor;
+        clickedButton.colors = colors;
     }
+
+    // Add letter to current word
+    currentWord += letter;
+    currentWordText.text = currentWord;
+
+    // Check if player reached full word
+    if (currentWord.Length == correctWord.Length)
+    {
+        CheckAnswer();
+    }
+}
+
 
     void CheckAnswer()
     {
@@ -80,12 +96,21 @@ public class WordPuzzle : MonoBehaviour
             ResetWord();
         }
     }
+public void ResetWord()
+{
+    currentWord = "";
+    currentWordText.text = "";
 
-    public void ResetWord()
+    foreach (Button btn in letterButtons)
     {
-        currentWord = "";
-        currentWordText.text = "";
+        btn.interactable = true;
+
+        ColorBlock colors = btn.colors;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = Color.white;
+        btn.colors = colors;
     }
+}
 
     void DisableButtons()
     {
