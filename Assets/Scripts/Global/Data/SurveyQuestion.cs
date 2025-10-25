@@ -12,17 +12,25 @@ public static class SurveyDatabase
 {
     public static List<SurveyQuestion> playerFeedback = new List<SurveyQuestion>
     {
-        new SurveyQuestion {
-            question = "How fun did you find this game?",
-            choices = new string[] { "Very fun", "Somewhat fun", "Not fun" }
+   new SurveyQuestion {
+            question = "I enjoyed playing this game.",
+            choices = new string[] { "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree" }
         },
         new SurveyQuestion {
-            question = "Was the game easy to understand?",
-            choices = new string[] { "Yes", "A little confusing", "No" }
+            question = "The game mechanics were easy to understand.",
+            choices = new string[] { "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree" }
         },
         new SurveyQuestion {
-            question = "Would you recommend this to a friend?",
-            choices = new string[] { "Definitely", "Maybe", "No" }
+            question = "The visuals and graphics were appealing.",
+            choices = new string[] { "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree" }
+        },
+        new SurveyQuestion {
+            question = "The controls were responsive and easy to use.",
+            choices = new string[] { "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree" }
+        },
+        new SurveyQuestion {
+            question = "I would recommend this game to others.",
+            choices = new string[] { "Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree" }
         }
     };
 }
