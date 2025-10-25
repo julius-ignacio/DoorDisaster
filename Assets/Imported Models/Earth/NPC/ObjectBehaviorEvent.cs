@@ -14,6 +14,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
     public PanicMeterScript panicMeter;
     public GameNotifier gameNotifier;
     public Objectives objectives;
+    public InventoryManager inventory;
 
 
     [Header("Npc icons")]
@@ -92,8 +93,6 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 if (npcsaved != null) { npcsaved.makeIconActive(); }
 
                 objectives.UpdateObjectives();
-
-
             }
         }
         else
@@ -114,6 +113,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 else
                 {
                     gameNotifier.cantHeal_FullHealth();
+                    inventory.medkit++;
                 }
 
                 
@@ -122,14 +122,23 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
             else if (score != 0 && currentNpcId >= 10 && currentNpcId <= 13) //waterbottle
             {
-                panicMeter.currHealth -= 20;
-                AudioManager.Instance.PlaySFX(18);
-                AudioManager.Instance.PlaySFX(8); //points
-                gameNotifier.EarnedPoints(score);
+                if (panicMeter.currHealth <= 75)
+                {
+                    panicMeter.currHealth -= 20;
+                    AudioManager.Instance.PlaySFX(18);
+                    AudioManager.Instance.PlaySFX(8); //points
+                    gameNotifier.EarnedPoints(score);
 
 
-                BlueFlashEffect.SetActive(true);
-                StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+                    BlueFlashEffect.SetActive(true);
+                    StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+                }
+                
+                else
+                {
+                    gameNotifier.notInPanic();
+                    inventory.water++;
+                }
             }
 
             else if (score != 0 && currentNpcId == 14)

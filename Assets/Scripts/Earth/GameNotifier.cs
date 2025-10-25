@@ -44,10 +44,19 @@ public void PanicWarning(float duration = 3f)
     }
 
 
-public void cantHeal_FullHealth(float duration = 5f)
+    public void cantHeal_FullHealth(float duration = 5f)
+    {
+        StartCoroutine(ShowNotificationCoroutine(
+            "Health is full.",
+            duration
+        ));
+    }
+
+
+public void notInPanic(float duration = 5f)
 {
     StartCoroutine(ShowNotificationCoroutine(
-        "Health is full.",
+        "Not in panic.",
         duration
     ));
 }
