@@ -137,7 +137,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
                 AudioManager.Instance.PlaySFX(8); //points
                 Debug.Log($"[DEBUG] heart={heart}, useWhistle={useWhistle}, gameNotifier={gameNotifier}, objectives={objectives}");
 
-                useWhistle.ButtonSkill.SetActive(true);
+             useWhistle.ButtonSkill.gameObject.SetActive(true);
+
                 gameNotifier.ObtainedItem(score, "Whistle");
             }
 

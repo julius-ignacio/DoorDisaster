@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro; // if you're using TextMeshPro
 
 public class UseWhistle : MonoBehaviour
 {
@@ -11,57 +13,94 @@ public class UseWhistle : MonoBehaviour
     public GameObject[] outlinedObjects;       // Objects to highlight
 
     private bool isUsingWhistle = false;
-    public GameObject ButtonSkill;
+    public RectTransform ButtonSkill;
+    private Vector2 originalPosition;
 
-    private int uses = 2;
+    [Header("Cooldown Settings")]
+    public float cooldown = 20f;  
 
- 
+    [Header("UI Elements")]
+    public TMP_Text cooldownText; // You can also use "public Text cooldownText;" if using the old UI Text
+
+    void Start()
+    {
+        originalPosition = ButtonSkill.anchoredPosition; // Store button's starting position
+
+        if (cooldownText != null)
+            cooldownText.gameObject.SetActive(false); // Hide at start
+    }
 
     public void Whistle()
     {
         if (!isUsingWhistle)
         {
-                 StartCoroutine(ShowOutlinesTemporarily());
-       ButtonSkill.transform.localScale = new Vector3(-50, -50, -50);
-
+            StartCoroutine(ActivateWhistleSkill());
         }
-       
     }
 
-    private IEnumerator ShowOutlinesTemporarily()
+    private IEnumerator ActivateWhistleSkill()
     {
         isUsingWhistle = true;
-        AudioManager.Instance.PlaySFX(21); // plays the whistle sound
 
-        // Enable silhouette outlines for all objects
+        // Move button off-screen instantly
+        ButtonSkill.anchoredPosition = new Vector2(2000f, ButtonSkill.anchoredPosition.y);
+                // Start cooldown countdown text
+        if (cooldownText != null)
+            StartCoroutine(ShowCooldownTimer());
+
+        // Play sound effect
+        AudioManager.Instance.PlaySFX(21);
+
+        // Enable silhouette outlines
         foreach (GameObject obj in outlinedObjects)
         {
             Outline outline = obj.GetComponent<Outline>();
             if (outline != null)
             {
                 outline.enabled = true;
-                outline.OutlineMode = Outline.Mode.SilhouetteOnly; // show through walls
+                outline.OutlineMode = Outline.Mode.SilhouetteOnly;
                 outline.OutlineWidth = 8f;
             }
         }
 
+        // Wait for outlines to stay active
         yield return new WaitForSeconds(outlineDuration);
 
-
-        // Turn outlines back to normal or hide them
+        // Disable or revert outlines
         foreach (GameObject obj in outlinedObjects)
         {
-
             Outline outline = obj.GetComponent<Outline>();
-                              outline.enabled = true;
-
-                outline.OutlineWidth = 3f;
-            outline.OutlineMode = Outline.Mode.OutlineAll;
-        
+            if (outline != null)
+            {
+                outline.enabled = false;
+            }
         }
 
-        isUsingWhistle = false;
 
-        ButtonSkill.SetActive(false);
+
+        // Wait for cooldown
+        yield return new WaitForSeconds(cooldown);
+
+        // Move button back to its original position
+        ButtonSkill.anchoredPosition = originalPosition;
+
+        // Allow the skill to be used again
+        isUsingWhistle = false;
+    }
+
+    private IEnumerator ShowCooldownTimer()
+    {
+        cooldownText.gameObject.SetActive(true);
+
+        float remaining = cooldown;
+
+        while (remaining > 0)
+        {
+            cooldownText.text = Mathf.Ceil(remaining).ToString(); // Round up for cleaner numbers
+            yield return new WaitForSeconds(1f);
+            remaining -= 1f;
+        }
+
+        cooldownText.gameObject.SetActive(false);
     }
 }
