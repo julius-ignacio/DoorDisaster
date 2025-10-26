@@ -47,10 +47,12 @@ public void PanicWarning(float duration = 3f)
     public void cantHeal_FullHealth(float duration = 5f)
     {
         StartCoroutine(ShowNotificationCoroutine(
-            "Health is full.",
+            "Health is full. Medkit stored in backpack.",
             duration
         ));
     }
+
+
 
 
 public void notInPanic(float duration = 5f)

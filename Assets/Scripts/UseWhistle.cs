@@ -58,8 +58,8 @@ public class UseWhistle : MonoBehaviour
             if (outline != null)
             {
                 outline.enabled = true;
-                outline.OutlineMode = Outline.Mode.SilhouetteOnly;
-                outline.OutlineWidth = 8f;
+                outline.OutlineMode = Outline.Mode.OutlineAndSilhouette;
+                outline.OutlineWidth = 3f;
             }
         }
 
@@ -72,7 +72,11 @@ public class UseWhistle : MonoBehaviour
             Outline outline = obj.GetComponent<Outline>();
             if (outline != null)
             {
-                outline.enabled = false;
+                outline.enabled = true;
+                outline.OutlineMode = Outline.Mode.OutlineAll;
+                outline.OutlineWidth = 3f;
+                
+                
             }
         }
 

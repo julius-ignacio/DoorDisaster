@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using TMPro;
+
 
 public class InventoryManager : MonoBehaviour
 {
@@ -11,46 +13,90 @@ public class InventoryManager : MonoBehaviour
     public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
     public int water = 0;
     public int medkit = 0;
+    public GameNotifier gameNotifier;
+
+    public TextMeshProUGUI medkitCounter, waterCounter;
+
     void Start()
     {
         inventoryUI.SetActive(false);
     }
 
-public void ToggleInventory()
-{
-    inventoryUI.SetActive(!inventoryUI.activeSelf);
-}
+    public void ToggleInventory()
+    {
+        inventoryUI.SetActive(!inventoryUI.activeSelf);
+        medkitCounter.text = medkit.ToString();
+        waterCounter.text = water.ToString();
+    }
 
 
 
     public void UseMedkit()
     {
-        if(medkit != 0)
+        if (medkit != 0)
         {
-                    medkit--;
-
-        inventoryUI.SetActive(false);
-        heal.Heal(1);
-                    AudioManager.Instance.PlaySFX(19);
-
-        GreenFlashEffect.SetActive(true);
-        StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+            checkifHealthisFull();
         }
-        
+
     }
+
+
+    private void checkifHealthisFull()
+    {
+        if (heal.currentHearts < 8 && heal.isHelmetUsed == false)
+        {
+            heal.Heal(1);
+            medkit--;
+            medkitCounter.text = medkit.ToString();
+            inventoryUI.SetActive(false);
+
+
+            AudioManager.Instance.PlaySFX(19);
+            AudioManager.Instance.PlaySFX(8); //points
+
+            GreenFlashEffect.SetActive(true);
+            StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+        }
+    }
+
+
 
 
     public void DrinkWater()
     {
-        if(water != 0)
+        if (water != 0)
         {
-                    water--;
-        inventoryUI.SetActive(false);
-        panic.currHealth -= 20;
-                AudioManager.Instance.PlaySFX(18);
+            water--;
+            waterCounter.text = water.ToString();
 
-        BlueFlashEffect.SetActive(true);
-        StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+            inventoryUI.SetActive(false);
+            panic.currHealth -= 20;
+            AudioManager.Instance.PlaySFX(18);
+
+            BlueFlashEffect.SetActive(true);
+            StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+        }
+    }
+
+
+        private void checkifPanicisNotHigh()
+    {
+        if (panic.currHealth <= 75)
+        {
+            heal.Heal(1);
+            medkit--;
+            medkitCounter.text = medkit.ToString();
+            inventoryUI.SetActive(false);
+
+
+            AudioManager.Instance.PlaySFX(19);
+            AudioManager.Instance.PlaySFX(8); //points
+
+            GreenFlashEffect.SetActive(true);
+            StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+        } else
+        {
+            
         }
     }
 
