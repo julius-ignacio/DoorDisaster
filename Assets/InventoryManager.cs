@@ -11,8 +11,8 @@ public class InventoryManager : MonoBehaviour
     public HeartSys heal;
     public PanicMeterScript panic;
     public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
-    public int water = 0;
-    public int medkit = 0;
+    public int water = 1;
+    public int medkit = 1;
     public GameNotifier gameNotifier;
 
     public TextMeshProUGUI medkitCounter, waterCounter;
@@ -52,10 +52,14 @@ public class InventoryManager : MonoBehaviour
 
 
             AudioManager.Instance.PlaySFX(19);
-            AudioManager.Instance.PlaySFX(8); //points
 
             GreenFlashEffect.SetActive(true);
             StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
+        } else
+        {
+            gameNotifier.cantHeal_FullHealth();
+            inventoryUI.SetActive(false);
+                    
         }
     }
 
@@ -66,20 +70,36 @@ public class InventoryManager : MonoBehaviour
     {
         if (water != 0)
         {
-            water--;
-            waterCounter.text = water.ToString();
+            if (panic.currHealth != 0 && panic.currHealth >= 20)
+            {
+                water--;
+                waterCounter.text = water.ToString();
 
-            inventoryUI.SetActive(false);
-            panic.currHealth -= 20;
-            AudioManager.Instance.PlaySFX(18);
+                inventoryUI.SetActive(false);
+                panic.currHealth -= 20;
+                AudioManager.Instance.PlaySFX(18);
 
-            BlueFlashEffect.SetActive(true);
-            StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+                BlueFlashEffect.SetActive(true);
+                StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+            }
+
+            else if (panic.currHealth < 20)
+            {
+                water--;
+                waterCounter.text = water.ToString();
+
+                inventoryUI.SetActive(false);
+                panic.currHealth = 0;
+                AudioManager.Instance.PlaySFX(18);
+
+                BlueFlashEffect.SetActive(true);
+                StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+            }
         }
     }
 
 
-        private void checkifPanicisNotHigh()
+    private void checkifPanicisNotHigh()
     {
         if (panic.currHealth <= 75)
         {
@@ -94,9 +114,10 @@ public class InventoryManager : MonoBehaviour
 
             GreenFlashEffect.SetActive(true);
             StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
-        } else
+        }
+        else
         {
-            
+
         }
     }
 

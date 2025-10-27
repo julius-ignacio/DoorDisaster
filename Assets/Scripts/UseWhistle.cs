@@ -22,12 +22,21 @@ public class UseWhistle : MonoBehaviour
     [Header("UI Elements")]
     public TMP_Text cooldownText; // You can also use "public Text cooldownText;" if using the old UI Text
 
+
+    [Header("Whistle CD")]
+    public GameObject cooldownUI;
+
+
     void Start()
     {
         originalPosition = ButtonSkill.anchoredPosition; // Store button's starting position
 
-        if (cooldownText != null)
-            cooldownText.gameObject.SetActive(false); // Hide at start
+        // if (cooldownText != null)
+        //     cooldownText.gameObject.SetActive(false); // Hide at start
+
+
+        if (cooldownUI != null)
+            cooldownUI.SetActive(false); // Hide at start
     }
 
     public void Whistle()
@@ -44,9 +53,7 @@ public class UseWhistle : MonoBehaviour
 
         // Move button off-screen instantly
         ButtonSkill.anchoredPosition = new Vector2(2000f, ButtonSkill.anchoredPosition.y);
-                // Start cooldown countdown text
-        if (cooldownText != null)
-            StartCoroutine(ShowCooldownTimer());
+        cooldownUI.SetActive(true);
 
         // Play sound effect
         AudioManager.Instance.PlaySFX(21);
@@ -75,10 +82,14 @@ public class UseWhistle : MonoBehaviour
                 outline.enabled = true;
                 outline.OutlineMode = Outline.Mode.OutlineAll;
                 outline.OutlineWidth = 3f;
-                
-                
+
+
             }
         }
+        
+                        // Start cooldown countdown text
+        if (cooldownText != null)
+            StartCoroutine(ShowCooldownTimer());
 
 
 
@@ -94,8 +105,6 @@ public class UseWhistle : MonoBehaviour
 
     private IEnumerator ShowCooldownTimer()
     {
-        cooldownText.gameObject.SetActive(true);
-
         float remaining = cooldown;
 
         while (remaining > 0)
@@ -105,6 +114,5 @@ public class UseWhistle : MonoBehaviour
             remaining -= 1f;
         }
 
-        cooldownText.gameObject.SetActive(false);
     }
 }

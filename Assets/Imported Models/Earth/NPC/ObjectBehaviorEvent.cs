@@ -10,6 +10,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
     public GameObject npcModel;
     public HeartSys heart;
     public UseWhistle useWhistle;
+    public GameObject whistleCD_UI;
     public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
     public PanicMeterScript panicMeter;
     public GameNotifier gameNotifier;
@@ -27,6 +28,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
         if (npcModel == null)
             npcModel = this.gameObject;
+
+        whistleCD_UI.SetActive(false);
 
 
         GreenFlashEffect.SetActive(false);
@@ -99,54 +102,26 @@ public class ObjectBehaviorEvent : MonoBehaviour
         {
             if (score != 0 && currentNpcId >= 6 && currentNpcId <= 9) //medkit
             {
-                if (heart.currentHearts < 8 && heart.isHelmetUsed == false)
-                {
-                    heart.Heal(1);
-                    AudioManager.Instance.PlaySFX(19);
-                    AudioManager.Instance.PlaySFX(8); //points
-                    gameNotifier.EarnedPoints(score);
-
-
-                    GreenFlashEffect.SetActive(true);
-                    StartCoroutine(FlashFade(GreenFlashEffect.GetComponent<CanvasGroup>(), 1));
-                }
-                else
-                {
-                    gameNotifier.cantHeal_FullHealth();
-                    inventory.medkit++;
-                }
-
-                
-
+                AudioManager.Instance.PlaySFX(8); //points
+                gameNotifier.EarnedPoints(score);
+                inventory.medkit++;
             }
 
             else if (score != 0 && currentNpcId >= 10 && currentNpcId <= 13) //waterbottle
             {
-                if (panicMeter.currHealth <= 75)
-                {
-                    panicMeter.currHealth -= 20;
-                    AudioManager.Instance.PlaySFX(18);
-                    AudioManager.Instance.PlaySFX(8); //points
-                    gameNotifier.EarnedPoints(score);
-
-
-                    BlueFlashEffect.SetActive(true);
-                    StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
-                }
-                
-                else
-                {
-                    gameNotifier.notInPanic();
-                    inventory.water++;
-                }
+                AudioManager.Instance.PlaySFX(8); //points
+                gameNotifier.EarnedPoints(score);
+                inventory.water++;
             }
 
-            else if (score != 0 && currentNpcId == 14)
+            else if (score != 0 && currentNpcId == 14)//whistle
             {
                 AudioManager.Instance.PlaySFX(8); //points
                 Debug.Log($"[DEBUG] heart={heart}, useWhistle={useWhistle}, gameNotifier={gameNotifier}, objectives={objectives}");
 
-             useWhistle.ButtonSkill.gameObject.SetActive(true);
+                useWhistle.ButtonSkill.gameObject.SetActive(true);
+                whistleCD_UI.SetActive(true);
+
 
                 gameNotifier.ObtainedItem(score, "Whistle");
             }
@@ -187,6 +162,39 @@ public class ObjectBehaviorEvent : MonoBehaviour
         flashGroup.alpha = 0f;
         flashGroup.gameObject.SetActive(false);
     }
+
+
+
+
+    // public void DrinkWater()
+    // {
+    //     if (panic.currHealth != 0 && panic.currHealth >= 20)
+    //     {
+    //         water--;
+    //         waterCounter.text = water.ToString();
+
+    //         inventoryUI.SetActive(false);
+    //         panic.currHealth -= 20;
+    //         AudioManager.Instance.PlaySFX(18);
+
+    //         BlueFlashEffect.SetActive(true);
+    //         StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+    //     }
+
+    //     else if(panic.currHealth < 20)
+    //     {
+    //         water--;
+    //         waterCounter.text = water.ToString();
+
+    //         inventoryUI.SetActive(false);
+    //         panic.currHealth = 0;
+    //         AudioManager.Instance.PlaySFX(18);
+
+    //         BlueFlashEffect.SetActive(true);
+    //         StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
+    //     }
+    // }
+
 
 
     // public void ReactToScore(int score)

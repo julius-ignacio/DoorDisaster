@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
       [Header("UI References")]
     public GameObject pauseUI, pauseBtn, resumeBtn, RestartBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
 
-     public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI, heartsys;
+     public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI, heartsys, InventoryUI;
     public TMP_Text panicText, injurtyText;
 
     [Header("Scripts")]
@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
         if (pauseBtn != null) pauseBtn.SetActive(true);
         if (RestartBtn != null) RestartBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(false);
+        if (InventoryUI != null) InventoryUI.SetActive(false);
 
           // Make sure HUD starts visible
         if (hudCanvasGroup != null)
@@ -115,6 +116,7 @@ AudioManager.Instance.StopLoop();
         if (RestartBtn != null) RestartBtn.SetActive(true);
         if (pauseBtn != null) pauseBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(true);
+        if (InventoryUI != null) InventoryUI.SetActive(false);
         if (hudCanvasGroup != null)
         {
             hudCanvasGroup.alpha = 0f;
@@ -196,7 +198,11 @@ AudioManager.Instance.StopLoop();
 IEnumerator LoadHubScene()
 {
     Time.timeScale = 1f;
-    AudioListener.pause = false;
+        AudioListener.pause = false;
+    
+        AudioManager.Instance.StopAll();
+AudioManager.Instance.StopLoop();
+
 
     CanvasGroup overlayGroup = blackOverlay.GetComponent<CanvasGroup>();
     blackOverlay.SetActive(true);

@@ -11,7 +11,7 @@ public class Objectives : MonoBehaviour
         FactsDiscovered_Objective.text = $"Facts discovered ({DataManager.Instance.factsDiscovered}/5)";
         NpcsHelped_Objective.text = $"NPCs helped ({DataManager.Instance.Npcs_saved}/3)";
 
-        if (!objectivesCompleted && DataManager.Instance.Npcs_saved == 3 && DataManager.Instance.factsDiscovered == 5)
+        if (!objectivesCompleted && DataManager.Instance.Npcs_saved >= 3 && DataManager.Instance.factsDiscovered >= 5)
         {
             ObjectivesComplete();
             objectivesCompleted = true;
