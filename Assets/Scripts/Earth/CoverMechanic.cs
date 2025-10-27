@@ -5,7 +5,7 @@ public class CoverMechanic : MonoBehaviour
 
     public GameObject Model, CoverBtn, UnCoverBtn, joystick, jumpbtn, RestrictionWall;
     public Camera CoverCamera, playerCamera;
-    public AudioManager footsteps_disable;
+
     
     public Movements PlayerMovements;
 
@@ -25,7 +25,8 @@ public class CoverMechanic : MonoBehaviour
 
             // Disable footsteps
     PlayerMovements.footstepsEnabled = false;
-    footsteps_disable.audClip.Stop(); 
+   AudioManager.Instance.audClip.Stop();
+
 
         joystick.SetActive(false); // Hide the joystick
         jumpbtn.SetActive(false); // Hide the jump button

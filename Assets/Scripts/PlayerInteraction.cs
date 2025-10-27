@@ -4,12 +4,12 @@ public class PlayerInteraction : MonoBehaviour
 {
     public float playerReach = 3f;  
     private Outline currentOutline;
+    public Camera activeCamera; // Assign in Inspector
 
     void Update()
     {
         CheckInteraction();
 
-        // Example: Press F to interact
         if (Input.GetKeyDown(KeyCode.F) && currentOutline != null)
         {
             Debug.Log("Interacted with: " + currentOutline.gameObject.name);
@@ -18,7 +18,11 @@ public class PlayerInteraction : MonoBehaviour
 
     void CheckInteraction()
     {
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+        // Use assigned camera instead of Camera.main
+        Camera cam = activeCamera != null ? activeCamera : Camera.main;
+        if (cam == null) return;
+
+        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, playerReach))
@@ -31,13 +35,12 @@ public class PlayerInteraction : MonoBehaviour
                 {
                     DisableCurrentOutline();
                     currentOutline = outline;
-                    currentOutline.enabled = true; // Turn on highlight
+                    currentOutline.enabled = true;
                 }
                 return;
             }
         }
 
-        // If looking at nothing / non-outline
         DisableCurrentOutline();
     }
 
@@ -45,7 +48,7 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (currentOutline != null)
         {
-            currentOutline.enabled = false; // Turn off highlight
+            currentOutline.enabled = false;
             currentOutline = null;
         }
     }

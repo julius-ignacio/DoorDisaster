@@ -37,6 +37,9 @@ public class EndGame_SaveData : MonoBehaviour
     {
         SceneManager.LoadScene("Temple");
 
+            AudioManager.Instance.StopAll();
+AudioManager.Instance.StopLoop();
+
         if (DataManager.Instance == null)
         {
             Debug.LogError("❌ DataManager is missing in scene!");
