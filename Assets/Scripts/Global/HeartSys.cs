@@ -20,6 +20,8 @@ public class HeartSys : MonoBehaviour
         hearts[8].gameObject.SetActive(false);
         hearts[9].gameObject.SetActive(false);
         hearts[10].gameObject.SetActive(false);
+        hearts[11].gameObject.SetActive(false);
+        hearts[12].gameObject.SetActive(false);
 
         // foreach (var heart in hearts)
         // {
@@ -45,68 +47,84 @@ public class HeartSys : MonoBehaviour
 
         if (currentHearts == 8)
         {
-            currentHearts += 3;
+            currentHearts += 5;
             hearts[8].gameObject.SetActive(true);
             hearts[9].gameObject.SetActive(true);
             hearts[10].gameObject.SetActive(true);
+            hearts[11].gameObject.SetActive(true);
+            hearts[12].gameObject.SetActive(true);
         }
         else if (currentHearts == 7)
         {
-            currentHearts += 3;
+            currentHearts += 5;
             hearts[7].sprite = yellowHeart;
             hearts[8].sprite = yellowHeart;
             hearts[9].sprite = yellowHeart;
+            hearts[10].sprite = yellowHeart;
+            hearts[11].sprite = yellowHeart;
             hearts[8].gameObject.SetActive(true);
 
         }
         else if (currentHearts == 6)
         {
-            currentHearts += 3;
+            currentHearts += 5;
             hearts[6].sprite = yellowHeart;
             hearts[7].sprite = yellowHeart;
             hearts[8].sprite = yellowHeart;
+            hearts[9].sprite = yellowHeart;
+            hearts[10].sprite = yellowHeart;
 
         }
 
         else if (currentHearts == 5)
         {
-            currentHearts += 3;
+            currentHearts += 5;
             hearts[5].sprite = yellowHeart;
             hearts[6].sprite = yellowHeart;
             hearts[7].sprite = yellowHeart;
+            hearts[8].sprite = yellowHeart;
+            hearts[9].sprite = yellowHeart;
         }
 
 
         else if (currentHearts == 4)
         {
-            currentHearts += 3;
+            currentHearts += 5;
+            hearts[4].sprite = yellowHeart;
+            hearts[5].sprite = yellowHeart;
+            hearts[6].sprite = yellowHeart;
+            hearts[7].sprite = yellowHeart;
+            hearts[8].sprite = yellowHeart;
+        }
+
+        else if (currentHearts == 3)
+        {
+            currentHearts += 5;
+            hearts[3].sprite = yellowHeart;
+            hearts[4].sprite = yellowHeart;
+            hearts[5].sprite = yellowHeart;
+            hearts[6].sprite = yellowHeart;
+            hearts[7].sprite = yellowHeart;
+        }
+
+        else if (currentHearts == 2)
+        {
+            currentHearts += 5;
+            hearts[2].sprite = yellowHeart;
+            hearts[3].sprite = yellowHeart;
             hearts[4].sprite = yellowHeart;
             hearts[5].sprite = yellowHeart;
             hearts[6].sprite = yellowHeart;
         }
 
-        else if (currentHearts == 3)
-        {
-            currentHearts += 3;
-            hearts[3].sprite = yellowHeart;
-            hearts[4].sprite = yellowHeart;
-            hearts[5].sprite = yellowHeart;
-        }
-
-        else if (currentHearts == 2)
-        {
-            currentHearts += 3;
-            hearts[2].sprite = yellowHeart;
-            hearts[3].sprite = yellowHeart;
-            hearts[4].sprite = yellowHeart;
-        }
-
         else if (currentHearts == 1)
         {
-            currentHearts += 3;
+            currentHearts += 5;
             hearts[1].sprite = yellowHeart;
             hearts[2].sprite = yellowHeart;
             hearts[3].sprite = yellowHeart;
+            hearts[4].sprite = yellowHeart;
+            hearts[5].sprite = yellowHeart;
         }
 
 
