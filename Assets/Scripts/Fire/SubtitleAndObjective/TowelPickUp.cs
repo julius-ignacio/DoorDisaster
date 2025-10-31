@@ -17,6 +17,9 @@ public class TowelPickup : MonoBehaviour, IPickupable
     [Header("Cat Audio")]
     public AudioSource catAudio;
 
+    [Header("Outline Settings")]
+    private Outline outline;
+
     void Awake()
     {
         // Make sure cat audio doesn't play at start
@@ -29,12 +32,31 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
     void Start()
     {
+        // Get outline component
+        outline = GetComponent<Outline>();
+        if (outline != null)
+            outline.enabled = false; // Hidden at start
+
+        // ✅ FIX: Set fade overlay to fully transparent at start
         if (fadeOverlay != null)
         {
-            fadeOverlay.gameObject.SetActive(true);
-            Color c = fadeOverlay.color;
-            c.a = 0f;
-            fadeOverlay.color = c;
+            fadeOverlay.gameObject.SetActive(true); // Keep active
+            CanvasGroup cg = fadeOverlay.GetComponent<CanvasGroup>();
+            if (cg == null)
+            {
+                cg = fadeOverlay.gameObject.AddComponent<CanvasGroup>();
+            }
+            cg.alpha = 0f; // Start transparent
+            cg.blocksRaycasts = false;
+        }
+    }
+
+    void Update()
+    {
+        // ✅ Show outline only after breaker puzzle is complete
+        if (outline != null && !hasPickedUp)
+        {
+            outline.enabled = BreakerPuzzle.BreakerPuzzleComplete;
         }
     }
 
@@ -43,7 +65,12 @@ public class TowelPickup : MonoBehaviour, IPickupable
         if (other.CompareTag("Player") && !hasPickedUp)
         {
             playerInRange = true;
-            GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Towel");
+
+            // ✅ Only show prompt if breaker puzzle is complete
+            if (BreakerPuzzle.BreakerPuzzleComplete)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Towel");
+            }
         }
     }
 
@@ -60,8 +87,20 @@ public class TowelPickup : MonoBehaviour, IPickupable
     {
         if (!playerInRange || hasPickedUp) return;
 
+        // ✅ Extra safety check
+        if (!BreakerPuzzle.BreakerPuzzleComplete)
+        {
+            Debug.Log("Cannot pick up towel before breaker puzzle is complete");
+            return;
+        }
+
         hasPickedUp = true;
         towel.SetActive(false);
+
+        // Disable outline
+        if (outline != null)
+            outline.enabled = false;
+
         subtitleManager.HideObjective();
         GenericPickupButton.Instance.HidePickupPrompt();
 
@@ -78,12 +117,22 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
     private IEnumerator FadeTeleportSequence()
     {
+        // ✅ FIX: Use CanvasGroup for smooth fading
+        CanvasGroup fadeGroup = null;
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
-            yield return StartCoroutine(Fade(0f, 1f));
+            fadeGroup = fadeOverlay.GetComponent<CanvasGroup>();
+            if (fadeGroup == null)
+            {
+                fadeGroup = fadeOverlay.gameObject.AddComponent<CanvasGroup>();
+            }
+            fadeGroup.blocksRaycasts = true; // Block input during fade
+
+            yield return StartCoroutine(FadeCanvasGroup(fadeGroup, 0f, 1f));
         }
 
+        // Teleport player
         if (player != null && houseBSpawnPoint != null)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
@@ -108,15 +157,12 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
         yield return new WaitForSeconds(0.2f);
 
-        if (fadeOverlay != null)
+        // Fade back in
+        if (fadeOverlay != null && fadeGroup != null)
         {
-            yield return StartCoroutine(Fade(1f, 0f));
-            fadeOverlay.gameObject.SetActive(false);
+            yield return StartCoroutine(FadeCanvasGroup(fadeGroup, 1f, 0f));
+            fadeGroup.blocksRaycasts = false;
         }
-
-        // Play cat audio AFTER player is teleported to House B
-        if (catAudio != null)
-            catAudio.Play();
 
         // Play cat audio AFTER player is teleported to House B
         if (catAudio != null)
@@ -150,24 +196,21 @@ public class TowelPickup : MonoBehaviour, IPickupable
         );
     }
 
-    private IEnumerator Fade(float startAlpha, float endAlpha)
+    // ✅ NEW: Fade using CanvasGroup (more reliable)
+    private IEnumerator FadeCanvasGroup(CanvasGroup canvasGroup, float startAlpha, float endAlpha)
     {
-        if (fadeOverlay == null) yield break;
-
-        fadeOverlay.gameObject.SetActive(true);
+        if (canvasGroup == null) yield break;
 
         float elapsedTime = 0f;
-        Color color = fadeOverlay.color;
 
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / fadeDuration);
-            fadeOverlay.color = new Color(color.r, color.g, color.b, alpha);
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / fadeDuration);
             yield return null;
         }
 
-        fadeOverlay.color = new Color(color.r, color.g, color.b, endAlpha);
+        canvasGroup.alpha = endAlpha;
     }
 
     public bool HasPickedUpTowel()

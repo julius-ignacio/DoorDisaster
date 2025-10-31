@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -11,6 +11,10 @@ public class GenericPickupButton : MonoBehaviour
     public TextMeshProUGUI buttonText; // Optional: show what you're picking up
 
     private IPickupable currentPickupable;
+
+    // 🟦 Track visibility before pausing
+    private bool wasVisibleBeforePause = false;
+    private IPickupable pausedPickupable = null; // Remember which object was active
 
     void Awake()
     {
@@ -36,6 +40,10 @@ public class GenericPickupButton : MonoBehaviour
     // Called by pickup objects when player is in range
     public void ShowPickupPrompt(IPickupable pickupable, string promptText = "Pick Up")
     {
+        // Don't show if game is paused
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
         currentPickupable = pickupable;
         if (pickupButton != null)
         {
@@ -59,6 +67,40 @@ public class GenericPickupButton : MonoBehaviour
         {
             currentPickupable.OnPickup();
             HidePickupPrompt();
+        }
+    }
+
+    // 🟧 Handle pause/resume visibility
+    public void OnPause()
+    {
+        if (pickupButton != null)
+        {
+            wasVisibleBeforePause = pickupButton.gameObject.activeSelf;
+
+            // Remember which pickupable was active
+            if (wasVisibleBeforePause)
+            {
+                pausedPickupable = currentPickupable;
+            }
+
+            pickupButton.gameObject.SetActive(false);
+        }
+    }
+
+    public void OnResume()
+    {
+        if (pickupButton != null && wasVisibleBeforePause)
+        {
+            // Restore the button with the same pickupable
+            if (pausedPickupable != null)
+            {
+                currentPickupable = pausedPickupable;
+                pickupButton.gameObject.SetActive(true);
+            }
+
+            // Reset the paused state
+            pausedPickupable = null;
+            wasVisibleBeforePause = false;
         }
     }
 }

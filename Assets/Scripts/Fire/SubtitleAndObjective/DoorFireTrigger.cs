@@ -7,22 +7,14 @@ public class DoorFireTrigger : MonoBehaviour
     public FireSafetyQuiz quizManager;
     public ObjectiveManager objectiveManager;
 
-    private bool shockShown = false;
     private bool fireMessageShown = false;
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            // Show shock reaction first time
-            if (!shockShown)
-            {
-                shockShown = true;
-                subtitleManager.HideObjective();
-                subtitleManager.ShowCustomMessage("!!", 1.5f);
-            }
-            // If all essentials collected, show fire message
-            else if (!fireMessageShown && objectiveManager != null && objectiveManager.GetObjectiveStage() >= 4)
+            // Only proceed if essentials are collected
+            if (!fireMessageShown && objectiveManager != null && objectiveManager.GetObjectiveStage() >= 4)
             {
                 TriggerFireSequence();
             }
@@ -35,9 +27,9 @@ public class DoorFireTrigger : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
+                // Only trigger after essentials are collected
                 if (!fireMessageShown)
                 {
-                    // Check if all essentials are collected (stage 4+)
                     if (objectiveManager != null && objectiveManager.GetObjectiveStage() >= 4)
                     {
                         TriggerFireSequence();
@@ -75,7 +67,7 @@ public class DoorFireTrigger : MonoBehaviour
                         quiz.correctAnswerIndex,
                         () =>
                         {
-                            // After quiz is done, objective stays pointing to window
+                            // After quiz is done, keep the objective visible
                             subtitleManager.ShowObjective("Find an alternative escape route - try the window!");
                         }
                     );

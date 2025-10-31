@@ -12,7 +12,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
     public GameObject timerUI;
     public SubtitleManager2 subtitleManager;
     public GameObject[] uiCanvases;
-    public float rescueTime = 20f;
+    public float rescueTime = 60f; // Changed to 60 seconds (1 minute)
     public Transform safeHouseSpawn;
     public GameOverManager gameOverManager;
 
@@ -28,6 +28,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
     private bool timerRunning = false;
     private float currentTime;
     private bool playerInRange = false;
+    private bool hasTriedDoor = false; // Track if player already tried the door
 
     private Quaternion closedRotation;
     private Quaternion openRotation;
@@ -44,6 +45,10 @@ public class LockedDoor : MonoBehaviour, IPickupable
 
     void Update()
     {
+        // ✅ Don't update anything if game is paused
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
         // Smooth door animation
         if (isDoorOpen)
             transform.rotation = Quaternion.Lerp(transform.rotation, openRotation, openSpeed * Time.deltaTime);
@@ -81,8 +86,16 @@ public class LockedDoor : MonoBehaviour, IPickupable
         if (other.CompareTag("Player") && !doorUnlocked)
         {
             playerInRange = true;
-            string buttonText = hasKey ? "Unlock Door" : "Try Door";
-            GenericPickupButton.Instance.ShowPickupPrompt(this, buttonText);
+
+            // Only show prompt if player has key OR hasn't tried the door yet
+            if (hasKey)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Unlock Door");
+            }
+            else if (!hasTriedDoor)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Try Door");
+            }
         }
     }
 
@@ -101,8 +114,14 @@ public class LockedDoor : MonoBehaviour, IPickupable
 
         if (!hasKey)
         {
-            AudioManager.Instance.PlaySFX(32);
-            StartCoroutine(ShowLockedSequence());
+            // Only trigger if player hasn't tried the door yet
+            if (!hasTriedDoor)
+            {
+                hasTriedDoor = true; // Mark as tried
+                AudioManager.Instance.PlaySFX(32);
+                GenericPickupButton.Instance.HidePickupPrompt(); // Hide button immediately
+                StartCoroutine(ShowLockedSequence());
+            }
         }
         else
         {

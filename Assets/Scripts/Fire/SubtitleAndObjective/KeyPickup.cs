@@ -8,13 +8,19 @@ public class KeyPickup : MonoBehaviour, IPickupable
     public SubtitleManager2 subtitleManager;
 
     private bool playerInRange = false;
+    private bool hasBeenPickedUp = false;
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !hasBeenPickedUp)
         {
             playerInRange = true;
-            GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Key");
+
+            // Don't show prompt if game is paused
+            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Key");
+            }
         }
     }
 
@@ -27,9 +33,28 @@ public class KeyPickup : MonoBehaviour, IPickupable
         }
     }
 
+    void Update()
+    {
+        if (playerInRange && !hasBeenPickedUp)
+        {
+            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            {
+                // Check if prompt isn't already showing
+                if (GenericPickupButton.Instance != null &&
+                    GenericPickupButton.Instance.pickupButton != null &&
+                    !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
+                {
+                    GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Key");
+                }
+            }
+        }
+    }
+
     public void OnPickup()
     {
-        if (!playerInRange) return;
+        if (!playerInRange || hasBeenPickedUp) return;
+
+        hasBeenPickedUp = true;
 
         // Tell the door we picked up the key
         if (lockedDoor != null)
@@ -51,6 +76,9 @@ public class KeyPickup : MonoBehaviour, IPickupable
             keyVisual.SetActive(false);
 
         Debug.Log("Key picked up!");
+
+        // Hide prompt before destroying
+        GenericPickupButton.Instance.HidePickupPrompt();
 
         // Destroy this pickup trigger
         Destroy(gameObject);
