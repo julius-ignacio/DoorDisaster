@@ -10,6 +10,8 @@ public class SurveyManager : MonoBehaviour
     [Header("Tree")]
     public GameObject tree;
     public GameObject Light1, Light2;
+    [Header("Detector / button")]
+    public GameObject detector, button;
 
     [Header("Barrier")]
     public GameObject Barrier;
@@ -45,6 +47,8 @@ public class SurveyManager : MonoBehaviour
 
         Light1.SetActive(false);
         Light2.SetActive(false);
+
+        if (DataManager.Instance.playerData.isSurveyDone) { detector.SetActive(false); button.SetActive(false); } else { detector.SetActive(true); }
 
     }
 
@@ -135,6 +139,8 @@ public class SurveyManager : MonoBehaviour
         hud.SetActive(true);
         movements.enabled = true;
         DataManager.Instance.playerData.isSurveyDone = true;
+        detector.SetActive(false); 
+        button.SetActive(false); 
         GrowTree();
         Debug.Log("Survey completed!");
         Debug.Log("Responses:");
