@@ -135,8 +135,10 @@ public void RestartLevel()
     AudioManager.Instance.StopAll();
 AudioManager.Instance.StopLoop();
 
-    // Unpause
-    Time.timeScale = 1f;
+        // Unpause
+        Time.timeScale = 1f;
+    AudioListener.pause = false;
+
 
     // Reload current scene
     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

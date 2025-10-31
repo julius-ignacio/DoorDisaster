@@ -8,7 +8,7 @@ public class MakeObjectsMove : MonoBehaviour
 {
     public GameObject[] locker;
 
-    public float chairMoveSpeed = 0.2f;
+    public float chairMoveSpeed = 0.001f;
     private AudioSource audi;
 
     public Vector3 velocity;

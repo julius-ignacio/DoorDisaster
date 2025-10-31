@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Collections;
 
 public class GameStart : MonoBehaviour  //, IPointerClickHandler
 {
@@ -11,7 +12,7 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
     NextBtn, PrevBtn, HUD, PauseBtn, startPanelUI, whistleSkill;
 
 
-   // public GameObject GamestartNarration; //Game start player narration /talking
+    // public GameObject GamestartNarration; //Game start player narration /talking
     public int currentBatchIndex = 0;
     public Movements PlayerMovements; //disables the player from moving until the intro is done/intro panel is closed
 
@@ -22,7 +23,7 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
     private bool isVisible = false; // tracks if tips are currently shown
 
     [SerializeField] private List<GameObject> pages;
-private int currentPage = 0;
+    private int currentPage = 0;
 
 
     void Start()
@@ -40,52 +41,54 @@ private int currentPage = 0;
         whistleSkill.SetActive(false);
 
 
-    //    GamestartNarration.SetActive(false);
+        //    GamestartNarration.SetActive(false);
 
         PlayerMovements.speed = 0f;
         PlayerMovements.jumpHeight = 0f;
     }
 
 
-public void NextPage()
-{
-    if (currentPage < pages.Count - 1)
+    public void NextPage()
     {
-        pages[currentPage].SetActive(false);
-        currentPage++;
-        pages[currentPage].SetActive(true);
-    }
-    else
-    {
-        // Last page reached — show start panel
-        IntroPanel.SetActive(false);
-        startPanelUI.SetActive(true);
-    }
+        if (currentPage < pages.Count - 1)
+        {
+            pages[currentPage].SetActive(false);
+            currentPage++;
+            pages[currentPage].SetActive(true);
+        }
+        else
+        {
+            // Last page reached — show start panel
+            IntroPanel.SetActive(false);
+            startPanelUI.SetActive(true);
+        }
 
-    UpdateButtons();
-}
-
-public void PrevPage()
-{
-    if (currentPage > 0)
-    {
-        pages[currentPage].SetActive(false);
-        currentPage--;
-        pages[currentPage].SetActive(true);
+        UpdateButtons();
     }
 
-    UpdateButtons();
-}
+    public void PrevPage()
+    {
+        if (currentPage > 0)
+        {
+            pages[currentPage].SetActive(false);
+            currentPage--;
+            pages[currentPage].SetActive(true);
+        }
 
-private void UpdateButtons()
-{
-    PrevBtn.SetActive(currentPage > 0);
-   // NextBtn.SetActive(currentPage < pages.Count - 1);
-}
+        UpdateButtons();
+    }
+
+    private void UpdateButtons()
+    {
+        PrevBtn.SetActive(currentPage > 0);
+        // NextBtn.SetActive(currentPage < pages.Count - 1);
+    }
 
 
     public void StartGame()
     {
+
+        AudioManager.Instance.PlaySFX(33);
 
         // hide the black start panel
         startPanelUI.SetActive(false);
@@ -94,7 +97,7 @@ private void UpdateButtons()
         // enable game HUD
         HUD.SetActive(true);
         PauseBtn.SetActive(true);
-      //  GamestartNarration.SetActive(true);
+        //  GamestartNarration.SetActive(true);
 
         // enable player movement
         PlayerMovements.speed = 3f;
@@ -102,4 +105,13 @@ private void UpdateButtons()
     }
 
 
+    // private IEnumerator StartSequence()
+    // {
+
+    //     // Wait another 1 second, then trigger the quake and panic meter
+    //     yield return new WaitForSeconds(1f);
+
+
+
+    // }
 }

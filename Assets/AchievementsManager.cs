@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AchievementsManager : MonoBehaviour
 {
-    public GameObject AllDoorsCompleted, AlmanacUI;
+    public GameObject AllDoorsCompleted, firedone, waterdone, earthdone, AlmanacUI;
     void Start()
     {
         AllDoorsCompleted.SetActive(false);
@@ -10,22 +10,42 @@ public class AchievementsManager : MonoBehaviour
     }
 
     // Update is called once per frame
-void Update()
-{
-    var playerData = DataManager.Instance.playerData;
-
-    if (playerData != null &&
-        playerData.isEarthFinished &&
-        playerData.isWaterFinished &&
-        playerData.isFireFinished)
+    void Update()
     {
-        AllDoorsCompleted.SetActive(true);
+        checkIFAchievementsIsDone();
     }
-        else
-        {
-            AllDoorsCompleted.SetActive(false);
-        }
-}
+
+
+public void checkIFAchievementsIsDone()
+    {
+         var playerData = DataManager.Instance.playerData;
+
+        if (playerData != null &&
+            playerData.isEarthFinished &&
+            playerData.isWaterFinished &&
+            playerData.isFireFinished)
+        { AllDoorsCompleted.SetActive(true); }
+        else { AllDoorsCompleted.SetActive(false); }
+
+
+        if (playerData != null &&
+            playerData.isFireFinished)
+        { firedone.SetActive(true); }
+        else { firedone.SetActive(false); }
+
+
+
+        if (playerData != null &&
+          playerData.isWaterFinished)
+        { waterdone.SetActive(true); }
+        else { waterdone.SetActive(false); }
+        
+
+          if (playerData != null &&
+            playerData.isEarthFinished)
+        { earthdone.SetActive(true); }
+        else { earthdone.SetActive(false); }
+    }
 
 
 
