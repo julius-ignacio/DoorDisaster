@@ -4,7 +4,7 @@ using UnityEngine;
 public class AnnouncementManager : MonoBehaviour
 {
     public GameObject subs, isFireDone, isWaterDone, isEarthDone;
-    public AchievementsManager achievementsManager;
+    public Achievement_Almanac_Manager achievementsManager;
     // Update is called once per frame
 
     void Start()
