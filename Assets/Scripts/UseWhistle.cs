@@ -111,7 +111,7 @@ public class UseWhistle : MonoBehaviour
         while (remaining > 0)
         {
             cooldownText.text = Mathf.Ceil(remaining).ToString(); // Round up for cleaner numbers
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSecondsRealtime(1f);
             remaining -= 1f;
         }
 

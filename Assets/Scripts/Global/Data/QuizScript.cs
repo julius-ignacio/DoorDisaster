@@ -105,7 +105,14 @@ public class QuizScript : MonoBehaviour
         shake.enabled = false;
         consistentQuake.enabled = false;
 
-        hud.SetActive(false);
+        CanvasGroup hudCanvas = hud.GetComponent<CanvasGroup>();
+if (hudCanvas != null)
+{
+    hudCanvas.alpha = 0;
+    hudCanvas.interactable = false;
+    hudCanvas.blocksRaycasts = false;
+}
+
 
 
         consistentQuake.PauseQuakes();
@@ -360,10 +367,14 @@ public class QuizScript : MonoBehaviour
         consistentQuake.enabled = true;
 consistentQuake.ResumeQuakes();
 
+        CanvasGroup hudCanvas = hud.GetComponent<CanvasGroup>();
 
 
 
-        hud.SetActive(true);
+        hudCanvas.alpha = 1;
+hudCanvas.interactable = true;
+hudCanvas.blocksRaycasts = true;
+
 
         shake.enabled = true;
         movements.enabled = true;
