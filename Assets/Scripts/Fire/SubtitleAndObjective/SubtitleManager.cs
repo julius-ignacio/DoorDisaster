@@ -20,9 +20,6 @@ public class SubtitleManager2 : MonoBehaviour
     [Header("Oxygen UI")]
     public GameObject oxygenBar;
 
-    [Header("Inventory UI")]
-    public GameObject backpackButton; // ✅ Added reference for backpack button
-
     [Header("Story Settings")]
     public bool autoStartStory = true;
 
@@ -55,7 +52,6 @@ public class SubtitleManager2 : MonoBehaviour
         if (objectivePanel != null) objectivePanel.SetActive(false);
         if (healthBar != null) healthBar.SetActive(false);
         if (oxygenBar != null) oxygenBar.SetActive(false);
-        if (backpackButton != null) backpackButton.SetActive(false); // ✅ Hide backpack at start
 
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
@@ -93,8 +89,7 @@ public class SubtitleManager2 : MonoBehaviour
         if (oxygenBar != null)
             oxygenBar.SetActive(true);
 
-        if (backpackButton != null)
-            backpackButton.SetActive(true); // ✅ Show backpack after story
+        // ✅ REMOVED: Don't show backpack here - it will show after picking up physical backpack
 
         PlayerOxygen oxygenSystem = FindObjectOfType<PlayerOxygen>();
         if (oxygenSystem != null)

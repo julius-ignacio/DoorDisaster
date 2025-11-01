@@ -55,7 +55,6 @@ public class DoorController : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         bool playerNearby = distanceToPlayer <= interactionDistance;
 
-        // Hide button if paused
         if (GameManager.Instance.isPaused)
         {
             if (playerInRange)
@@ -66,7 +65,6 @@ public class DoorController : MonoBehaviour
             return;
         }
 
-        // Show/hide interact prompt manually
         if (playerNearby && !playerInRange && !IsMoving)
         {
             playerInRange = true;
@@ -86,12 +84,20 @@ public class DoorController : MonoBehaviour
 
         float angle = openAngle;
 
-        // Smart open — away from player
         if (smartDoorOpen && playerTransform != null)
         {
             Vector3 doorToPlayer = (playerTransform.position - transform.position).normalized;
-            float dot = Vector3.Dot(doorToPlayer, transform.TransformDirection(doorForward));
-            angle = dot > 0 ? openAngle : -openAngle;
+            Vector3 doorDir = transform.TransformDirection(doorForward);
+            float dot = Vector3.Dot(doorToPlayer, doorDir);
+
+            Debug.Log($"[DoorController] Smart Open: dot={dot}, doorForward={doorForward}, doorDir={doorDir}");
+
+            if (dot > 0.1f)
+                angle = openAngle;
+            else if (dot < -0.1f)
+                angle = -openAngle;
+            else
+                angle = openAngle; // fallback
         }
 
         Quaternion targetOpenRotation = closedRotation * Quaternion.Euler(0, angle, 0);
@@ -174,7 +180,6 @@ public class DoorController : MonoBehaviour
     }
 }
 
-// Adapter for GenericPickupButton integration
 public class DoorPickupAdapter : IPickupable
 {
     private DoorController doorController;

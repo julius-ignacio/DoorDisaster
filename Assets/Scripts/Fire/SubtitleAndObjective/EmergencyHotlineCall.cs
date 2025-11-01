@@ -16,7 +16,7 @@ public class EmergencyHotlineCall : MonoBehaviour
     [Header("Other UI Elements")]
     public GameObject dialingUI;
     public TextMeshProUGUI questionText;
-    public Button skipButton; // ✅ NEW: Skip button for dispatcher dialogue
+    public Button skipButton;
 
     [Header("Subtitle Panel (for dispatcher dialogue)")]
     public GameObject subtitlePanel;
@@ -35,14 +35,13 @@ public class EmergencyHotlineCall : MonoBehaviour
     private bool hasCalledHotline = false;
     private QuizQuestion2 currentQuiz;
     private Coroutine typingCoroutine;
-    private bool skipDialogue = false; // ✅ NEW: Flag to skip dialogue
+    private bool skipDialogue = false;
 
     void Start()
     {
         if (phoneUI != null) phoneUI.SetActive(false);
         if (dialingUI != null) dialingUI.SetActive(false);
 
-        // ✅ Setup skip button
         if (skipButton != null)
         {
             skipButton.gameObject.SetActive(false);
@@ -232,7 +231,6 @@ public class EmergencyHotlineCall : MonoBehaviour
 
     IEnumerator ShowDispatcherDialogue()
     {
-        // ✅ Show skip button at start of dialogue
         if (skipButton != null)
             skipButton.gameObject.SetActive(true);
 
@@ -251,16 +249,13 @@ public class EmergencyHotlineCall : MonoBehaviour
 
         for (int i = 0; i < dispatcherLines.Length; i++)
         {
-            // ✅ Check if skip was pressed
             if (skipDialogue)
             {
                 Debug.Log("Dialogue skipped!");
 
-                // ✅ Stop all audio when skipping
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.StopAll();
 
-                // Stop typing coroutine
                 if (typingCoroutine != null)
                     StopCoroutine(typingCoroutine);
 
@@ -280,12 +275,10 @@ public class EmergencyHotlineCall : MonoBehaviour
 
             yield return new WaitForSecondsRealtime(2f);
 
-            // ✅ Check skip again after typing
             if (skipDialogue)
             {
                 Debug.Log("Dialogue skipped!");
 
-                // ✅ Stop all audio when skipping
                 if (AudioManager.Instance != null)
                     AudioManager.Instance.StopAll();
 
@@ -298,11 +291,9 @@ public class EmergencyHotlineCall : MonoBehaviour
             yield return new WaitForSecondsRealtime(3f);
         }
 
-        // ✅ Hide skip button after all dialogue ends
         if (skipButton != null)
             skipButton.gameObject.SetActive(false);
 
-        // Reset flag
         skipDialogue = false;
     }
 
@@ -351,24 +342,24 @@ public class EmergencyHotlineCall : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.StopAll();
 
+        // ✅ Changed: Now just shows objective to pick up backpack
+        // Backpack object will unlock inventory UI when picked up
         if (subtitleManager != null)
         {
             SubtitleManager2.CallObjectiveActive = false;
-
-            // ✅ Activate cloth pickup now that door objective is starting
             HandCoverPickup.DoorObjectiveActive = true;
 
             subtitleManager.ShowCustomMessage(
-                "Help is on the way! Now I need to get out of here safely!",
+                "Help is on the way! Let me grab my backpack first.",
                 3f,
                 () =>
                 {
-                    subtitleManager.ShowObjective("Exit the bedroom - find a way to open the door safely");
+                    subtitleManager.ShowObjective("Pick up your backpack");
                 }
             );
         }
 
-        Debug.Log("Emergency call completed - door handle interaction now enabled!");
+        Debug.Log("Emergency call completed - player can now find and pickup backpack!");
     }
 
     public bool HasCalledHotline()
@@ -376,7 +367,6 @@ public class EmergencyHotlineCall : MonoBehaviour
         return hasCalledHotline;
     }
 
-    // ✅ NEW: Skip button handler
     void OnSkipButtonPressed()
     {
         skipDialogue = true;

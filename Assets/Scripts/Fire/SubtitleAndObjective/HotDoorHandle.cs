@@ -25,9 +25,9 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     public Color flashColor = new Color(1f, 0f, 0f, 0.5f);
 
     [Header("Audio")]
-    public int burnSFX = 16;           // Burn sound when touching hot handle
-    public int doorOpenSFX = 25;       // Door opening sound
-    public int doorCloseSFX = 3;       // Door closing sound
+    public int burnSFX = 16;
+    public int doorOpenSFX = 25;
+    public int doorCloseSFX = 3;
 
     private bool doorLocked = true;
     private bool doorOpen = false;
@@ -35,7 +35,6 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     private bool promptShown = false;
 
     private Quaternion closedRotation;
-    private Quaternion openRotation;
 
     void Start()
     {
@@ -64,7 +63,6 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
 
     void Update()
     {
-        // Keep prompt updated if player stays in trigger
         if (playerInRange && !promptShown)
         {
             UpdatePrompt();
@@ -75,18 +73,12 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     {
         if (!SubtitleManager2.IntroStoryComplete) return;
 
-        // ✅ Don't show prompt until emergency call is complete
         if (!EmergencyHotlineCall.IsHotlineActive && SubtitleManager2.CallObjectiveActive)
-        {
-            // Player needs to complete the call first
             return;
-        }
 
-        // Don't show if game is paused
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
-        // Before towel scene
         if (doorLocked)
         {
             GenericPickupButton.Instance.ShowPickupPrompt(this, "Touch Door Handle");
@@ -94,7 +86,6 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
         }
         else
         {
-            // After towel scene, allow open/close anytime
             GenericPickupButton.Instance.ShowPickupPrompt(this, "Interact");
             promptShown = true;
         }
@@ -104,21 +95,18 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     {
         if (!playerInRange) return;
 
-        // Prevent early interaction
         if (!SubtitleManager2.IntroStoryComplete)
         {
             Debug.Log("Cannot interact during intro story");
             return;
         }
 
-        // ✅ Prevent interaction until emergency call is done
         if (!EmergencyHotlineCall.IsHotlineActive && SubtitleManager2.CallObjectiveActive)
         {
             Debug.Log("Cannot interact with door until emergency call is complete");
             return;
         }
 
-        // ✅ SCENARIO 1: Player has towel BEFORE touching door (no damage!)
         if (doorLocked && player.HasTowel())
         {
             player.UseTowel();
@@ -136,7 +124,6 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             return;
         }
 
-        // ✅ SCENARIO 2: Player touches hot handle WITHOUT towel (takes damage!)
         if (doorLocked && !player.HasTowel())
         {
             player.TakeDamage(burnDamage);
@@ -144,19 +131,16 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             subtitleManager.ShowCustomMessage("The handle is too hot!", 2.5f);
             subtitleManager.ShowObjective("Find something to protect your hand");
 
-            // Play burn sound
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlaySFX(burnSFX);
 
-            touchedHotHandle = true; // ✅ This enables the towel pickup button
+            touchedHotHandle = true;
             Debug.Log("Touched hot handle - took damage!");
             return;
         }
 
-        // ✅ Door unlocked — toggle open/close
         if (!doorLocked)
         {
-            // 🔄 Immediately refresh the prompt (button reappears right away)
             GenericPickupButton.Instance.ShowPickupPrompt(this, "Interact");
             promptShown = true;
 
@@ -181,7 +165,10 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             yield break;
         }
 
-        // Play door sound at the start of animation
+        Collider playerCollider = player.GetComponent<Collider>();
+        if (playerCollider != null)
+            playerCollider.enabled = false;
+
         if (AudioManager.Instance != null)
         {
             if (opening)
@@ -192,23 +179,20 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
 
         float angle = openAngle;
 
-        // ✅ FIXED: Smart door opening - opens AWAY from player
         if (smartDoorOpen && player != null)
         {
-            // Get direction from door to player
             Vector3 doorToPlayer = (player.transform.position - doorTransform.position).normalized;
-
-            // Get door's forward direction in world space
             Vector3 doorForwardWorld = doorTransform.TransformDirection(doorForward);
-
-            // Calculate dot product to determine which side player is on
             float dot = Vector3.Dot(doorToPlayer, doorForwardWorld);
 
-            // If dot > 0, player is on the "forward" side, so open in negative direction (away)
-            // If dot < 0, player is on the "back" side, so open in positive direction (away)
-            angle = dot > 0 ? -openAngle : openAngle;
+            if (dot > 0.1f)
+                angle = -openAngle;
+            else if (dot < -0.1f)
+                angle = openAngle;
+            else
+                angle = openAngle; // fallback
 
-            Debug.Log($"Smart Door: dot={dot:F2}, opening angle={angle}°");
+            Debug.Log($"Smart Door: dot={dot:F2}, doorForward={doorForward}, angle={angle}°");
         }
 
         Quaternion startRotation = doorTransform.localRotation;
@@ -223,6 +207,10 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
         }
 
         doorTransform.localRotation = targetRotation;
+
+        if (playerCollider != null)
+            playerCollider.enabled = true;
+
         Debug.Log(opening ? "Door opened away from player" : "Door closed");
     }
 

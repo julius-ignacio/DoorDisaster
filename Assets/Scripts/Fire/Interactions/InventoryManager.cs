@@ -28,6 +28,8 @@ public class InventoryManager : MonoBehaviour
     private int oxygenCount = 0;
     private int essentialItemsCount = 0;
     private bool isInventoryOpen = false;
+    private bool wasInventoryOpenBeforePause = false;
+    private bool isBackpackUnlocked = false; // ✅ NEW: Controls when backpack becomes available
 
     void Awake()
     {
@@ -42,12 +44,9 @@ public class InventoryManager : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
+        // ✅ Hide backpack button at start - only show after 911 call
         if (backpackButton != null)
-        {
-            Button btn = backpackButton.GetComponent<Button>();
-            if (btn != null)
-                btn.onClick.AddListener(ToggleInventory);
-        }
+            backpackButton.SetActive(false);
 
         if (oxygenUseButton != null)
         {
@@ -69,15 +68,32 @@ public class InventoryManager : MonoBehaviour
 
         if (essentialItemsNameText != null)
             essentialItemsNameText.text = "ESSENTIAL ITEMS";
+
+        // Setup button listener
+        if (backpackButton != null)
+        {
+            Button btn = backpackButton.GetComponent<Button>();
+            if (btn != null)
+                btn.onClick.AddListener(ToggleInventory);
+        }
     }
 
     void Update()
     {
+        // ✅ Don't allow toggling inventory when game is paused or backpack not unlocked
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
+        if (!isBackpackUnlocked)
+            return;
+
+        // Toggle inventory with I or Tab key
         if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleInventory();
         }
 
+        // Close inventory with Escape (if open)
         if (Input.GetKeyDown(KeyCode.Escape) && isInventoryOpen)
         {
             CloseInventory();
@@ -86,6 +102,16 @@ public class InventoryManager : MonoBehaviour
 
     public void ToggleInventory()
     {
+        // ✅ Don't toggle if game is paused or backpack not unlocked
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
+        if (!isBackpackUnlocked)
+        {
+            Debug.Log("Backpack not unlocked yet!");
+            return;
+        }
+
         if (inventoryPanel != null)
         {
             isInventoryOpen = !isInventoryOpen;
@@ -117,6 +143,17 @@ public class InventoryManager : MonoBehaviour
             if (GameManager.Instance != null)
                 GameManager.Instance.isPaused = false;
         }
+    }
+
+    // ✅ NEW: Call this after 911 call to unlock backpack
+    public void UnlockBackpack()
+    {
+        isBackpackUnlocked = true;
+
+        if (backpackButton != null)
+            backpackButton.SetActive(true);
+
+        Debug.Log("Backpack unlocked and button shown!");
     }
 
     public void AddOxygenCanister()
@@ -179,25 +216,43 @@ public class InventoryManager : MonoBehaviour
         return essentialItemsCount;
     }
 
+    public bool IsBackpackUnlocked()
+    {
+        return isBackpackUnlocked;
+    }
+
+    // ✅ Called by GameManager when pausing
     public void OnPause()
     {
-        if (isInventoryOpen)
+        // ✅ Remember if inventory was open
+        wasInventoryOpenBeforePause = isInventoryOpen;
+
+        // ✅ Hide inventory if it was open
+        if (isInventoryOpen && inventoryPanel != null)
         {
             inventoryPanel.SetActive(false);
         }
 
+        // ✅ Hide backpack button
         if (backpackButton != null)
             backpackButton.SetActive(false);
+
+        Debug.Log($"Inventory paused. Was open: {wasInventoryOpenBeforePause}");
     }
 
+    // ✅ Called by GameManager when resuming
     public void OnResume()
     {
-        if (isInventoryOpen)
+        // ✅ Restore inventory if it was open before pause
+        if (wasInventoryOpenBeforePause && inventoryPanel != null)
         {
             inventoryPanel.SetActive(true);
         }
 
-        if (backpackButton != null)
+        // ✅ Show backpack button again (only if unlocked)
+        if (backpackButton != null && isBackpackUnlocked)
             backpackButton.SetActive(true);
+
+        Debug.Log($"Inventory resumed. Restoring open state: {wasInventoryOpenBeforePause}");
     }
 }
