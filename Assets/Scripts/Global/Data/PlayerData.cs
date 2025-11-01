@@ -10,9 +10,5 @@ public class PlayerData
 
     // Game progress
     public TrialData[] trials = new TrialData[3];
-    public int overallTotalScore;
-    public int totalQuestionsAnswered;
-    public string lastPlayedScene;
-
     public bool isEarthFinished, isWaterFinished, isFireFinished, isSurveyDone;
 }

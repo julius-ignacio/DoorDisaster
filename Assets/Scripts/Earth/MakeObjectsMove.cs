@@ -96,7 +96,11 @@ public class MakeObjectsMove : MonoBehaviour
                 case "hallway1":
                     { locker[0].GetComponent<LockerFall>().Fall(); }
                     break;
-
+         case "hallway1 (1)":
+                    {
+                        locker[47].GetComponent<LockerFall>().Fall();
+                    locker[48].GetComponent<LockerFall>().Fall(); }
+                    break;
                 case "hallway2":
                     { locker[1].GetComponent<LockerFall2>().Fall(); }
                     break;
@@ -155,6 +159,12 @@ public class MakeObjectsMove : MonoBehaviour
 
                         locker[23].GetComponent<LockerFall2>().Fall();
                         locker[24].GetComponent<LockerFall2>().Fall();
+                    }
+                    break;      case "hallway8 (1)":
+                    {
+
+                        locker[45].GetComponent<LockerFall>().Fall();
+                        locker[46].GetComponent<LockerFall>().Fall();
                     }
                     break;
 
@@ -296,6 +306,11 @@ public class MakeObjectsMove : MonoBehaviour
                     }
                     break;
 
+
+
+
+
+
                         case "StartLibRack2":
                     {
 
@@ -305,7 +320,83 @@ public class MakeObjectsMove : MonoBehaviour
 
          
 
+                        case "CeilingTrigger99 (6)":
+                    {
 
+                        locker[43].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                 case "CeilingTrigger99 (7)":
+                    {
+
+                        locker[44].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;  
+                      case "CeilingTrigger99 (8)":
+                    {
+
+                        locker[45].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                             case "CeilingTrigger99 (9)":
+                    {
+
+                        locker[46].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                                    case "CeilingTrigger99 (10)":
+                    {
+
+                        locker[47].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                        case "CeilingTrigger99 (11)":
+                    {
+
+                        locker[48].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                        case "hallway14 1":
+                    {
+
+                        locker[49].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                                  case "hallway15 1":
+                    {
+
+                        locker[50].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+                                             case "hallway15 1 (1)":
+                    {
+
+                        locker[51].GetComponent<CeilingFall>().Fall();
+                    }
+                    break;
+
+
+                                                                 case "CanteenRack1":
+                    {
+
+                        locker[52].GetComponent<RackFall>().Fall();
+                    }
+                    break;
+
+                                                                       case "CanteenRack1 (1)":
+                    {
+
+                        locker[53].GetComponent<RackFall>().Fall();
+                    }
+                    break;
             }
 
         }

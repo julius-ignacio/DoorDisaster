@@ -147,8 +147,6 @@ AudioManager.Instance.StopLoop();
     if (DataManager.Instance.playerData != null)
     {
         var data = DataManager.Instance.playerData;
-        data.totalQuestionsAnswered = 0;
-        data.overallTotalScore = 0;
 
         foreach (var trial in data.trials)
         {

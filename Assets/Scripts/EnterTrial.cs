@@ -15,6 +15,7 @@ public void OnTriggerEnter(Collider other)
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.StopAll(); // or StopLoop(), depending on your AudioManager
+                    AudioManager.Instance.StopAll();
             }
 
             DataManager.Instance.currentTrial = trialIndex;

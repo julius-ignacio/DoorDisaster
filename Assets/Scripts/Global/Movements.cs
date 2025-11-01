@@ -27,15 +27,6 @@ public class Movements : MonoBehaviour
 
     public FootstepSurface currentSurface = FootstepSurface.Pavement;
 
-[Header("Camera Bob Settings")]
-public Camera playerCamera;            // Assign your camera here
-public float bobAmplitude = 0.05f;     // up/down bob size
-public float bobFrequency = 6f;        // how fast the bob cycles
-public float tiltAmplitude = 1.5f;     // left/right tilt angle
-public float tiltFrequency = 3f;       // how fast it tilts
-private float bobTimer = 0f;
-private Vector3 cameraInitialPos;
-private Quaternion cameraInitialRot;
 
 
 
@@ -44,11 +35,6 @@ private Quaternion cameraInitialRot;
     void Start()
     {
         controller = GetComponent<CharacterController>();
-            if (playerCamera != null)
-    {
-        cameraInitialPos = playerCamera.transform.localPosition;
-        cameraInitialRot = playerCamera.transform.localRotation;
-    }
     }
 
     void Awake()
@@ -94,7 +80,6 @@ private Quaternion cameraInitialRot;
         // --- Footsteps ---
         HandleFootsteps(move);
 
-   HandleHeadBob(move);
 
 
     }
@@ -130,60 +115,11 @@ private Quaternion cameraInitialRot;
     }
 
 
-void HandleHeadBob(Vector3 move)
-{
-    if (playerCamera == null) return;
-
-    bool isMoving = move.magnitude > 0.1f && isGrounded;
-
-    if (isMoving)
-    {
-        bobTimer += Time.deltaTime * bobFrequency;
-
-        // Up-down bob
-        float bobOffset = Mathf.Sin(bobTimer) * bobAmplitude;
-
-        // Left-right tilt (like head sway)
-        float tiltAngle = Mathf.Sin(bobTimer * tiltFrequency) * tiltAmplitude;
-
-        // Apply new position
-        Vector3 targetPos = cameraInitialPos + new Vector3(0, bobOffset, 0);
-        playerCamera.transform.localPosition = Vector3.Lerp(
-            playerCamera.transform.localPosition,
-            targetPos,
-            Time.deltaTime * 8f
-        );
-
-        // Apply tilt rotation
-        Quaternion targetRot = cameraInitialRot * Quaternion.Euler(0, 0, tiltAngle);
-        playerCamera.transform.localRotation = Quaternion.Lerp(
-            playerCamera.transform.localRotation,
-            targetRot,
-            Time.deltaTime * 8f
-        );
-    }
-    else
-    {
-        // Smoothly reset to neutral when standing still
-        playerCamera.transform.localPosition = Vector3.Lerp(
-            playerCamera.transform.localPosition,
-            cameraInitialPos,
-            Time.deltaTime * 5f
-        );
-
-        playerCamera.transform.localRotation = Quaternion.Lerp(
-            playerCamera.transform.localRotation,
-            cameraInitialRot,
-            Time.deltaTime * 5f
-        );
-
-        bobTimer = 0f;
-    }
 }
 
 
 
 
 
-}
+
 

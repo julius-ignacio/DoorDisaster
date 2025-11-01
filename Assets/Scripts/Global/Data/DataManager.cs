@@ -81,20 +81,9 @@ public void SaveTrialData(int trialIndex)
             playerData.isFireFinished = true;
             break;
     }
-
-    UpdateTotals();
 }
 
 
 
-    private void UpdateTotals()
-    {
-        int overall = 0;
-        int totalQuestions = 0;
-
-
-        playerData.overallTotalScore = overall;
-        playerData.totalQuestionsAnswered = totalQuestions;
-    }
 
 }

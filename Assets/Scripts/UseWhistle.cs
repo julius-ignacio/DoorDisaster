@@ -54,6 +54,7 @@ public class UseWhistle : MonoBehaviour
         // Move button off-screen instantly
         ButtonSkill.anchoredPosition = new Vector2(2000f, ButtonSkill.anchoredPosition.y);
         cooldownUI.SetActive(true);
+        cooldownText.text = "20";
 
         // Play sound effect
         AudioManager.Instance.PlaySFX(21);
