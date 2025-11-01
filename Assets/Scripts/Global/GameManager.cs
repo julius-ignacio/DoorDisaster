@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
     [Header("Fire Extinguisher References")]
     public FireExtinguisher fireExtinguisher;
 
+    [Header("Inventory References")] // ✅ NEW - Added this section
+    public InventoryManager inventoryManager;
+
     [Header("Text")]
     public TMP_Text panicText;
     public TMP_Text injurtyText;
@@ -167,6 +170,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // ✅ NEW - Hide inventory UI when pausing
+        if (inventoryManager != null)
+            inventoryManager.OnPause();
+
         // 🔸 Hide subtitles/objectives (SubtitleManager handles resume)
         if (subtitleManager2 != null)
             subtitleManager2.OnPause();
@@ -215,6 +222,10 @@ public class GameManager : MonoBehaviour
 
         if (wasFireExtinguisherSprayVisible && fireExtinguisher != null && fireExtinguisher.sprayButton != null)
             fireExtinguisher.sprayButton.SetActive(true);
+
+        // ✅ NEW - Restore inventory UI when resuming
+        if (inventoryManager != null)
+            inventoryManager.OnResume();
 
         // 🔹 Resume subtitles/objectives safely
         if (subtitleManager2 != null)
@@ -301,6 +312,10 @@ public class GameManager : MonoBehaviour
         // ✅ Hide pickup UI on game over (handles ALL pickups)
         if (GenericPickupButton.Instance != null)
             GenericPickupButton.Instance.HidePickupPrompt();
+
+        // ✅ NEW - Close inventory on game over
+        if (inventoryManager != null && inventoryManager.inventoryPanel != null)
+            inventoryManager.inventoryPanel.SetActive(false);
 
         // ✅ Also hide subtitles on death
         if (subtitleManager2 != null)

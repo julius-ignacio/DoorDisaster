@@ -8,17 +8,19 @@ public class PlayerOxygen : MonoBehaviour
     public float maxOxygen = 100f;
     public float normalDrainRate = 0.8f;
     public float towelDrainRate = 0.3f;
-    public float hallwayDrainRate = 1f; // ✅ Faster drain during hallway chase!
+    public float hallwayDrainRate = 1f;
+
+    [Header("Panic UI")]
+    public Image panickedStateImage; // 👈 Assign in Inspector
 
     private float currentOxygen;
     private float drainRate;
     private bool isAlive = true;
     private Movements2 playerMovement;
 
-    // Flags to control when oxygen starts draining
     private bool oxygenDrainActive = false;
+    private bool hasTriggeredDeath = false;
 
-    // ✅ Public flag for hallway chase mode
     public static bool InHallwayChase { get; set; } = false;
 
     void Start()
@@ -35,14 +37,16 @@ public class PlayerOxygen : MonoBehaviour
             {
                 fillImage.color = Color.blue;
             }
+
+            oxygenSlider.gameObject.SetActive(false);
+        }
+
+        if (panickedStateImage != null)
+        {
+            panickedStateImage.gameObject.SetActive(false); // Hide panic UI at start
         }
 
         drainRate = normalDrainRate;
-
-        // Hide bar at start, SubtitleManager will show it after intro
-        if (oxygenSlider != null)
-            oxygenSlider.gameObject.SetActive(false);
-
         playerMovement = GetComponent<Movements2>();
 
         Debug.Log("PlayerOxygen initialized - Value: " + currentOxygen + "/" + maxOxygen + ", drain rate: " + drainRate);
@@ -53,10 +57,8 @@ public class PlayerOxygen : MonoBehaviour
     {
         if (!isAlive) return;
 
-        // Only drain oxygen if intro story is complete
         if (!oxygenDrainActive)
         {
-            // Check if story is complete to start draining
             if (SubtitleManager2.IntroStoryComplete)
             {
                 oxygenDrainActive = true;
@@ -64,34 +66,47 @@ public class PlayerOxygen : MonoBehaviour
             }
             else
             {
-                return; // Don't drain oxygen yet
+                return;
             }
         }
 
-        // ✅ Check if in hallway chase mode - use faster drain rate
         if (InHallwayChase)
         {
             drainRate = hallwayDrainRate;
         }
 
-        // Drain oxygen continuously
         currentOxygen -= drainRate * Time.deltaTime;
         currentOxygen = Mathf.Clamp(currentOxygen, 0f, maxOxygen);
 
-        // Update slider
         if (oxygenSlider != null)
             oxygenSlider.value = currentOxygen;
 
-        // Oxygen runs out
-        if (currentOxygen <= 0f)
+        // ✅ Show panic UI if oxygen is low
+        if (panickedStateImage != null)
         {
+            bool shouldShowPanic = currentOxygen <= 30f;
+            if (panickedStateImage.gameObject.activeSelf != shouldShowPanic)
+            {
+                panickedStateImage.gameObject.SetActive(shouldShowPanic);
+                Debug.Log("PanickedState UI " + (shouldShowPanic ? "activated!" : "hidden."));
+            }
+        }
+
+        if (currentOxygen <= 0f && !hasTriggeredDeath)
+        {
+            hasTriggeredDeath = true;
             isAlive = false;
             Debug.Log("Player suffocated!");
 
             if (playerMovement != null)
             {
-                playerMovement.TakeDamage(playerMovement.currentHealth);
+                playerMovement.enabled = false;
+                CharacterController controller = playerMovement.GetComponent<CharacterController>();
+                if (controller != null)
+                    controller.enabled = false;
             }
+
+            GameOverManager.TriggerDeath("OUT OF OXYGEN", "You ran out of breathable air.");
         }
     }
 
@@ -104,8 +119,15 @@ public class PlayerOxygen : MonoBehaviour
     public void RefillOxygen()
     {
         currentOxygen = maxOxygen;
+        hasTriggeredDeath = false;
+        isAlive = true;
+
         if (oxygenSlider != null)
             oxygenSlider.value = currentOxygen;
+
+        if (panickedStateImage != null)
+            panickedStateImage.gameObject.SetActive(false); // Hide panic UI on refill
+
         Debug.Log("Oxygen refilled to max! (" + maxOxygen + ")");
     }
 

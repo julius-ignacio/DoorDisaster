@@ -14,6 +14,7 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
         if (other.CompareTag("Player") && !hasPickedUp)
         {
             playerInRange = true;
+
             // ✅ Only show prompt if intro story is complete and game is not paused
             if (SubtitleManager2.IntroStoryComplete && !GameManager.Instance.isPaused)
             {
@@ -31,7 +32,6 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
         }
     }
 
-    // ✅ Check if player is still in range when story completes
     void Update()
     {
         // ✅ Don't show button if game is paused
@@ -41,8 +41,8 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
         // If player is in range but prompt isn't showing yet, check if story is now complete
         if (playerInRange && !hasPickedUp && SubtitleManager2.IntroStoryComplete)
         {
-            // Show the prompt if it wasn't shown before (because story just completed)
-            if (GenericPickupButton.Instance != null && GenericPickupButton.Instance.pickupButton != null)
+            if (GenericPickupButton.Instance != null &&
+                GenericPickupButton.Instance.pickupButton != null)
             {
                 // Only show if it's not already showing
                 if (!GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
@@ -55,17 +55,22 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
 
     public void OnPickup()
     {
-        if (!playerInRange || hasPickedUp) return;
+        if (!playerInRange || hasPickedUp)
+            return;
 
         hasPickedUp = true;
-        canister.SetActive(false);
-        GenericPickupButton.Instance.HidePickupPrompt();
 
-        PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
-        if (oxygen != null)
+        // ✅ Add to inventory instead of using immediately
+        if (InventoryManager.Instance != null)
         {
-            oxygen.RefillOxygen();
-            Debug.Log("Oxygen canister picked up - oxygen refilled!");
+            InventoryManager.Instance.AddOxygenCanister();
+            canister.SetActive(false);
+            GenericPickupButton.Instance.HidePickupPrompt();
+            Debug.Log("Oxygen canister added to inventory!");
+        }
+        else
+        {
+            Debug.LogError("InventoryManager not found!");
         }
     }
 }

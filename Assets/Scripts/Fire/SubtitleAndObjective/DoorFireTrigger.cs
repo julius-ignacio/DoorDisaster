@@ -13,8 +13,7 @@ public class DoorFireTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Only proceed if essentials are collected
-            if (!fireMessageShown && objectiveManager != null && objectiveManager.GetObjectiveStage() >= 4)
+            if (!fireMessageShown && objectiveManager != null && objectiveManager.GetObjectiveStage() >= 2)
             {
                 TriggerFireSequence();
             }
@@ -23,24 +22,17 @@ public class DoorFireTrigger : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && Input.GetKeyDown(KeyCode.E))
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (!fireMessageShown)
             {
-                // Only trigger after essentials are collected
-                if (!fireMessageShown)
+                if (objectiveManager != null && objectiveManager.GetObjectiveStage() >= 2)
                 {
-                    if (objectiveManager != null && objectiveManager.GetObjectiveStage() >= 4)
-                    {
-                        TriggerFireSequence();
-                    }
-                    else
-                    {
-                        subtitleManager.ShowCustomMessage(
-                            "I need to collect my essentials first!",
-                            2f
-                        );
-                    }
+                    TriggerFireSequence();
+                }
+                else
+                {
+                    subtitleManager.ShowCustomMessage("I need to collect my essentials first!", 2f);
                 }
             }
         }
@@ -50,6 +42,7 @@ public class DoorFireTrigger : MonoBehaviour
     {
         fireMessageShown = true;
         subtitleManager.HideObjective();
+
         subtitleManager.ShowCustomMessage(
             "The door is blocked by fire!",
             2.5f,
@@ -57,7 +50,6 @@ public class DoorFireTrigger : MonoBehaviour
             {
                 subtitleManager.ShowObjective("Find an alternative escape route - try the window!");
 
-                // Fetch quiz from database
                 QuizQuestion2 quiz = QuizDatabase2.GetQuiz("fire_blocked_door");
                 if (quiz != null && quizManager != null)
                 {
@@ -67,7 +59,6 @@ public class DoorFireTrigger : MonoBehaviour
                         quiz.correctAnswerIndex,
                         () =>
                         {
-                            // After quiz is done, keep the objective visible
                             subtitleManager.ShowObjective("Find an alternative escape route - try the window!");
                         }
                     );

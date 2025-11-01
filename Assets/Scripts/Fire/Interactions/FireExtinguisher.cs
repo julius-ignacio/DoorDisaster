@@ -44,6 +44,30 @@ public class FireExtinguisher : MonoBehaviour
     {
         if (pickupButton != null)
             pickupButton.SetActive(false); // Hide extinguisher button at start
+
+        // Setup spray button with pointer event handler
+        if (sprayButton != null)
+        {
+            // Add EventTrigger component if not already present
+            EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = sprayButton.AddComponent<EventTrigger>();
+
+            // Clear existing events to avoid duplicates
+            trigger.triggers.Clear();
+
+            // Add PointerDown event
+            EventTrigger.Entry pointerDown = new EventTrigger.Entry();
+            pointerDown.eventID = EventTriggerType.PointerDown;
+            pointerDown.callback.AddListener((data) => { OnSprayButtonPress(); });
+            trigger.triggers.Add(pointerDown);
+
+            // Add PointerUp event
+            EventTrigger.Entry pointerUp = new EventTrigger.Entry();
+            pointerUp.eventID = EventTriggerType.PointerUp;
+            pointerUp.callback.AddListener((data) => { OnSprayButtonRelease(); });
+            trigger.triggers.Add(pointerUp);
+        }
     }
 
     // -------------------------------
@@ -92,6 +116,7 @@ public class FireExtinguisher : MonoBehaviour
         // Only allow spraying after quizzes
         if (!canSpray) return;
 
+        // Check for keyboard input OR touch/mouse input
         if (isSpraying || Input.GetKey(KeyCode.F))
         {
             if (sprayParticleSystem != null && !sprayParticleSystem.isPlaying)
@@ -117,19 +142,38 @@ public class FireExtinguisher : MonoBehaviour
                 isSpraySoundPlaying = false;
             }
         }
+
+        // ✅ FALLBACK: Check if any touch/mouse is held down while spray mode is active
+        // This ensures spraying continues even if finger moves off button
+        if (canSpray && (Input.GetMouseButton(0) || Input.touchCount > 0))
+        {
+            // If we were spraying and finger is still down, keep spraying
+            if (isSpraying)
+            {
+                // Continue spraying (already handled above)
+            }
+        }
     }
 
     // -------------------------------
     // 🖱️  SPRAY BUTTON FUNCTIONS
     // -------------------------------
-    public void OnSprayButtonHold()
+    public void OnSprayButtonPress()
     {
         isSpraying = true;
+        Debug.Log("Spray button pressed - spraying started!");
     }
 
     public void OnSprayButtonRelease()
     {
         isSpraying = false;
+        Debug.Log("Spray button released - spraying stopped!");
+    }
+
+    // Alternative method names for compatibility (keep both)
+    public void OnSprayButtonHold()
+    {
+        OnSprayButtonPress();
     }
 
     // -------------------------------
@@ -197,7 +241,7 @@ public class FireExtinguisher : MonoBehaviour
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
-                "Good! Now use the fire extinguisher to put out the fires. Press and hold F or the Spray button!",
+                "Good! Now use the fire extinguisher to put out the fires. Press and hold the Spray button!",
                 4f,
                 null
             );

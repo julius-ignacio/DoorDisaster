@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
-using UnityEngine.UI;
 
 public class WindowEscape : MonoBehaviour, IPickupable
 {
@@ -23,10 +24,10 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
     [Header("Fade Settings")]
     public Image fadeOverlay;
-    public float fadeDuration = 1f;
+    public float fadeDuration = 2f;
 
     [Header("Audio")]
-    public int windowBreakSFX = 37; // Window breaking sound
+    public int windowBreakSFX = 37;
 
     private bool hasHeavyObject = false;
     private bool hasEscaped = false;
@@ -46,12 +47,10 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
     void Update()
     {
-        // ✅ Show prompt when player is in range and game resumes
         if (playerInRange && !hasEscaped)
         {
             if (GameManager.Instance != null && !GameManager.Instance.isPaused)
             {
-                // Check if prompt isn't already showing
                 if (GenericPickupButton.Instance != null &&
                     GenericPickupButton.Instance.pickupButton != null &&
                     !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
@@ -69,19 +68,16 @@ public class WindowEscape : MonoBehaviour, IPickupable
     {
         if (other.CompareTag("Player") && !hasEscaped)
         {
-            // Wait until the SDR message (doorFireTrigger) has been shown
             if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
                 return;
 
             playerInRange = true;
 
-            // Don't show prompt if game is paused
             if (GameManager.Instance == null || !GameManager.Instance.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
             }
 
-            // Only show subtitle/objective once (the first time)
             if (!promptShown)
             {
                 promptShown = true;
@@ -110,10 +106,8 @@ public class WindowEscape : MonoBehaviour, IPickupable
         if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
             return;
 
-        // Window is stuck, need heavy object
         if (!hasHeavyObject)
         {
-            // Enable the lamp pickup button
             if (heavyObjectPickup != null)
             {
                 heavyObjectPickup.EnablePickup();
@@ -122,7 +116,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
             subtitleManager.ShowCustomMessage(
                 "Oh no, it's stuck! I need something heavy to break this open!",
                 2f,
-                () => subtitleManager.ShowObjective("Find a heavy object - try the lamp near the bed")
+                () => subtitleManager.ShowObjective("Find a heavy object, try the lamp near the bed")
             );
         }
         else
@@ -131,7 +125,6 @@ public class WindowEscape : MonoBehaviour, IPickupable
         }
     }
 
-    // Called by HeavyObjectPickup after the player picks up the object
     public void PickupHeavyObject()
     {
         hasHeavyObject = true;
@@ -147,7 +140,6 @@ public class WindowEscape : MonoBehaviour, IPickupable
             {
                 subtitleManager.ShowObjective("Use the heavy object to break the bedroom window");
 
-                // Show the button again if player is near the window
                 if (playerInRange)
                 {
                     GenericPickupButton.Instance.ShowPickupPrompt(this, "Break Window");
@@ -162,13 +154,15 @@ public class WindowEscape : MonoBehaviour, IPickupable
         subtitleManager.HideObjective();
         GenericPickupButton.Instance.HidePickupPrompt();
 
-        // ✅ Play window breaking sound
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX(windowBreakSFX);
-            // Stop the sound after 2 seconds
             StartCoroutine(StopSoundAfterDelay(2f));
         }
+
+        // Hide oxygen bar during escape subtitle
+        if (oxygenBar != null)
+            oxygenBar.SetActive(false);
 
         subtitleManager.ShowCustomMessage(
             "I broke the window! Time to get out!",
@@ -186,14 +180,12 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
     private IEnumerator FadeTeleportSequence()
     {
-        // 1️⃣ Fade to black
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
             yield return StartCoroutine(Fade(0f, 1f));
         }
 
-        // 2️⃣ Teleport player
         if (player != null && hallwaySpawnPoint != null)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
@@ -207,33 +199,39 @@ public class WindowEscape : MonoBehaviour, IPickupable
             if (cc != null) cc.enabled = true;
         }
 
-        // ✅ Hide health, oxygen bars, and objective after teleport
         if (healthBar != null)
             healthBar.SetActive(false);
-
-        if (oxygenBar != null)
-            oxygenBar.SetActive(false);
 
         if (subtitleManager != null)
             subtitleManager.HideObjective();
 
         yield return new WaitForSeconds(0.2f);
 
-        // 3️⃣ Fade back in
+        PlayerOxygen.InHallwayChase = true;
+
+        PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+        if (oxygen != null)
+        {
+            oxygen.ShowOxygenBar(); // ✅ Re-enable oxygen bar after subtitle finishes
+        }
+
+        if (InventoryManager.Instance != null && InventoryManager.Instance.backpackButton != null)
+        {
+            InventoryManager.Instance.backpackButton.SetActive(false);
+        }
+
         if (fadeOverlay != null)
         {
             yield return StartCoroutine(Fade(1f, 0f));
             fadeOverlay.gameObject.SetActive(false);
         }
 
-        // 4️⃣ Show next objective
         subtitleManager.ShowCustomMessage(
-            "The fire is spreading! I need to find the exit before I run out of air!",
+            "Where am I? I need to find the exit before I run out of air!",
             3f,
             () => subtitleManager.ShowObjective("Find the exit door - hurry!")
         );
 
-        // 5️⃣ Save progress
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SaveTrialData(DataManager.Instance.currentTrial);

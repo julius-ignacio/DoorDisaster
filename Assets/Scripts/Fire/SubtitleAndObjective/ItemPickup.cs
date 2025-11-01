@@ -36,13 +36,7 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
         int stage = objectiveManager.GetObjectiveStage();
 
-        // 🎒 Backpack outline for stage 2
-        if (itemName == "Backpack" && stage >= 2)
-        {
-            outline.enabled = true;
-        }
-        // 📦 Essential items outline for stage 3+
-        else if (isEssential && stage >= 3)
+        if (isEssential && stage >= 1)
         {
             outline.enabled = true;
         }
@@ -59,17 +53,10 @@ public class ItemPickup : MonoBehaviour, IPickupable
             playerInRange = true;
             int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
 
-            // If item is in a cabinet, only show button if cabinet is open
             if (cabinetOpener != null && !cabinetOpener.IsCabinetOpen())
                 return;
 
-            // 🎒 Backpack pickup prompt at stage 2
-            if (itemName == "Backpack" && stage >= 2)
-            {
-                GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
-            }
-            // 📦 Essentials pickup prompt at stage 3+
-            else if (isEssential && stage >= 3)
+            if (isEssential && stage >= 1)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
             }
@@ -87,11 +74,11 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
     void OnTriggerStay(Collider other)
     {
-        // If cabinet just opened, show the button
         if (other.CompareTag("Player") && !hasBeenPickedUp && playerInRange && cabinetOpener != null && cabinetOpener.IsCabinetOpen())
         {
             int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
-            if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
+
+            if (isEssential && stage >= 1)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
             }
@@ -104,7 +91,7 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
         int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
 
-        if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
+        if (isEssential && stage >= 1)
         {
             PickupItem();
         }
@@ -121,8 +108,9 @@ public class ItemPickup : MonoBehaviour, IPickupable
         hasBeenPickedUp = true;
 
         subtitleManager?.ShowCustomMessage(
-            isEssential ? $"Picked up {itemName}. This could be important!" : $"Picked up {itemName}.",
-            1.5f, null
+            $"Picked up {itemName}. This could be important!",
+            1.5f,
+            null
         );
 
         if (outline != null)
@@ -131,6 +119,16 @@ public class ItemPickup : MonoBehaviour, IPickupable
         StartCoroutine(FadeOutAndHide());
 
         objectiveManager?.OnItemPickedUp(itemName, isEssential);
+
+        if (itemName.Contains("Oxygen") || itemName.Contains("oxygen"))
+        {
+            InventoryManager.Instance?.AddOxygenCanister();
+        }
+
+        if (isEssential)
+        {
+            InventoryManager.Instance?.AddEssentialItem();
+        }
     }
 
     private IEnumerator FadeOutAndHide()

@@ -16,6 +16,8 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     public float openAngle = 90f;
     public float openSpeed = 2f;
     public bool smartDoorOpen = true;
+    [Tooltip("The door's forward direction (usually Vector3.right for doors hinged on left/right)")]
+    public Vector3 doorForward = Vector3.right;
 
     [Header("Damage Settings")]
     public int burnDamage = 10;
@@ -25,7 +27,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     [Header("Audio")]
     public int burnSFX = 16;           // Burn sound when touching hot handle
     public int doorOpenSFX = 25;       // Door opening sound
-    public int doorCloseSFX = 3;      // Door closing sound
+    public int doorCloseSFX = 3;       // Door closing sound
 
     private bool doorLocked = true;
     private bool doorOpen = false;
@@ -189,12 +191,24 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
         }
 
         float angle = openAngle;
+
+        // ✅ FIXED: Smart door opening - opens AWAY from player
         if (smartDoorOpen && player != null)
         {
+            // Get direction from door to player
             Vector3 doorToPlayer = (player.transform.position - doorTransform.position).normalized;
-            Vector3 doorForward = doorTransform.right;
-            float dot = Vector3.Dot(doorToPlayer, doorForward);
-            angle = dot > 0 ? openAngle : -openAngle;
+
+            // Get door's forward direction in world space
+            Vector3 doorForwardWorld = doorTransform.TransformDirection(doorForward);
+
+            // Calculate dot product to determine which side player is on
+            float dot = Vector3.Dot(doorToPlayer, doorForwardWorld);
+
+            // If dot > 0, player is on the "forward" side, so open in negative direction (away)
+            // If dot < 0, player is on the "back" side, so open in positive direction (away)
+            angle = dot > 0 ? -openAngle : openAngle;
+
+            Debug.Log($"Smart Door: dot={dot:F2}, opening angle={angle}°");
         }
 
         Quaternion startRotation = doorTransform.localRotation;
@@ -209,7 +223,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
         }
 
         doorTransform.localRotation = targetRotation;
-        Debug.Log(opening ? "Door opened" : "Door closed");
+        Debug.Log(opening ? "Door opened away from player" : "Door closed");
     }
 
     IEnumerator FlashDamage()

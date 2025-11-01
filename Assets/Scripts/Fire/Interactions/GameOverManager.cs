@@ -14,15 +14,15 @@ public class GameOverManager : MonoBehaviour
     public GameObject darkOverlay;
 
     [Header("References")]
-    public Movements playerMovement;
+    public Movements2 playerMovement;
     public PlayerOxygen playerOxygen;
 
     [Header("Fade Settings")]
     public float fadeDuration = 1.5f;
 
     [Header("Hallway Checkpoint")]
-    public Transform hallwaySpawnPoint; // ✅ Where to respawn if died in hallway
-    public Transform player; // ✅ Player transform
+    public Transform hallwaySpawnPoint;
+    public Transform player;
 
     private CanvasGroup panelCanvasGroup;
     private CanvasGroup overlayCanvasGroup;
@@ -34,7 +34,6 @@ public class GameOverManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern
         if (instance == null)
         {
             instance = this;
@@ -110,13 +109,8 @@ public class GameOverManager : MonoBehaviour
 
     void Update()
     {
-        if (isGameOver) return;
-
-        // Check for death conditions separately
-        if (playerOxygen != null && !playerOxygen.IsAlive())
-        {
-            TriggerGameOver("OUT OF OXYGEN", "You ran out of breathable air. Remember: Use a wet towel to filter smoke!");
-        }
+        // ✅ REMOVED - PlayerOxygen now handles its own death
+        // No need to check oxygen here anymore
     }
 
     void SetupCanvasGroup(GameObject obj, out CanvasGroup cg)
@@ -153,6 +147,10 @@ public class GameOverManager : MonoBehaviour
         // ✅ Hide pickup button if visible when player dies
         if (GenericPickupButton.Instance != null)
             GenericPickupButton.Instance.HidePickupPrompt();
+
+        // ✅ Close inventory if open
+        if (InventoryManager.Instance != null && InventoryManager.Instance.inventoryPanel != null)
+            InventoryManager.Instance.inventoryPanel.SetActive(false);
 
         // Disable player controls
         if (playerMovement != null)
@@ -273,7 +271,7 @@ public class GameOverManager : MonoBehaviour
                 if (cc != null) cc.enabled = true;
             }
 
-            // Refill oxygen
+            // ✅ Refill oxygen (this also resets hasTriggeredDeath flag)
             if (playerOxygen != null)
             {
                 playerOxygen.RefillOxygen();
