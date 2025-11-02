@@ -12,9 +12,9 @@ public class FirebaseAuth : MonoBehaviour
     public static string UserIdToken;
     public static string UserLocalId;
     public PlayerData playerData;
-    
-    
-    
+
+
+
 
 
     // Register
@@ -80,35 +80,70 @@ public class FirebaseAuth : MonoBehaviour
 
 
     // Login
-public IEnumerator LoginUser(string email, string password, Action<bool, string, string> callback)
-{
-    string loginUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
-
-    RegisterRequest requestData = new RegisterRequest { email = email, password = password };
-    string jsonData = JsonUtility.ToJson(requestData);
-
-    UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
-    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
-
-    yield return request.SendWebRequest();
-
-    if (request.result == UnityWebRequest.Result.Success)
+    public IEnumerator LoginUser(string email, string password, Action<bool, string, string> callback)
     {
-        AuthResponse authResponse = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
-        UserIdToken = authResponse.idToken;
-        UserLocalId = authResponse.localId;
+        string loginUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
 
-        Debug.Log("✅ Login successful!");
-        callback(true, authResponse.idToken, authResponse.localId);
+        RegisterRequest requestData = new RegisterRequest { email = email, password = password };
+        string jsonData = JsonUtility.ToJson(requestData);
+
+        UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            AuthResponse authResponse = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
+            UserIdToken = authResponse.idToken;
+            UserLocalId = authResponse.localId;
+
+            Debug.Log("✅ Login successful!");
+            callback(true, authResponse.idToken, authResponse.localId);
+        }
+        else
+        {
+            Debug.LogError("❌ Login error: " + request.error + "\n" + request.downloadHandler.text);
+            callback(false, null, null);
+        }
     }
-    else
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public IEnumerator SendPasswordResetEmail(string email, Action<bool, string> callback)
     {
-        Debug.LogError("❌ Login error: " + request.error + "\n" + request.downloadHandler.text);
-        callback(false, null, null);
+        string resetUrl = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + apiKey;
+
+        var requestData = new
+        {
+            requestType = "PASSWORD_RESET",
+            email = email
+        };
+
+        string jsonData = JsonUtility.ToJson(requestData);
+        UnityWebRequest request = new UnityWebRequest(resetUrl, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("✅ Password reset email sent to: " + email);
+            callback(true, "Password reset email sent!");
+        }
+        else
+        {
+            Debug.LogError("❌ Password reset failed: " + request.error + "\n" + request.downloadHandler.text);
+            callback(false, request.downloadHandler.text);
+        }
     }
-}
+
 
 }

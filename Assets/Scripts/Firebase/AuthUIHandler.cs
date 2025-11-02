@@ -64,42 +64,71 @@ public class AuthUIHandler : MonoBehaviour
 
 
 
-public void OnLoginButton()
+    public void OnLoginButton()
+    {
+        StartCoroutine(firebaseAuth.LoginUser(login_emailInput.text, login_passwordInput.text, (success, idToken, localId) =>
+        {
+            if (success)
+            {
+                feedbackTextlog.text = "✅ Login successful!";
+                Debug.Log("Token: " + idToken);
+                Debug.Log("UserID: " + localId);
+
+                // 🔹 Load player data from Firebase
+                StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
+                {
+                    if (loadedData != null)
+                    {
+                        DataManager.Instance.playerData = loadedData;
+                        Debug.Log("✅ Player data loaded into DataManager");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("⚠️ No existing player data found, using defaults");
+                    }
+                }));
+
+                // Delay and then load MainMenu
+                StartCoroutine(LoadMainMenuWithDelay(2f));
+            }
+            else
+            {
+                feedbackTextlog.text = "❌ Login failed!";
+            }
+        }));
+    }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public TMP_InputField forgotEmailInput; // optional: or reuse login_emailInput
+public TMP_Text forgotFeedbackText;
+
+public void OnForgotPasswordButton()
 {
-    StartCoroutine(firebaseAuth.LoginUser(login_emailInput.text, login_passwordInput.text, (success, idToken, localId) =>
+    string email = forgotEmailInput.text.Trim();
+
+    if (string.IsNullOrEmpty(email) || !email.Contains("@"))
+    {
+        forgotFeedbackText.text = "Please enter a valid email.";
+        return;
+    }
+
+    StartCoroutine(firebaseAuth.SendPasswordResetEmail(email, (success, message) =>
     {
         if (success)
         {
-            feedbackTextlog.text = "✅ Login successful!";
-            Debug.Log("Token: " + idToken);
-            Debug.Log("UserID: " + localId);
-
-            // 🔹 Load player data from Firebase
-            StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
-            {
-                if (loadedData != null)
-                {
-                    DataManager.Instance.playerData = loadedData;
-                    Debug.Log("✅ Player data loaded into DataManager");
-                }
-                else
-                {
-                    Debug.LogWarning("⚠️ No existing player data found, using defaults");
-                }
-            }));
-
-            // Delay and then load MainMenu
-            StartCoroutine(LoadMainMenuWithDelay(2f));
+            forgotFeedbackText.text = "✅ Password reset email sent! Check your inbox.";
         }
         else
         {
-            feedbackTextlog.text = "❌ Login failed!";
+            forgotFeedbackText.text = "❌ Failed to send reset email: " + message;
         }
     }));
 }
 
-    
-        private IEnumerator LoadMainMenuWithDelay(float delay)
+
+
+    private IEnumerator LoadMainMenuWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene("GameMenu"); // Change to your MainMenu scene name

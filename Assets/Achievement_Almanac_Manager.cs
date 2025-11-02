@@ -1,7 +1,4 @@
-using Microsoft.Unity.VisualStudio.Editor;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Achievement_Almanac_Manager : MonoBehaviour
 {
