@@ -7,7 +7,6 @@ public class FuseBoxTrigger : MonoBehaviour
 
     void Start()
     {
-        // Debug checks
         Collider col = GetComponent<Collider>();
         if (col == null)
         {
@@ -17,7 +16,6 @@ public class FuseBoxTrigger : MonoBehaviour
         {
             Debug.LogWarning("FuseBoxTrigger: Collider is not marked as Trigger!");
         }
-
         Debug.Log("FuseBoxTrigger: Ready and waiting for player");
     }
 
@@ -25,12 +23,12 @@ public class FuseBoxTrigger : MonoBehaviour
     {
         Debug.Log($"FuseBoxTrigger: Something entered! Tag: {other.tag}, Name: {other.name}");
 
-        if (other.CompareTag("Player") && !hasTriggered)
+        // ✅ Only trigger if door has been opened with towel AND subtitles finished
+        if (other.CompareTag("Player") && !hasTriggered && HotDoorHandle.DoorOpenedWithTowel)
         {
             Debug.Log("FuseBoxTrigger: Player detected! Showing subtitle...");
             hasTriggered = true;
 
-            // ✅ Activate fuse box outline
             FuseBoxInteraction.FuseBoxObjectiveActive = true;
             Debug.Log("FuseBoxTrigger: Fuse box outline activated!");
 
@@ -40,25 +38,26 @@ public class FuseBoxTrigger : MonoBehaviour
                 return;
             }
 
-            // Show subtitle about needing to turn off electricity
             subtitleManager.ShowCustomMessage(
-                "Wait - with all this smoke, I should turn off the electricity first. Where's the breaker?",
+                "Wait, with all this smoke, I should turn off the electricity first. Where's the breaker?",
                 4f,
                 () => {
-                    // After subtitle, show objective
                     subtitleManager.ShowObjective("Find and turn off the main breaker");
                 }
             );
         }
+        else if (other.CompareTag("Player") && !HotDoorHandle.DoorOpenedWithTowel)
+        {
+            Debug.Log("FuseBoxTrigger: Player entered but door subtitles not finished yet");
+        }
     }
 
-    // Visual debug in Scene view
     void OnDrawGizmos()
     {
         Collider col = GetComponent<Collider>();
         if (col != null)
         {
-            Gizmos.color = new Color(1, 1, 0, 0.3f); // Yellow
+            Gizmos.color = new Color(1, 1, 0, 0.3f);
             Gizmos.matrix = transform.localToWorldMatrix;
             if (col is BoxCollider box)
                 Gizmos.DrawCube(box.center, box.size);

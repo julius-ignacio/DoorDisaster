@@ -209,10 +209,11 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
         PlayerOxygen.InHallwayChase = true;
 
+        // ✅ Refill oxygen to max BEFORE showing the bar
         PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
         if (oxygen != null)
         {
-            oxygen.ShowOxygenBar(); // ✅ Re-enable oxygen bar after subtitle finishes
+            oxygen.RefillOxygen(); // Reset to maximum
         }
 
         if (InventoryManager.Instance != null && InventoryManager.Instance.backpackButton != null)
@@ -226,10 +227,20 @@ public class WindowEscape : MonoBehaviour, IPickupable
             fadeOverlay.gameObject.SetActive(false);
         }
 
+        // ✅ Show subtitle FIRST, then show oxygen bar AFTER subtitle completes
         subtitleManager.ShowCustomMessage(
             "Where am I? I need to find the exit before I run out of air!",
             3f,
-            () => subtitleManager.ShowObjective("Find the exit door - hurry!")
+            () =>
+            {
+                subtitleManager.ShowObjective("Find the exit door - hurry!");
+
+                // ✅ Show oxygen bar AFTER subtitle ends
+                if (oxygen != null)
+                {
+                    oxygen.ShowOxygenBar();
+                }
+            }
         );
 
         if (DataManager.Instance != null)

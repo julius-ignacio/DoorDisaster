@@ -9,10 +9,10 @@ public class TowelPickup : MonoBehaviour, IPickupable
     public SubtitleManager2 subtitleManager;
     public Transform player;
     public Transform houseBSpawnPoint;
-    public Image fadeOverlay;
+    public Image fadeOverlay; // ✅ Use the Image directly (BlackTP)
 
     [Header("Fade Settings")]
-    public float fadeDuration = 1f;
+    public float fadeDuration = 3f;
 
     [Header("Cat Audio")]
     public AudioSource catAudio;
@@ -20,34 +20,37 @@ public class TowelPickup : MonoBehaviour, IPickupable
     [Header("Outline Settings")]
     private Outline outline;
 
+    private bool hasPickedUp = false;
+    private bool playerInRange = false;
+
     void Awake()
     {
-        // Make sure cat audio doesn't play at start
+        // Stop cat audio at start
         if (catAudio != null)
             catAudio.Stop();
     }
-
-    private bool hasPickedUp = false;
-    private bool playerInRange = false;
 
     void Start()
     {
         // Get outline component
         outline = GetComponent<Outline>();
         if (outline != null)
-            outline.enabled = false; // Hidden at start
+            outline.enabled = false;
 
-        // ✅ FIX: Set fade overlay to fully transparent at start
+        // ✅ Setup fade overlay (BlackTP)
         if (fadeOverlay != null)
         {
-            fadeOverlay.gameObject.SetActive(true); // Keep active
-            CanvasGroup cg = fadeOverlay.GetComponent<CanvasGroup>();
-            if (cg == null)
-            {
-                cg = fadeOverlay.gameObject.AddComponent<CanvasGroup>();
-            }
-            cg.alpha = 0f; // Start transparent
-            cg.blocksRaycasts = false;
+            fadeOverlay.gameObject.SetActive(true); // Must stay active
+            fadeOverlay.enabled = true; // Ensure Image is active
+
+            // Start fully transparent
+            Color c = fadeOverlay.color;
+            c.a = 0f;
+            fadeOverlay.color = c;
+        }
+        else
+        {
+            Debug.LogWarning("Fade overlay (BlackTP) not assigned in TowelPickup!");
         }
     }
 
@@ -66,7 +69,6 @@ public class TowelPickup : MonoBehaviour, IPickupable
         {
             playerInRange = true;
 
-            // ✅ Only show prompt if breaker puzzle is complete
             if (BreakerPuzzle.BreakerPuzzleComplete)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Towel");
@@ -87,7 +89,6 @@ public class TowelPickup : MonoBehaviour, IPickupable
     {
         if (!playerInRange || hasPickedUp) return;
 
-        // ✅ Extra safety check
         if (!BreakerPuzzle.BreakerPuzzleComplete)
         {
             Debug.Log("Cannot pick up towel before breaker puzzle is complete");
@@ -97,7 +98,6 @@ public class TowelPickup : MonoBehaviour, IPickupable
         hasPickedUp = true;
         towel.SetActive(false);
 
-        // Disable outline
         if (outline != null)
             outline.enabled = false;
 
@@ -117,20 +117,14 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
     private IEnumerator FadeTeleportSequence()
     {
-        // ✅ FIX: Use CanvasGroup for smooth fading
-        CanvasGroup fadeGroup = null;
-        if (fadeOverlay != null)
+        if (fadeOverlay == null)
         {
-            fadeOverlay.gameObject.SetActive(true);
-            fadeGroup = fadeOverlay.GetComponent<CanvasGroup>();
-            if (fadeGroup == null)
-            {
-                fadeGroup = fadeOverlay.gameObject.AddComponent<CanvasGroup>();
-            }
-            fadeGroup.blocksRaycasts = true; // Block input during fade
-
-            yield return StartCoroutine(FadeCanvasGroup(fadeGroup, 0f, 1f));
+            Debug.LogError("Fade overlay Image not found!");
+            yield break;
         }
+
+        // ✅ Fade to black
+        yield return StartCoroutine(FadeImage(fadeOverlay, 0f, 1f));
 
         // Teleport player
         if (player != null && houseBSpawnPoint != null)
@@ -157,17 +151,14 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
         yield return new WaitForSeconds(0.2f);
 
-        // Fade back in
-        if (fadeOverlay != null && fadeGroup != null)
-        {
-            yield return StartCoroutine(FadeCanvasGroup(fadeGroup, 1f, 0f));
-            fadeGroup.blocksRaycasts = false;
-        }
+        // ✅ Fade back in
+        yield return StartCoroutine(FadeImage(fadeOverlay, 1f, 0f));
 
-        // Play cat audio AFTER player is teleported to House B
+        // Play cat audio AFTER teleport
         if (catAudio != null)
             catAudio.Play();
 
+        // Dialogue sequence
         subtitleManager.ShowCustomMessage(
             "Huh..? What just happened? This doesn't look right...",
             3f,
@@ -183,7 +174,6 @@ public class TowelPickup : MonoBehaviour, IPickupable
                             3f,
                             () =>
                             {
-                                // Stop cat audio after subtitles finish
                                 if (catAudio != null)
                                     catAudio.Stop();
 
@@ -196,21 +186,24 @@ public class TowelPickup : MonoBehaviour, IPickupable
         );
     }
 
-    // ✅ NEW: Fade using CanvasGroup (more reliable)
-    private IEnumerator FadeCanvasGroup(CanvasGroup canvasGroup, float startAlpha, float endAlpha)
+    // ✅ Smooth fade helper for Image
+    private IEnumerator FadeImage(Image img, float startAlpha, float endAlpha)
     {
-        if (canvasGroup == null) yield break;
+        if (img == null) yield break;
 
-        float elapsedTime = 0f;
+        float elapsed = 0f;
+        Color c = img.color;
 
-        while (elapsedTime < fadeDuration)
+        while (elapsed < fadeDuration)
         {
-            elapsedTime += Time.deltaTime;
-            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / fadeDuration);
+            elapsed += Time.deltaTime;
+            c.a = Mathf.Lerp(startAlpha, endAlpha, elapsed / fadeDuration);
+            img.color = c;
             yield return null;
         }
 
-        canvasGroup.alpha = endAlpha;
+        c.a = endAlpha;
+        img.color = c;
     }
 
     public bool HasPickedUpTowel()

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class InventoryManager : MonoBehaviour
@@ -29,7 +30,7 @@ public class InventoryManager : MonoBehaviour
     private int essentialItemsCount = 0;
     private bool isInventoryOpen = false;
     private bool wasInventoryOpenBeforePause = false;
-    private bool isBackpackUnlocked = false; // ✅ NEW: Controls when backpack becomes available
+    private bool isBackpackUnlocked = false;
 
     void Awake()
     {
@@ -44,7 +45,6 @@ public class InventoryManager : MonoBehaviour
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
 
-        // ✅ Hide backpack button at start - only show after 911 call
         if (backpackButton != null)
             backpackButton.SetActive(false);
 
@@ -69,7 +69,6 @@ public class InventoryManager : MonoBehaviour
         if (essentialItemsNameText != null)
             essentialItemsNameText.text = "ESSENTIAL ITEMS";
 
-        // Setup button listener
         if (backpackButton != null)
         {
             Button btn = backpackButton.GetComponent<Button>();
@@ -80,7 +79,6 @@ public class InventoryManager : MonoBehaviour
 
     void Update()
     {
-        // ✅ Don't allow toggling inventory when game is paused or backpack not unlocked
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
@@ -98,11 +96,52 @@ public class InventoryManager : MonoBehaviour
         {
             CloseInventory();
         }
+
+        // ✅ NEW: Close inventory by touching/clicking outside the panel
+        if (isInventoryOpen && inventoryPanel != null)
+        {
+            // Check for touch input
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                if (!IsTouchOverUI(Input.GetTouch(0).position))
+                {
+                    CloseInventory();
+                }
+            }
+            // Check for mouse click (editor testing)
+            else if (Input.GetMouseButtonDown(0))
+            {
+                if (!IsTouchOverUI(Input.mousePosition))
+                {
+                    CloseInventory();
+                }
+            }
+        }
+    }
+
+    // ✅ NEW: Check if touch/click is over the inventory panel
+    private bool IsTouchOverUI(Vector2 position)
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = position;
+
+        var results = new System.Collections.Generic.List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        // Check if any of the hits are the inventory panel or its children
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject == inventoryPanel || result.gameObject.transform.IsChildOf(inventoryPanel.transform))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void ToggleInventory()
     {
-        // ✅ Don't toggle if game is paused or backpack not unlocked
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
@@ -122,12 +161,22 @@ public class InventoryManager : MonoBehaviour
                 Time.timeScale = 0f;
                 if (GameManager.Instance != null)
                     GameManager.Instance.isPaused = true;
+
+                // ✅ Notify subtitle manager
+                SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
+                if (subtitleManager != null)
+                    subtitleManager.OnInventoryOpen();
             }
             else
             {
                 Time.timeScale = 1f;
                 if (GameManager.Instance != null)
                     GameManager.Instance.isPaused = false;
+
+                // ✅ Notify subtitle manager
+                SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
+                if (subtitleManager != null)
+                    subtitleManager.OnInventoryClose();
             }
         }
     }
@@ -142,10 +191,14 @@ public class InventoryManager : MonoBehaviour
 
             if (GameManager.Instance != null)
                 GameManager.Instance.isPaused = false;
+
+            // ✅ Notify subtitle manager
+            SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
+            if (subtitleManager != null)
+                subtitleManager.OnInventoryClose();
         }
     }
 
-    // ✅ NEW: Call this after 911 call to unlock backpack
     public void UnlockBackpack()
     {
         isBackpackUnlocked = true;
@@ -221,35 +274,34 @@ public class InventoryManager : MonoBehaviour
         return isBackpackUnlocked;
     }
 
-    // ✅ Called by GameManager when pausing
+    // ✅ NEW: Public method to check if inventory is open
+    public bool IsInventoryOpen()
+    {
+        return isInventoryOpen;
+    }
+
     public void OnPause()
     {
-        // ✅ Remember if inventory was open
         wasInventoryOpenBeforePause = isInventoryOpen;
 
-        // ✅ Hide inventory if it was open
         if (isInventoryOpen && inventoryPanel != null)
         {
             inventoryPanel.SetActive(false);
         }
 
-        // ✅ Hide backpack button
         if (backpackButton != null)
             backpackButton.SetActive(false);
 
         Debug.Log($"Inventory paused. Was open: {wasInventoryOpenBeforePause}");
     }
 
-    // ✅ Called by GameManager when resuming
     public void OnResume()
     {
-        // ✅ Restore inventory if it was open before pause
         if (wasInventoryOpenBeforePause && inventoryPanel != null)
         {
             inventoryPanel.SetActive(true);
         }
 
-        // ✅ Show backpack button again (only if unlocked)
         if (backpackButton != null && isBackpackUnlocked)
             backpackButton.SetActive(true);
 

@@ -39,9 +39,10 @@ public class SubtitleManager2 : MonoBehaviour
     private Coroutine currentTyping;
     private string lastObjective = "";
     private bool subtitleJustFinished = false;
-
-    // ✅ NEW: Track if objective was visible before pause
     private bool objectiveWasVisibleBeforePause = false;
+    private bool wasTypingBeforeInventoryOpen = false;
+    private string currentSubtitleText = "";
+    private float currentSubtitleDuration = 0f;
 
     void Start()
     {
@@ -55,12 +56,6 @@ public class SubtitleManager2 : MonoBehaviour
 
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-            SkipCurrentText();
     }
 
     public IEnumerator PlayWakeUpStory()
@@ -89,13 +84,10 @@ public class SubtitleManager2 : MonoBehaviour
         if (oxygenBar != null)
             oxygenBar.SetActive(true);
 
-        // ✅ REMOVED: Don't show backpack here - it will show after picking up physical backpack
-
         PlayerOxygen oxygenSystem = FindObjectOfType<PlayerOxygen>();
         if (oxygenSystem != null)
             oxygenSystem.ShowOxygenBar();
 
-        // ✅ Show "Find phone" objective
         CallObjectiveActive = true;
         ShowObjective("Find the phone and call for help!");
     }
@@ -107,6 +99,8 @@ public class SubtitleManager2 : MonoBehaviour
 
         IsSubtitleActive = true;
         subtitleJustFinished = false;
+        currentSubtitleText = text;
+        currentSubtitleDuration = displayTime;
 
         if (subtitleText != null)
         {
@@ -116,9 +110,18 @@ public class SubtitleManager2 : MonoBehaviour
                 StopCoroutine(currentTyping);
 
             currentTyping = StartCoroutine(TypeText(text));
+
             yield return currentTyping;
 
-            yield return new WaitForSeconds(displayTime);
+            if (subtitleText != null)
+                subtitleText.text = text;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < displayTime)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                yield return null;
+            }
 
             subtitlePanel.SetActive(false);
             IsSubtitleActive = false;
@@ -132,17 +135,15 @@ public class SubtitleManager2 : MonoBehaviour
     {
         for (int i = 0; i <= text.Length; i++)
         {
-            subtitleText.text = text.Substring(0, i);
-            yield return new WaitForSeconds(typingSpeed);
-        }
-    }
+            if (subtitleText != null)
+                subtitleText.text = text.Substring(0, i);
 
-    void SkipCurrentText()
-    {
-        if (currentTyping != null)
-        {
-            StopCoroutine(currentTyping);
-            currentTyping = null;
+            float elapsed = 0f;
+            while (elapsed < typingSpeed)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
         }
     }
 
@@ -176,7 +177,6 @@ public class SubtitleManager2 : MonoBehaviour
 
     public void OnPause()
     {
-        // ✅ Track if objective was actually visible before hiding
         objectiveWasVisibleBeforePause = (objectivePanel != null && objectivePanel.activeSelf);
 
         if (subtitlePanel != null && subtitlePanel.activeSelf)
@@ -187,18 +187,30 @@ public class SubtitleManager2 : MonoBehaviour
 
     public void OnResume()
     {
-        // Resume subtitle only if it was actively typing
         if (IsSubtitleActive && subtitleText != null && !string.IsNullOrEmpty(subtitleText.text) && !subtitleJustFinished)
             subtitlePanel.SetActive(true);
 
-        // ✅ FIXED: Only restore objective if it was visible before pause
         if (objectiveWasVisibleBeforePause && !string.IsNullOrEmpty(lastObjective))
         {
             objectivePanel.SetActive(true);
         }
 
-        // Reset the tracking flag
         objectiveWasVisibleBeforePause = false;
+    }
+
+    public void OnInventoryOpen()
+    {
+        wasTypingBeforeInventoryOpen = IsSubtitleActive;
+
+        if (IsSubtitleActive && subtitlePanel != null)
+        {
+            Debug.Log("Inventory opened during subtitle - subtitle continues");
+        }
+    }
+
+    public void OnInventoryClose()
+    {
+        Debug.Log("Inventory closed - subtitle resumes normally");
     }
 
     public void HideAll()

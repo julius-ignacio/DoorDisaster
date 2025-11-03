@@ -11,31 +11,29 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
     private bool hasPickedUp = false;
     private bool playerInRange = false;
 
-    // ✅ Flag to track when door objective is active
     public static bool DoorObjectiveActive { get; set; } = false;
 
     void Start()
     {
         outline = GetComponent<Outline>();
         if (outline != null)
-            outline.enabled = false; // Start hidden
+            outline.enabled = false;
     }
 
     void Update()
     {
-        // ✅ Show outline only AFTER touching hot door (visual hint)
-        if (HotDoorHandle.touchedHotHandle && !hasPickedUp)
+        // ✅ Show outline when door objective is active (instead of after touching door)
+        if (DoorObjectiveActive && !hasPickedUp)
         {
             if (outline != null)
                 outline.enabled = true;
         }
 
-        // ✅ Show button only if door objective is active
+        // Show button only if door objective is active
         if (playerInRange && !hasPickedUp && DoorObjectiveActive)
         {
             if (GameManager.Instance != null && !GameManager.Instance.isPaused)
             {
-                // Check if prompt isn't already showing
                 if (GenericPickupButton.Instance != null &&
                     GenericPickupButton.Instance.pickupButton != null &&
                     !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
@@ -52,7 +50,6 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         {
             playerInRange = true;
 
-            // ✅ Only show button if door objective is active
             if (DoorObjectiveActive)
             {
                 if (GameManager.Instance == null || !GameManager.Instance.isPaused)
@@ -76,7 +73,6 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
     {
         if (!playerInRange || hasPickedUp) return;
 
-        // ✅ Can only pick up if door objective is active
         if (!DoorObjectiveActive)
         {
             Debug.Log("Cannot pick up cloth yet - complete previous objectives first");
@@ -95,12 +91,10 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         if (player != null)
             player.hasTowel = true;
 
-        // ✅ Show message based on if they touched door first
         if (subtitleManager != null)
         {
             if (HotDoorHandle.touchedHotHandle)
             {
-                // Picked up AFTER touching hot door
                 subtitleManager.ShowCustomMessage(
                     "Got the cloth! Now I can safely open the hot door.",
                     2.5f,
@@ -111,7 +105,6 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
             }
             else
             {
-                // Picked up BEFORE touching door (smart player!)
                 subtitleManager.ShowCustomMessage(
                     "This cloth might come in handy for the hot door.",
                     2f,

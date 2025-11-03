@@ -5,6 +5,7 @@ using System.Collections;
 public class HotDoorHandle : MonoBehaviour, IPickupable
 {
     public static bool touchedHotHandle = false;
+    public static bool DoorOpenedWithTowel { get; private set; } = false; // ✅ NEW FLAG
 
     [Header("References")]
     public Movements2 player;
@@ -38,6 +39,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
 
     void Start()
     {
+        DoorOpenedWithTowel = false; // ✅ Reset on start
         if (doorTransform != null)
             closedRotation = doorTransform.localRotation;
     }
@@ -112,8 +114,13 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             player.UseTowel();
             subtitleManager.ShowCustomMessage("Good thing I have this cloth! The door is hot!", 3f, () =>
             {
-                subtitleManager.ShowCustomMessage("I should close the door after me so the fire spreads slowly.", 4f);
-                subtitleManager.ShowObjective("Exit the bedroom");
+                subtitleManager.ShowCustomMessage("I should close the door after me so the fire spreads slowly.", 4f, () =>
+                {
+                    // ✅ Set flag AFTER both subtitles finish
+                    DoorOpenedWithTowel = true;
+                    Debug.Log("HotDoorHandle: Door opened with towel - FuseBox can now trigger");
+                    subtitleManager.ShowObjective("Exit the bedroom");
+                });
             });
             doorLocked = false;
             doorOpen = true;
@@ -190,7 +197,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             else if (dot < -0.1f)
                 angle = openAngle;
             else
-                angle = openAngle; // fallback
+                angle = openAngle;
 
             Debug.Log($"Smart Door: dot={dot:F2}, doorForward={doorForward}, angle={angle}°");
         }
