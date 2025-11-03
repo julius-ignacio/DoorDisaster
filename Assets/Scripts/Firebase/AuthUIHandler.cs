@@ -183,4 +183,54 @@ private void SetVerifyEmail(string email)
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene("GameMenu"); // Change to your MainMenu scene name
     }
+
+
+    public void OnVerifyButton()
+{
+    string email = verifyEmailInput.text.Trim();
+    string password = verifyPasswordInput.text;
+
+    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+    {
+        verifyFeedbackText.text = "Please enter email and password.";
+        return;
+    }
+
+    // Try logging in again to get a fresh idToken
+    StartCoroutine(firebaseAuth.LoginUser(email, password, (success, idToken, localId) =>
+    {
+        if (success && !string.IsNullOrEmpty(idToken))
+        {
+            // Check if email is verified now
+            StartCoroutine(firebaseAuth.CheckEmailVerified(idToken, (isVerified) =>
+            {
+                if (isVerified)
+                {
+                    verifyFeedbackText.text = "✅ Email verified successfully!";
+
+                    // Optional: Auto login & go to game
+                    StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
+                    {
+                        if (loadedData != null)
+                        {
+                            DataManager.Instance.playerData = loadedData;
+                            Debug.Log("✅ Player data loaded after verification");
+                        }
+                    }));
+
+                    StartCoroutine(LoadMainMenuWithDelay(2f)); // Load your main game/menu scene
+                }
+                else
+                {
+                    verifyFeedbackText.text = "❌ Email not verified yet. Please check your inbox.";
+                }
+            }));
+        }
+        else
+        {
+            verifyFeedbackText.text = "❌ Invalid login credentials.";
+        }
+    }));
+}
+
 }
