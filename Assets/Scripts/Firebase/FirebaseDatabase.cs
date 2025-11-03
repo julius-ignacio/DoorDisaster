@@ -4,6 +4,22 @@ using UnityEngine.Networking;
 
 public class FirebaseDatabase : MonoBehaviour
 {
+    public static FirebaseDatabase Instance;
+
+
+        private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private string databaseURL = "https://doordisaster-7003b-default-rtdb.firebaseio.com/";
 
     // Save player data (score, position, etc.)

@@ -244,8 +244,10 @@ if (hudCanvas != null)
 
             // ✅ Only track GLOBAL score here
             DataManager.Instance.quizScore++;
-
-
+        }
+        else
+        {
+            DataManager.Instance.wrongAnswers++;
         }
 
 

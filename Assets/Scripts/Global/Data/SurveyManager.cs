@@ -28,6 +28,9 @@ public class SurveyManager : MonoBehaviour
     private List<SurveyQuestion> currentQuestions;
     private int currentIndex = 0;
 
+    [Header("Firebase")]
+
+
     // Store player responses
     private List<int> selectedAnswers = new List<int>();
 
@@ -38,6 +41,7 @@ public class SurveyManager : MonoBehaviour
         if (DataManager.Instance.playerData.isSurveyDone == true)
         {
             tree.transform.localScale = new Vector3(16f, 20.07392f, 16f);
+
         }
         else
         {
@@ -57,11 +61,14 @@ public class SurveyManager : MonoBehaviour
         if (DataManager.Instance.playerData.isSurveyDone == true)
         {
             tree.transform.localScale = new Vector3(16f, 20.07392f, 16f);
+                                Light1.SetActive(true);
+        Light2.SetActive(true);
         }
         else
         {
             tree.transform.localScale = new Vector3(0.94f, 1.179f, 0.94f);
-
+                             Light1.SetActive(false);
+        Light2.SetActive(false);
         }
 
          Barrier.SetActive(!DataManager.Instance.playerData.isEarthFinished);
@@ -148,6 +155,22 @@ public class SurveyManager : MonoBehaviour
         {
             Debug.Log($"Q{i + 1}: Choice {selectedAnswers[i]}");
         }
+
+
+        // ✅ Save to Firebase
+    if (FirebaseDatabase.Instance != null)
+    {
+        StartCoroutine(FirebaseDatabase.Instance .SaveData(
+            FirebaseAuth.UserIdToken,
+            FirebaseAuth.UserLocalId,
+            DataManager.Instance.playerData
+        ));
+        Debug.Log("✅ Survey completion saved to Firebase.");
+    }
+    else
+    {
+        Debug.LogWarning("⚠️ firebaseDatabase not assigned in SurveyManager!");
+    }
 
         // Optional: Display a Thank You message
         // Or send data to DataManager / save system

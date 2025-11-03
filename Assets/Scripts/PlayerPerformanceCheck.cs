@@ -11,46 +11,46 @@ public class PlayerPerformanceCheck : MonoBehaviour
         warning.SetActive(true);
         DestroyBtn3.SetActive(false);
     }
-    
 
     void Update()
     {
         if (DataManager.Instance.Npcs_saved >= 3 && DataManager.Instance.factsDiscovered >= 5)
         {
-            isObjectivesCompleted = true;
+            if (!isObjectivesCompleted)
+            {
+                isObjectivesCompleted = true;
+                warning.SetActive(false); // ✅ Hide warning when objectives are completed
+            }
         }
         else
         {
+            isObjectivesCompleted = false;
             warning.SetActive(true);
         }
     }
 
-
-    void OnTriggerEnter()
+    void OnTriggerEnter(Collider other)
     {
-        DestroyBtn3.SetActive(true);
+        if (other.CompareTag("Player"))
+            DestroyBtn3.SetActive(true);
     }
 
-
-
-    void OnTriggerExit()
+    void OnTriggerExit(Collider other)
     {
-        DestroyBtn3.SetActive(false);
+        if (other.CompareTag("Player"))
+            DestroyBtn3.SetActive(false);
     }
 
     public void DestroyWall()
     {
         if (isObjectivesCompleted)
         {
-            warning.SetActive(false);
             barrier.SetActive(false);
             AudioManager.Instance.PlaySFX(22);
         }
-
         else
         {
             warning.SetActive(true);
         }
     }
-
 }

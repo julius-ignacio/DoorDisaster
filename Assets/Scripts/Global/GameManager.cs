@@ -105,8 +105,6 @@ public class GameManager : MonoBehaviour
         isPaused = true;
 
         AudioListener.pause = true; // 🔇 Pause ALL audio in the scene
-AudioManager.Instance.StopAll();
-AudioManager.Instance.StopLoop();
 
 
 

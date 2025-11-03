@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class EndGame_SaveData : MonoBehaviour
 {
-    public FirebaseDatabase firebaseDatabase; // Drag your FirebaseDatabase GameObject here
     public GameObject SaveBtn;
 
 
@@ -46,7 +45,7 @@ AudioManager.Instance.StopLoop();
             return;
         }
 
-        if (firebaseDatabase == null)
+        if (FirebaseDatabase.Instance == null)
         {
             Debug.LogError("❌ FirebaseDatabase is not assigned!");
             return;
@@ -56,7 +55,7 @@ AudioManager.Instance.StopLoop();
         DataManager.Instance.SaveTrialData(DataManager.Instance.currentTrial);
 
         // Push to Firebase
-        StartCoroutine(firebaseDatabase.SaveData(
+        StartCoroutine(FirebaseDatabase.Instance.SaveData(
             FirebaseAuth.UserIdToken,
             FirebaseAuth.UserLocalId,
             DataManager.Instance.playerData

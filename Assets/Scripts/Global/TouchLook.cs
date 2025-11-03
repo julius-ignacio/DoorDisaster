@@ -22,6 +22,10 @@ void Update()
 #else
     foreach (Touch touch in Input.touches)
     {
+        // Only use touches on the RIGHT half of the screen for camera look
+        if (touch.position.x < Screen.width / 2)
+            continue;
+
         if (lookFingerId == -1 && touch.phase == TouchPhase.Began)
             lookFingerId = touch.fingerId;
 
@@ -42,4 +46,5 @@ void Update()
     xRotation = Mathf.Clamp(xRotation, -90f, 90f);
     transform.localRotation = Quaternion.Euler(-xRotation, yRotation, 0f);
 }
+
     }
