@@ -11,4 +11,5 @@ public class PlayerData
     // Game progress
     public TrialData[] trials = new TrialData[3];
     public bool isEarthFinished, isWaterFinished, isFireFinished, isSurveyDone;
+    public bool isVerified;
 }

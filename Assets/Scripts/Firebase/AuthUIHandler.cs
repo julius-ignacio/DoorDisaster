@@ -6,7 +6,7 @@ using System.Collections; // for scene loading
 
 public class AuthUIHandler : MonoBehaviour
 {
-    
+
     public FirebaseAuth firebaseAuth;
 
     public TMP_InputField emailInput, login_emailInput;
@@ -15,6 +15,9 @@ public class AuthUIHandler : MonoBehaviour
     public TMP_InputField ageInput;
     public TMP_InputField gradeLevelInput;
     public TMP_Text feedbackTextlog, feedbackTextReg;
+
+    [Header("Verification Panel")]
+    public GameObject verifyPanel;
 
 
     [Header("Panel for switching IF successful")]
@@ -47,14 +50,29 @@ public class AuthUIHandler : MonoBehaviour
         {
             if (success)
             {
-                feedbackTextReg.text = "Register successful!";
+                feedbackTextReg.text = "Register successful! Sending verification email...";
                 Debug.Log("Token: " + idToken);
                 Debug.Log("UserID: " + localId);
 
+                // Send verification email
+                StartCoroutine(firebaseAuth.SendEmailVerification(idToken, (verifySuccess, message) =>
+                {
+                    if (verifySuccess)
+                    {
+                        feedbackTextReg.text = "✅ Verification email sent! Please check your inbox.";
+                    }
+                    else
+                    {
+                        feedbackTextReg.text = "❌ Failed to send verification email: " + message;
+                    }
+                }));
 
-            register.SetActive(false);
-            login.SetActive(true);
+                register.SetActive(false);
+                login.SetActive(false);
+verifyPanel.SetActive(true);
+SetVerifyEmail(email); 
             }
+
             else
             {
                 feedbackTextReg.text = "Register failed!";
@@ -66,64 +84,96 @@ public class AuthUIHandler : MonoBehaviour
 
     public void OnLoginButton()
     {
-        StartCoroutine(firebaseAuth.LoginUser(login_emailInput.text, login_passwordInput.text, (success, idToken, localId) =>
+        string email = login_emailInput.text.Trim();
+        string password = login_passwordInput.text;
+
+        StartCoroutine(firebaseAuth.LoginUser(email, password, (success, idToken, localId) =>
         {
             if (success)
             {
-                feedbackTextlog.text = "✅ Login successful!";
-                Debug.Log("Token: " + idToken);
-                Debug.Log("UserID: " + localId);
-
-                // 🔹 Load player data from Firebase
-                StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
+                  Debug.Log("Login returned token: " + idToken);
+                // Check if the email is verified
+                StartCoroutine(firebaseAuth.CheckEmailVerified(idToken, (isVerified) =>
                 {
-                    if (loadedData != null)
+                    if (isVerified)
                     {
-                        DataManager.Instance.playerData = loadedData;
-                        Debug.Log("✅ Player data loaded into DataManager");
+                        feedbackTextlog.text = "✅ Login successful!";
+                        Debug.Log("Token: " + idToken);
+                        Debug.Log("UserID: " + localId);
+
+                        // Load player data from Firebase
+                        StartCoroutine(FindObjectOfType<FirebaseDatabase>().LoadData(idToken, localId, (loadedData) =>
+                        {
+                            if (loadedData != null)
+                            {
+                                DataManager.Instance.playerData = loadedData;
+                                Debug.Log("✅ Player data loaded into DataManager");
+                            }
+                            else
+                            {
+                                Debug.LogWarning("⚠️ No existing player data found, using defaults");
+                            }
+                        }));
+
+                        // Delay and load main menu
+                        StartCoroutine(LoadMainMenuWithDelay(2f));
                     }
                     else
                     {
-                        Debug.LogWarning("⚠️ No existing player data found, using defaults");
-                    }
-                }));
+                        feedbackTextlog.text = "";
+                        Debug.LogWarning("User email not verified yet.");
 
-                // Delay and then load MainMenu
-                StartCoroutine(LoadMainMenuWithDelay(2f));
+                        login.SetActive(false);
+                        verifyPanel.SetActive(true);
+
+                        SetVerifyEmail(email); 
+                    }
+
+                }));
             }
             else
             {
-                feedbackTextlog.text = "❌ Login failed!";
+                feedbackTextlog.text = "❌ Login failed! Check your credentials.";
             }
         }));
     }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public TMP_InputField forgotEmailInput; // optional: or reuse login_emailInput
-public TMP_Text forgotFeedbackText;
+    public TMP_Text verifyFeedbackText;
+    public TMP_InputField verifyEmailInput;
+public TMP_InputField verifyPasswordInput; // ADD THIS FIELD
 
-public void OnForgotPasswordButton()
+public void OnResendVerificationButton()
 {
-    string email = forgotEmailInput.text.Trim();
-
-    if (string.IsNullOrEmpty(email) || !email.Contains("@"))
+    string email = verifyEmailInput.text.Trim();
+    string password = verifyPasswordInput.text;
+    if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
     {
-        forgotFeedbackText.text = "Please enter a valid email.";
+        verifyFeedbackText.text = "Please enter email and password.";
         return;
     }
 
-    StartCoroutine(firebaseAuth.SendPasswordResetEmail(email, (success, message) =>
+    StartCoroutine(firebaseAuth.LoginUser(email, password, (success, idToken, localId) =>
     {
-        if (success)
+        if (success && !string.IsNullOrEmpty(idToken))
         {
-            forgotFeedbackText.text = "✅ Password reset email sent! Check your inbox.";
+            StartCoroutine(firebaseAuth.SendEmailVerification(idToken, (verifySuccess, message) =>
+            {
+                verifyFeedbackText.text = verifySuccess ? "✅ Verification email resent!" : "❌ Failed: " + message;
+            }));
         }
         else
         {
-            forgotFeedbackText.text = "❌ Failed to send reset email: " + message;
+            verifyFeedbackText.text = "❌ Couldn't log in with provided credentials.";
         }
     }));
+}
+
+
+private void SetVerifyEmail(string email)
+{
+    if (verifyEmailInput != null)
+        verifyEmailInput.text = email;
 }
 
 
