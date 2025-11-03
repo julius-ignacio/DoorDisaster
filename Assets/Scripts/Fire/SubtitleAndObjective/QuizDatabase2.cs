@@ -4,7 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public class QuizQuestion2
 {
-    public string questionID; // Unique identifier like "wet_towel", "stop_drop_roll", etc.
+    public string questionID;
     [TextArea(3, 5)]
     public string question;
     public string[] answers;

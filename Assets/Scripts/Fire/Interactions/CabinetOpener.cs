@@ -6,11 +6,11 @@ public class CabinetOpener : MonoBehaviour, IPickupable
     public enum CabinetType { SlideForward, SwingDoor }
 
     [Header("Cabinet Settings")]
-    public CabinetType cabinetType = CabinetType.SlideForward; // choose in Inspector
+    public CabinetType cabinetType = CabinetType.SlideForward;
     public Transform cabinetDoor;
     public float openDistance = 0.5f;
     public float openSpeed = 2f;
-    public float openAngle = 90f; // for SwingDoor type
+    public float openAngle = 90f;
 
     [Header("Item inside the cabinet")]
     public ItemPickup item;
@@ -43,11 +43,15 @@ public class CabinetOpener : MonoBehaviour, IPickupable
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isAnimating && !isOpen)
+        if (other.CompareTag("Player") && !isAnimating)
         {
             playerInRange = true;
-            if (objectiveManager != null && objectiveManager.IsBackpackPickedUp())
+
+            // ✅ Only show cabinet prompt if cabinet is still closed and at collecting stage
+            if (!isOpen && objectiveManager != null && objectiveManager.GetObjectiveStage() >= 1)
+            {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Open Cabinet");
+            }
         }
     }
 
@@ -62,10 +66,13 @@ public class CabinetOpener : MonoBehaviour, IPickupable
 
     void OnTriggerStay(Collider other)
     {
+        // ✅ Only show cabinet prompt if not open and not animating
         if (other.CompareTag("Player") && !isAnimating && playerInRange && !isOpen)
         {
-            if (objectiveManager != null && objectiveManager.IsBackpackPickedUp())
+            if (objectiveManager != null && objectiveManager.GetObjectiveStage() >= 1)
+            {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Open Cabinet");
+            }
         }
     }
 
@@ -73,9 +80,10 @@ public class CabinetOpener : MonoBehaviour, IPickupable
     {
         if (!playerInRange || isAnimating || isOpen) return;
 
-        if (objectiveManager != null && !objectiveManager.IsBackpackPickedUp())
+        // ✅ Check if we're at the collecting stage
+        if (objectiveManager != null && objectiveManager.GetObjectiveStage() < 1)
         {
-            subtitleManager?.ShowCustomMessage("I should focus on packing first.", 1.5f, null);
+            subtitleManager?.ShowCustomMessage("I should focus on escaping first.", 1.5f, null);
             return;
         }
 
@@ -89,7 +97,10 @@ public class CabinetOpener : MonoBehaviour, IPickupable
     {
         isAnimating = true;
 
-        subtitleManager?.ShowCustomMessage("I found a cabinet.", 1.5f, null);
+        // ✅ Hide cabinet prompt immediately
+        GenericPickupButton.Instance.HidePickupPrompt();
+
+        subtitleManager?.ShowCustomMessage("Let me check what's inside...", 1.5f, null);
 
         float elapsedTime = 0f;
         float duration = 1f / openSpeed;
@@ -125,21 +136,26 @@ public class CabinetOpener : MonoBehaviour, IPickupable
         cabinetDoor.localPosition = endPos;
         cabinetDoor.localRotation = endRot;
 
-        // ✅ Enable the item only after door fully opens
+        isOpen = true;
+
+        // ✅ Enable the item after door opens
         if (item != null)
             item.SetInteractable(true);
 
-        // ✅ Hide prompt permanently after use
-        GenericPickupButton.Instance.HidePickupPrompt();
-
-        // ✅ Refresh pickup prompt for item if player still nearby
-        if (playerInRange && item != null)
-        {
-            yield return new WaitForSeconds(0.1f);
-            GenericPickupButton.Instance.ShowPickupPrompt(item, $"Pick Up {item.itemName}");
-        }
-
-        isOpen = true;
         isAnimating = false;
+
+        // ✅ Wait a moment, then show item prompt if player still in range
+        yield return new WaitForSeconds(0.3f);
+
+        if (playerInRange && item != null && !item.HasBeenPickedUp())
+        {
+            // ✅ Check if we're at collecting stage to show item prompt
+            int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
+
+            if (item.isEssential && stage >= 1)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(item, $"Pick Up {item.itemName}");
+            }
+        }
     }
 }

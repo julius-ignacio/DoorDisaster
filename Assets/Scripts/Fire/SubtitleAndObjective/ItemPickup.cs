@@ -36,8 +36,7 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
         int stage = objectiveManager.GetObjectiveStage();
 
-        // Show outline for all essential items once backpack is picked up (stage >= 3)
-        if (isEssential && stage >= 3)
+        if (isEssential && stage >= 1)
         {
             outline.enabled = true;
         }
@@ -54,12 +53,10 @@ public class ItemPickup : MonoBehaviour, IPickupable
             playerInRange = true;
             int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
 
-            // If item is in a cabinet, only show button if cabinet is open
             if (cabinetOpener != null && !cabinetOpener.IsCabinetOpen())
                 return;
 
-            // Only show pickup prompt if at the right stage
-            if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
+            if (isEssential && stage >= 1)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
             }
@@ -77,11 +74,11 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
     void OnTriggerStay(Collider other)
     {
-        // If cabinet just opened, show the button
         if (other.CompareTag("Player") && !hasBeenPickedUp && playerInRange && cabinetOpener != null && cabinetOpener.IsCabinetOpen())
         {
             int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
-            if ((itemName == "Backpack" && stage >= 2) || (isEssential && stage >= 3))
+
+            if (isEssential && stage >= 1)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, $"Pick Up {itemName}");
             }
@@ -94,11 +91,7 @@ public class ItemPickup : MonoBehaviour, IPickupable
 
         int stage = (objectiveManager != null) ? objectiveManager.GetObjectiveStage() : 0;
 
-        if (itemName == "Backpack" && stage >= 2)
-        {
-            PickupItem();
-        }
-        else if (isEssential && stage >= 3)
+        if (isEssential && stage >= 1)
         {
             PickupItem();
         }
@@ -115,8 +108,9 @@ public class ItemPickup : MonoBehaviour, IPickupable
         hasBeenPickedUp = true;
 
         subtitleManager?.ShowCustomMessage(
-            isEssential ? $"Picked up {itemName}. This could be important!" : $"Picked up {itemName}.",
-            1.5f, null
+            $"Picked up {itemName}. This could be important!",
+            1.5f,
+            null
         );
 
         if (outline != null)
@@ -125,6 +119,16 @@ public class ItemPickup : MonoBehaviour, IPickupable
         StartCoroutine(FadeOutAndHide());
 
         objectiveManager?.OnItemPickedUp(itemName, isEssential);
+
+        if (itemName.Contains("Oxygen") || itemName.Contains("oxygen"))
+        {
+            InventoryManager_fire.Instance?.AddOxygenCanister();
+        }
+
+        if (isEssential)
+        {
+            InventoryManager_fire.Instance?.AddEssentialItem();
+        }
     }
 
     private IEnumerator FadeOutAndHide()

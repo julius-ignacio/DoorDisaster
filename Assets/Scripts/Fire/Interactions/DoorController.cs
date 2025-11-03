@@ -11,12 +11,9 @@ public class DoorController : MonoBehaviour
     [SerializeField] public float openAngle = 90f;
     [SerializeField] public float openSpeed = 2f;
     [SerializeField] public float interactionDistance = 4f;
-    [SerializeField] public bool automaticOpen = true;
     [SerializeField] public bool smartDoorOpen = true;
     [Tooltip("The direction the door should open towards (e.g., forward vector)")]
     [SerializeField] private Vector3 doorForward = Vector3.right;
-    [Tooltip("Automatically close after specified time (0 = no auto-close)")]
-    [SerializeField] private float autoCloseDelay = 5f;
 
     [Header("Transform Targets")]
     [SerializeField] private Vector3 closedPosition;
@@ -37,57 +34,46 @@ public class DoorController : MonoBehaviour
     public bool IsMoving { get; private set; } = false;
 
     private Quaternion closedRotation;
-    private Quaternion openRotation;
     private Transform playerTransform;
     private Coroutine movementCoroutine;
     private bool playerInRange = false;
 
-    void Awake()
-    {
-        // AudioSource no longer needed since we're using AudioManager
-    }
-
     void Start()
     {
-        closedRotation = transform.rotation;
-        openRotation = closedRotation * Quaternion.Euler(0, openAngle, 0);
-
+        closedRotation = transform.localRotation;
         if (item != null)
             item.SetInteractable(false);
 
-        playerTransform = GameObject.FindWithTag("Player").transform;
+        playerTransform = GameObject.FindWithTag("Player")?.transform;
     }
 
     void Update()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null || GameManager.Instance == null)
+            return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         bool playerNearby = distanceToPlayer <= interactionDistance;
 
-        if (automaticOpen)
+        if (GameManager.Instance.isPaused)
         {
-            // Auto-open when player enters range
-            if (playerNearby && !IsOpen && !IsMoving)
-                OpenDoor();
-
-            // Auto-close when player leaves range
-            if (!playerNearby && IsOpen && !IsMoving)
-                CloseDoor();
-        }
-        else
-        {
-            // Show interaction prompt only if not auto-opening
-            if (playerNearby && !playerInRange && !IsMoving)
+            if (playerInRange)
             {
-                playerInRange = true;
-                GenericPickupButton.Instance.ShowPickupPrompt(new DoorPickupAdapter(this), "Interact");
-            }
-            else if (!playerNearby && playerInRange)
-            {
-                playerInRange = false;
                 GenericPickupButton.Instance.HidePickupPrompt();
+                playerInRange = false;
             }
+            return;
+        }
+
+        if (playerNearby && !playerInRange && !IsMoving)
+        {
+            playerInRange = true;
+            GenericPickupButton.Instance.ShowPickupPrompt(new DoorPickupAdapter(this), "Interact");
+        }
+        else if (!playerNearby && playerInRange)
+        {
+            playerInRange = false;
+            GenericPickupButton.Instance.HidePickupPrompt();
         }
     }
 
@@ -96,21 +82,26 @@ public class DoorController : MonoBehaviour
         if (IsOpen || IsMoving) return;
         if (item != null && item.HasBeenPickedUp()) return;
 
-        Vector3 targetPos = movementType != MovementType.Rotation ? openedPosition : transform.localPosition;
         float angle = openAngle;
 
-        // Smart door: open away from player
         if (smartDoorOpen && playerTransform != null)
         {
             Vector3 doorToPlayer = (playerTransform.position - transform.position).normalized;
-            float dot = Vector3.Dot(doorToPlayer, transform.TransformDirection(doorForward));
-            angle = dot > 0 ? openAngle : -openAngle;
+            Vector3 doorDir = transform.TransformDirection(doorForward);
+            float dot = Vector3.Dot(doorToPlayer, doorDir);
+
+            Debug.Log($"[DoorController] Smart Open: dot={dot}, doorForward={doorForward}, doorDir={doorDir}");
+
+            if (dot > 0.1f)
+                angle = openAngle;
+            else if (dot < -0.1f)
+                angle = -openAngle;
+            else
+                angle = openAngle; // fallback
         }
 
         Quaternion targetOpenRotation = closedRotation * Quaternion.Euler(0, angle, 0);
-        Vector3 targetRot = targetOpenRotation.eulerAngles;
-
-        MoveDoor(targetPos, targetRot, true);
+        MoveDoor(transform.localPosition, targetOpenRotation.eulerAngles, true);
         PlaySound(doorOpenSoundIndex);
         OnDoorOpening.Invoke();
     }
@@ -119,16 +110,15 @@ public class DoorController : MonoBehaviour
     {
         if (!IsOpen || IsMoving) return;
 
-        Vector3 targetPos = movementType != MovementType.Rotation ? closedPosition : transform.localPosition;
-        Vector3 targetRot = movementType != MovementType.Position ? closedRotation.eulerAngles : transform.localEulerAngles;
-
-        MoveDoor(targetPos, targetRot, false);
+        MoveDoor(closedPosition, closedRotation.eulerAngles, false);
         PlaySound(doorCloseSoundIndex);
         OnDoorClosed.Invoke();
     }
 
     public void ToggleDoor()
     {
+        if (IsMoving) return;
+
         if (IsOpen)
             CloseDoor();
         else
@@ -150,43 +140,31 @@ public class DoorController : MonoBehaviour
         Vector3 startPos = transform.localPosition;
         Quaternion targetQuaternion = Quaternion.Euler(targetRot);
 
-        float progress = 0;
-        float maxSpeed = Mathf.Max(openSpeed, openSpeed); // Can separate rotation/position speeds if needed
-
-        while (progress < 1)
+        float progress = 0f;
+        while (progress < 1f)
         {
-            progress += Time.deltaTime * maxSpeed;
+            progress += Time.deltaTime * openSpeed;
 
             if (movementType != MovementType.Position)
-            {
                 transform.localRotation = Quaternion.Slerp(startRot, targetQuaternion, progress);
-            }
 
             if (movementType != MovementType.Rotation)
-            {
                 transform.localPosition = Vector3.Lerp(startPos, targetPos, progress);
-            }
 
             yield return null;
         }
 
-        // Ensure final positions are exact
         if (movementType != MovementType.Position)
             transform.localRotation = targetQuaternion;
 
         if (movementType != MovementType.Rotation)
             transform.localPosition = targetPos;
 
-        // Enable or disable item only after fully open
         if (item != null)
             item.SetInteractable(opening);
 
         IsOpen = opening;
         IsMoving = false;
-
-        // Auto-close logic
-        if (autoCloseDelay > 0 && IsOpen)
-            Invoke(nameof(CloseDoor), autoCloseDelay);
     }
 
     private void PlaySound(int soundIndex)
@@ -197,13 +175,11 @@ public class DoorController : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.blue;
-        Vector3 gizmoOffset = new Vector3(0, 0, 0); // Adjust X, Y, Z as needed
-        Gizmos.DrawWireSphere(transform.position + gizmoOffset, interactionDistance);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, interactionDistance);
     }
 }
 
-// Adapter to make DoorController work with IPickupable system
 public class DoorPickupAdapter : IPickupable
 {
     private DoorController doorController;

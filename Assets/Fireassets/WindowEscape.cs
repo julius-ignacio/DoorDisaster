@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
-using UnityEngine.UI;
 
 public class WindowEscape : MonoBehaviour, IPickupable
 {
@@ -10,13 +11,23 @@ public class WindowEscape : MonoBehaviour, IPickupable
     public GameObject heavyObject;
     public DoorFireTrigger doorFireTrigger;
     public Transform player;
+    public HeavyObjectPickup heavyObjectPickup;
+
+    [Header("UI to Hide After Escape")]
+    public GameObject healthBar;
+    public GameObject oxygenBar;
+    public GameObject joystick;
+    public GameObject jumpButton;
 
     [Header("Teleport Settings")]
     public Transform hallwaySpawnPoint;
 
     [Header("Fade Settings")]
     public Image fadeOverlay;
-    public float fadeDuration = 1f;
+    public float fadeDuration = 2f;
+
+    [Header("Audio")]
+    public int windowBreakSFX = 37;
 
     private bool hasHeavyObject = false;
     private bool hasEscaped = false;
@@ -34,20 +45,39 @@ public class WindowEscape : MonoBehaviour, IPickupable
         }
     }
 
+    void Update()
+    {
+        if (playerInRange && !hasEscaped)
+        {
+            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            {
+                if (GenericPickupButton.Instance != null &&
+                    GenericPickupButton.Instance.pickupButton != null &&
+                    !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
+                {
+                    if (doorFireTrigger != null && doorFireTrigger.HasShownFireMessage())
+                    {
+                        GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
+                    }
+                }
+            }
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasEscaped)
         {
-            // ✅ Wait until the SDR message (doorFireTrigger) has been shown
             if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
                 return;
 
             playerInRange = true;
 
-            // ✅ Always show the button when player is near
-            GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
+            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
+            }
 
-            // ✅ Only show subtitle/objective once (the first time)
             if (!promptShown)
             {
                 promptShown = true;
@@ -76,13 +106,17 @@ public class WindowEscape : MonoBehaviour, IPickupable
         if (doorFireTrigger != null && !doorFireTrigger.HasShownFireMessage())
             return;
 
-        // 🚪 Window is locked, need heavy object
         if (!hasHeavyObject)
         {
+            if (heavyObjectPickup != null)
+            {
+                heavyObjectPickup.EnablePickup();
+            }
+
             subtitleManager.ShowCustomMessage(
                 "Oh no, it's stuck! I need something heavy to break this open!",
                 2f,
-                () => subtitleManager.ShowObjective("Find a heavy object - try the lamp near the bed")
+                () => subtitleManager.ShowObjective("Find a heavy object, try the lamp near the bed")
             );
         }
         else
@@ -91,7 +125,6 @@ public class WindowEscape : MonoBehaviour, IPickupable
         }
     }
 
-    // ✅ Called by HeavyObjectPickup after the player picks up the object
     public void PickupHeavyObject()
     {
         hasHeavyObject = true;
@@ -107,7 +140,6 @@ public class WindowEscape : MonoBehaviour, IPickupable
             {
                 subtitleManager.ShowObjective("Use the heavy object to break the bedroom window");
 
-                // ✅ Show the button again if player is near the window
                 if (playerInRange)
                 {
                     GenericPickupButton.Instance.ShowPickupPrompt(this, "Break Window");
@@ -122,6 +154,16 @@ public class WindowEscape : MonoBehaviour, IPickupable
         subtitleManager.HideObjective();
         GenericPickupButton.Instance.HidePickupPrompt();
 
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX(windowBreakSFX);
+            StartCoroutine(StopSoundAfterDelay(2f));
+        }
+
+        // Hide oxygen bar during escape subtitle
+        if (oxygenBar != null)
+            oxygenBar.SetActive(false);
+
         subtitleManager.ShowCustomMessage(
             "I broke the window! Time to get out!",
             2f,
@@ -129,16 +171,21 @@ public class WindowEscape : MonoBehaviour, IPickupable
         );
     }
 
+    private IEnumerator StopSoundAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.StopAll();
+    }
+
     private IEnumerator FadeTeleportSequence()
     {
-        // 1️⃣ Fade to black
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
             yield return StartCoroutine(Fade(0f, 1f));
         }
 
-        // 2️⃣ Teleport player
         if (player != null && hallwaySpawnPoint != null)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
@@ -152,23 +199,50 @@ public class WindowEscape : MonoBehaviour, IPickupable
             if (cc != null) cc.enabled = true;
         }
 
+        if (healthBar != null)
+            healthBar.SetActive(false);
+
+        if (subtitleManager != null)
+            subtitleManager.HideObjective();
+
         yield return new WaitForSeconds(0.2f);
 
-        // 3️⃣ Fade back in
+        PlayerOxygen.InHallwayChase = true;
+
+        // ✅ Refill oxygen to max BEFORE showing the bar
+        PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+        if (oxygen != null)
+        {
+            oxygen.RefillOxygen(); // Reset to maximum
+        }
+
+        if (InventoryManager_fire.Instance != null && InventoryManager_fire.Instance.backpackButton != null)
+        {
+            InventoryManager_fire.Instance.backpackButton.SetActive(false);
+        }
+
         if (fadeOverlay != null)
         {
             yield return StartCoroutine(Fade(1f, 0f));
             fadeOverlay.gameObject.SetActive(false);
         }
 
-        // 4️⃣ Show next objective
+        // ✅ Show subtitle FIRST, then show oxygen bar AFTER subtitle completes
         subtitleManager.ShowCustomMessage(
-            "I made it out! Now I need to find the exit.",
+            "Where am I? I need to find the exit before I run out of air!",
             3f,
-            () => subtitleManager.ShowObjective("Find the exit door")
+            () =>
+            {
+                subtitleManager.ShowObjective("Find the exit door - hurry!");
+
+                // ✅ Show oxygen bar AFTER subtitle ends
+                if (oxygen != null)
+                {
+                    oxygen.ShowOxygenBar();
+                }
+            }
         );
 
-        // 5️⃣ Save progress
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SaveTrialData(DataManager.Instance.currentTrial);

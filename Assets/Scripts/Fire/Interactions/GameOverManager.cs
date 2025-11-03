@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -11,14 +11,18 @@ public class GameOverManager : MonoBehaviour
     public TextMeshProUGUI gameOverTitle;
     public TextMeshProUGUI deathReasonText;
     public Button restartButton;
-    public GameObject darkOverlay; // Simple dark image overlay
+    public GameObject darkOverlay;
 
     [Header("References")]
-    public Movements playerMovement;
+    public Movements2 playerMovement;
     public PlayerOxygen playerOxygen;
 
     [Header("Fade Settings")]
-    public float fadeDuration = 1.5f; // Duration of fade
+    public float fadeDuration = 1.5f;
+
+    [Header("Hallway Checkpoint")]
+    public Transform hallwaySpawnPoint;
+    public Transform player;
 
     private CanvasGroup panelCanvasGroup;
     private CanvasGroup overlayCanvasGroup;
@@ -30,7 +34,6 @@ public class GameOverManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern
         if (instance == null)
         {
             instance = this;
@@ -106,13 +109,8 @@ public class GameOverManager : MonoBehaviour
 
     void Update()
     {
-        if (isGameOver) return;
-
-        // Check for death conditions separately
-        if (playerOxygen != null && !playerOxygen.IsAlive())
-        {
-            TriggerGameOver("OUT OF OXYGEN", "You ran out of breathable air. Remember: Use a wet towel to filter smoke!");
-        }
+        // ✅ REMOVED - PlayerOxygen now handles its own death
+        // No need to check oxygen here anymore
     }
 
     void SetupCanvasGroup(GameObject obj, out CanvasGroup cg)
@@ -145,6 +143,14 @@ public class GameOverManager : MonoBehaviour
 
         isGameOver = true;
         Debug.Log("Setting isGameOver to true");
+
+        // ✅ Hide pickup button if visible when player dies
+        if (GenericPickupButton.Instance != null)
+            GenericPickupButton.Instance.HidePickupPrompt();
+
+        // ✅ Close inventory if open
+        if (InventoryManager_fire.Instance != null && InventoryManager_fire.Instance.inventoryPanel != null)
+            InventoryManager_fire.Instance.inventoryPanel.SetActive(false);
 
         // Disable player controls
         if (playerMovement != null)
@@ -235,8 +241,54 @@ public class GameOverManager : MonoBehaviour
     public void RestartGame()
     {
         Debug.Log("Restarting game...");
-        Time.timeScale = 1f; // Reset time scale in case it was paused
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1f;
+
+        // ✅ Check if player died during hallway chase
+        if (PlayerOxygen.InHallwayChase && hallwaySpawnPoint != null && player != null)
+        {
+            Debug.Log("Respawning at hallway checkpoint!");
+
+            // Reset game over state
+            isGameOver = false;
+
+            // Hide game over UI
+            if (gameOverPanel != null) gameOverPanel.SetActive(false);
+            if (darkOverlay != null) darkOverlay.SetActive(false);
+
+            // Teleport player to hallway spawn
+            CharacterController cc = player.GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+
+            player.position = hallwaySpawnPoint.position;
+            player.rotation = Quaternion.Euler(0f, 270f, 0f);
+
+            if (cc != null) cc.enabled = true;
+
+            // Re-enable player movement
+            if (playerMovement != null)
+            {
+                playerMovement.enabled = true;
+                if (cc != null) cc.enabled = true;
+            }
+
+            // ✅ Refill oxygen (this also resets hasTriggeredDeath flag)
+            if (playerOxygen != null)
+            {
+                playerOxygen.RefillOxygen();
+                playerOxygen.ShowOxygenBar();
+            }
+
+            // Hide cursor
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            Debug.Log("Hallway checkpoint restart complete!");
+        }
+        else
+        {
+            // Regular restart - reload entire scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     // Static method so other scripts can call it easily

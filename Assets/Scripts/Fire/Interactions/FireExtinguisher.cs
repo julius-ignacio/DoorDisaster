@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
@@ -9,11 +10,11 @@ public class FireExtinguisher : MonoBehaviour
     public GameObject worldExtinguisher;
     public Transform extinguisherHolder;
     public GameObject heldExtinguisherPrefab;
-    public GameObject pickupButton; // 👈 assign the pickup UI button here
-    public GameObject sprayButton;  // 👈 assign the spray UI button here
+    public GameObject pickupButton;
+    public GameObject sprayButton;
 
     [Header("Dependencies")]
-    public TowelPickup towelPickup; // 👈 Assign in Inspector to prevent early pickup
+    public TowelPickup towelPickup;
 
     [Header("Held Position")]
     public Vector3 heldPosition = new Vector3(0.5f, -0.3f, 1.5f);
@@ -33,27 +34,41 @@ public class FireExtinguisher : MonoBehaviour
     private bool hasExtinguisher = false;
     private bool canSpray = false;
     private bool isSpraying = false;
+    private bool allFiresExtinguished = false;
     private ParticleSystem sprayParticleSystem;
+    private bool sprayButtonDestroyed = false; // ✅ NEW: Track if button is destroyed
 
     private Dictionary<SpreadFire, Coroutine> firesBeingExtinguished = new Dictionary<SpreadFire, Coroutine>();
 
-    // -------------------------------
-    // 🎬  START
-    // -------------------------------
     void Start()
     {
         if (pickupButton != null)
-            pickupButton.SetActive(false); // Hide extinguisher button at start
+            pickupButton.SetActive(false);
+
+        if (sprayButton != null)
+        {
+            EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = sprayButton.AddComponent<EventTrigger>();
+
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry pointerDown = new EventTrigger.Entry();
+            pointerDown.eventID = EventTriggerType.PointerDown;
+            pointerDown.callback.AddListener((data) => { OnSprayButtonPress(); });
+            trigger.triggers.Add(pointerDown);
+
+            EventTrigger.Entry pointerUp = new EventTrigger.Entry();
+            pointerUp.eventID = EventTriggerType.PointerUp;
+            pointerUp.callback.AddListener((data) => { OnSprayButtonRelease(); });
+            trigger.triggers.Add(pointerUp);
+        }
     }
 
-    // -------------------------------
-    // 🚪  TRIGGER ENTER/EXIT
-    // -------------------------------
     void OnTriggerStay(Collider other)
     {
         if (!hasExtinguisher && other.CompareTag("Player"))
         {
-            // Don't show button until towel is picked up
             if (towelPickup != null && !towelPickup.HasPickedUpTowel())
                 return;
 
@@ -71,9 +86,6 @@ public class FireExtinguisher : MonoBehaviour
         }
     }
 
-    // -------------------------------
-    // 🔘  UI BUTTON PICKUP
-    // -------------------------------
     public void OnPickupButtonClicked()
     {
         if (!hasExtinguisher)
@@ -84,13 +96,16 @@ public class FireExtinguisher : MonoBehaviour
         }
     }
 
-    // -------------------------------
-    // 🧯  UPDATE LOOP (Spraying)
-    // -------------------------------
     void Update()
     {
-        // Only allow spraying after quizzes
-        if (!canSpray) return;
+        // ✅ Ensure spray button stays hidden if fires are done
+        if (allFiresExtinguished && sprayButton != null && sprayButton.activeSelf)
+        {
+            sprayButton.SetActive(false);
+        }
+
+        // ✅ Don't allow spraying if all fires are extinguished
+        if (!canSpray || allFiresExtinguished) return;
 
         if (isSpraying || Input.GetKey(KeyCode.F))
         {
@@ -117,24 +132,36 @@ public class FireExtinguisher : MonoBehaviour
                 isSpraySoundPlaying = false;
             }
         }
+
+        if (canSpray && (Input.GetMouseButton(0) || Input.touchCount > 0))
+        {
+            if (isSpraying)
+            {
+                // Continue spraying
+            }
+        }
     }
 
-    // -------------------------------
-    // 🖱️  SPRAY BUTTON FUNCTIONS
-    // -------------------------------
-    public void OnSprayButtonHold()
+    public void OnSprayButtonPress()
     {
+        // ✅ Don't allow spraying if all fires are done
+        if (allFiresExtinguished) return;
+
         isSpraying = true;
+        Debug.Log("Spray button pressed - spraying started!");
     }
 
     public void OnSprayButtonRelease()
     {
         isSpraying = false;
+        Debug.Log("Spray button released - spraying stopped!");
     }
 
-    // -------------------------------
-    // 🔧  PICKUP LOGIC
-    // -------------------------------
+    public void OnSprayButtonHold()
+    {
+        OnSprayButtonPress();
+    }
+
     void PickupAndStartQuizzes(GameObject player)
     {
         hasExtinguisher = true;
@@ -155,14 +182,11 @@ public class FireExtinguisher : MonoBehaviour
             sprayParticleSystem.Stop();
 
         if (sprayButton != null)
-            sprayButton.SetActive(false); // Hide spray button initially
+            sprayButton.SetActive(false);
 
         StartCoroutine(ShowQuizzesSequentially());
     }
 
-    // -------------------------------
-    // 📚  QUIZ SEQUENCE
-    // -------------------------------
     IEnumerator ShowQuizzesSequentially()
     {
         string[] quizIDs = {
@@ -191,22 +215,20 @@ public class FireExtinguisher : MonoBehaviour
 
         canSpray = true;
 
-        if (sprayButton != null)
-            sprayButton.SetActive(true); // ✅ show spray button after quizzes
+        // ✅ Only show spray button if fires aren't already extinguished
+        if (sprayButton != null && !allFiresExtinguished)
+            sprayButton.SetActive(true);
 
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
-                "Good! Now use the fire extinguisher to put out the fires. Press and hold F or the Spray button!",
+                "Good! Now use the fire extinguisher to put out the fires. Press and hold the Spray button!",
                 4f,
                 null
             );
         }
     }
 
-    // -------------------------------
-    // 🔥  EXTINGUISH FIRE LOGIC
-    // -------------------------------
     void ExtinguishFiresInRange()
     {
         if (sprayParticleSystem == null) return;
@@ -252,9 +274,6 @@ public class FireExtinguisher : MonoBehaviour
             firesBeingExtinguished.Remove(fire);
     }
 
-    // -------------------------------
-    // ✅  CHECK IF ALL FIRES OUT
-    // -------------------------------
     void CheckIfAllFiresOut()
     {
         SpreadFire[] allFires = FindObjectsOfType<SpreadFire>();
@@ -269,8 +288,9 @@ public class FireExtinguisher : MonoBehaviour
             }
         }
 
-        if (!anyFireActive && canSpray)
+        if (!anyFireActive && canSpray && !allFiresExtinguished) // ✅ Check flag
         {
+            allFiresExtinguished = true; // ✅ Set flag permanently
             canSpray = false;
             Debug.Log("All fires extinguished!");
             StartCoroutine(OnAllFiresExtinguished());
@@ -287,6 +307,27 @@ public class FireExtinguisher : MonoBehaviour
         if (heldInstance != null)
             heldInstance.SetActive(false);
 
+        // ✅ AGGRESSIVELY hide and disable spray button
+        if (sprayButton != null && !sprayButtonDestroyed)
+        {
+            sprayButton.SetActive(false);
+
+            // ✅ Disable all components to prevent re-activation
+            Button btn = sprayButton.GetComponent<Button>();
+            if (btn != null) btn.interactable = false;
+
+            EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
+            if (trigger != null) trigger.enabled = false;
+
+            // ✅ Move it far away as extra safety
+            RectTransform rect = sprayButton.GetComponent<RectTransform>();
+            if (rect != null) rect.anchoredPosition = new Vector2(10000, 10000);
+
+            sprayButtonDestroyed = true;
+
+            Debug.Log("Spray button permanently disabled!");
+        }
+
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
@@ -295,8 +336,5 @@ public class FireExtinguisher : MonoBehaviour
                 () => subtitleManager.ShowObjective("Rescue Mr. Kitty in the bedroom")
             );
         }
-
-        if (sprayButton != null)
-            sprayButton.SetActive(false);
     }
 }

@@ -37,7 +37,12 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
         if (other.CompareTag("Player") && !hasTriggered)
         {
             playerInRange = true;
-            GenericPickupButton.Instance.ShowPickupPrompt(this, "Rescue Mr. Kitty");
+
+            // Don't show prompt if game is paused
+            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            {
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Rescue Mr. Kitty");
+            }
         }
     }
 
@@ -47,6 +52,24 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
         {
             playerInRange = false;
             GenericPickupButton.Instance.HidePickupPrompt();
+        }
+    }
+
+    void Update()
+    {
+        // ✅ Show prompt when player is in range and game resumes
+        if (playerInRange && !hasTriggered)
+        {
+            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            {
+                // Check if prompt isn't already showing
+                if (GenericPickupButton.Instance != null &&
+                    GenericPickupButton.Instance.pickupButton != null &&
+                    !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
+                {
+                    GenericPickupButton.Instance.ShowPickupPrompt(this, "Rescue Mr. Kitty");
+                }
+            }
         }
     }
 

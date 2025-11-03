@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class SubtitleManager2 : MonoBehaviour
@@ -9,20 +8,25 @@ public class SubtitleManager2 : MonoBehaviour
     [Header("Subtitle UI (Bottom)")]
     public GameObject subtitlePanel;
     public TextMeshProUGUI subtitleText;
-    public float typingSpeed = 0.05f;
+    public float typingSpeed = 0.02f;
 
     [Header("Objective UI")]
     public GameObject objectivePanel;
     public TextMeshProUGUI objectiveText;
 
     [Header("Health UI")]
-    public GameObject healthBar; // Reference to your HP bar GameObject
+    public GameObject healthBar;
 
     [Header("Oxygen UI")]
-    public GameObject oxygenBar; // Reference to your Oxygen bar GameObject
+    public GameObject oxygenBar;
 
     [Header("Story Settings")]
     public bool autoStartStory = true;
+
+    // ✅ Flags
+    public static bool IntroStoryComplete { get; private set; } = false;
+    public static bool IsSubtitleActive { get; private set; } = false;
+    public static bool CallObjectiveActive { get; set; } = false;
 
     private string[] wakingStory = {
         "*sniff sniff*",
@@ -32,49 +36,26 @@ public class SubtitleManager2 : MonoBehaviour
         "I need to get out of here NOW!"
     };
 
-    private string[] doorCheckStory = {
-        "I need to check if the door is hot before opening it",
-        "The door feels warm but not burning hot",
-        "It should be safe to open"
-    };
-
-    private string[] hallwayStory = {
-        "The hallway is filling with smoke!",
-        "I need to stay low and find an exit",
-        "The front door... I can see flames blocking it!"
-    };
-
-    private string[] windowStory = {
-        "The window! That's my way out!",
-        "I need to break it and get outside",
-        "Almost there... just a little more!"
-    };
-
     private Coroutine currentTyping;
+    private string lastObjective = "";
+    private bool subtitleJustFinished = false;
+    private bool objectiveWasVisibleBeforePause = false;
+    private bool wasTypingBeforeInventoryOpen = false;
+    private string currentSubtitleText = "";
+    private float currentSubtitleDuration = 0f;
 
     void Start()
     {
-        if (subtitlePanel != null)
-            subtitlePanel.SetActive(false);
+        IntroStoryComplete = false;
+        CallObjectiveActive = false;
 
-        if (objectivePanel != null)
-            objectivePanel.SetActive(false);
-
-        if (healthBar != null)
-            healthBar.SetActive(false);
-
-        if (oxygenBar != null)
-            oxygenBar.SetActive(false);
-
+        if (subtitlePanel != null) subtitlePanel.SetActive(false);
+        if (objectivePanel != null) objectivePanel.SetActive(false);
+        if (healthBar != null) healthBar.SetActive(false);
+        if (oxygenBar != null) oxygenBar.SetActive(false);
 
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-            SkipCurrentText();
     }
 
     public IEnumerator PlayWakeUpStory()
@@ -83,55 +64,43 @@ public class SubtitleManager2 : MonoBehaviour
 
         for (int i = 0; i < wakingStory.Length; i++)
         {
-            float duration = (i == 0) ? 2f : 3f;
+            float duration = (i == 0) ? 1.5f : 2.5f;
             yield return StartCoroutine(ShowSubtitle(wakingStory[i], duration));
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.2f);
         }
 
-        // ✅ FIXED: Enable movement after story
-        Cursor.lockState = CursorLockMode.None;
- 
+        IntroStoryComplete = true;
+        Debug.Log("Intro story complete - pickups now enabled");
 
-        // ✅ Force enable player movement
+        Cursor.lockState = CursorLockMode.None;
+
         Movements2 player = FindObjectOfType<Movements2>();
         if (player != null)
-        {
             player.ForceEnable();
-            Debug.Log("Player movement force enabled after subtitles");
-        }
 
-        // ✅ Show HP bar after the story ends
         if (healthBar != null)
-        {
             healthBar.SetActive(true);
-            Debug.Log("Health bar shown");
-        }
 
-        // ✅ Show oxygen bar after the story ends
         if (oxygenBar != null)
-        {
             oxygenBar.SetActive(true);
-            Debug.Log("Oxygen bar shown via GameObject");
-        }
 
-        // ✅ Show oxygen bar via PlayerOxygen script
         PlayerOxygen oxygenSystem = FindObjectOfType<PlayerOxygen>();
         if (oxygenSystem != null)
-        {
             oxygenSystem.ShowOxygenBar();
-            Debug.Log("Oxygen bar shown via PlayerOxygen script");
-        }
 
-        // ✅ Show first objective after story ends
-        ShowObjective("Find a way out of the house");
-
-        Debug.Log("Subtitle sequence complete - movement should now be enabled");
+        CallObjectiveActive = true;
+        ShowObjective("Find the phone and call for help!");
     }
 
     IEnumerator ShowSubtitle(string text, float displayTime, Action onComplete = null)
     {
         if (subtitlePanel != null)
             subtitlePanel.SetActive(true);
+
+        IsSubtitleActive = true;
+        subtitleJustFinished = false;
+        currentSubtitleText = text;
+        currentSubtitleDuration = displayTime;
 
         if (subtitleText != null)
         {
@@ -141,10 +110,22 @@ public class SubtitleManager2 : MonoBehaviour
                 StopCoroutine(currentTyping);
 
             currentTyping = StartCoroutine(TypeText(text));
+
             yield return currentTyping;
 
-            yield return new WaitForSeconds(displayTime);
+            if (subtitleText != null)
+                subtitleText.text = text;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < displayTime)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
             subtitlePanel.SetActive(false);
+            IsSubtitleActive = false;
+            subtitleJustFinished = true;
 
             onComplete?.Invoke();
         }
@@ -154,18 +135,15 @@ public class SubtitleManager2 : MonoBehaviour
     {
         for (int i = 0; i <= text.Length; i++)
         {
-            subtitleText.text = text.Substring(0, i);
-            yield return new WaitForSeconds(typingSpeed);
-        }
-    }
-
-    void SkipCurrentText()
-    {
-        if (currentTyping != null)
-        {
-            StopCoroutine(currentTyping);
             if (subtitleText != null)
-                subtitleText.text = subtitleText.text;
+                subtitleText.text = text.Substring(0, i);
+
+            float elapsed = 0f;
+            while (elapsed < typingSpeed)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
         }
     }
 
@@ -175,11 +153,11 @@ public class SubtitleManager2 : MonoBehaviour
         StartCoroutine(ShowSubtitle(message, duration, onComplete));
     }
 
-    // --- Objective Methods ---
     public void ShowObjective(string text)
     {
         if (objectivePanel != null && objectiveText != null)
         {
+            lastObjective = text;
             objectiveText.text = "Objective: " + text;
             objectivePanel.SetActive(true);
         }
@@ -187,10 +165,65 @@ public class SubtitleManager2 : MonoBehaviour
 
     public void HideObjective()
     {
-        if (objectivePanel != null && objectiveText != null)
-        {
+        if (objectivePanel != null)
             objectivePanel.SetActive(false);
-            objectiveText.text = ""; // Clear text when hiding
+    }
+
+    public void RestoreLastObjective()
+    {
+        if (!string.IsNullOrEmpty(lastObjective))
+            ShowObjective(lastObjective);
+    }
+
+    public void OnPause()
+    {
+        objectiveWasVisibleBeforePause = (objectivePanel != null && objectivePanel.activeSelf);
+
+        if (subtitlePanel != null && subtitlePanel.activeSelf)
+            subtitlePanel.SetActive(false);
+        if (objectivePanel != null && objectivePanel.activeSelf)
+            objectivePanel.SetActive(false);
+    }
+
+    public void OnResume()
+    {
+        if (IsSubtitleActive && subtitleText != null && !string.IsNullOrEmpty(subtitleText.text) && !subtitleJustFinished)
+            subtitlePanel.SetActive(true);
+
+        if (objectiveWasVisibleBeforePause && !string.IsNullOrEmpty(lastObjective))
+        {
+            objectivePanel.SetActive(true);
         }
+
+        objectiveWasVisibleBeforePause = false;
+    }
+
+    public void OnInventoryOpen()
+    {
+        wasTypingBeforeInventoryOpen = IsSubtitleActive;
+
+        if (IsSubtitleActive && subtitlePanel != null)
+        {
+            Debug.Log("Inventory opened during subtitle - subtitle continues");
+        }
+    }
+
+    public void OnInventoryClose()
+    {
+        Debug.Log("Inventory closed - subtitle resumes normally");
+    }
+
+    public void HideAll()
+    {
+        if (subtitlePanel != null)
+            subtitlePanel.SetActive(false);
+        if (objectivePanel != null)
+            objectivePanel.SetActive(false);
+        if (subtitleText != null)
+            subtitleText.text = "";
+        if (objectiveText != null)
+            objectiveText.text = "";
+        IsSubtitleActive = false;
+        subtitleJustFinished = true;
     }
 }
