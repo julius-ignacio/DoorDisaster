@@ -14,7 +14,7 @@ public class ConsistentQuake : MonoBehaviour
 
     [Header("Settings")]
     public float quakeInterval = 15f;  // cooldown between quakes
-    public float quakeDuration = 10f;  // how long quake lasts
+    public float quakeDuration = 0f;  // how long quake lasts
 
     private AudioSource audi;
     private ShakeInstance currentShake;
@@ -28,6 +28,11 @@ public class ConsistentQuake : MonoBehaviour
         quakeIcon.SetActive(false);
         audi = GetComponent<AudioSource>();
         quakeRoutine = StartCoroutine(QuakeRoutine());
+
+        if(DataManager.Instance.currentMode == 1){ quakeDuration = 20f; } else
+        {
+            quakeDuration = 10f;
+        }
     }
 
     // ✅ Call this to PAUSE quake (used during quiz)

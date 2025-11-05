@@ -9,13 +9,14 @@ public class UnlockDoor : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (getkey.isDoorLocked = false) // ✅ check global flag
-        {
-            colliderObject.SetActive(false);
+        if (!other.CompareTag("Player")) return;
 
-            var doorScript = door.GetComponent<EasyDoorSystem.EasyDoor>();
-            if (doorScript != null)
-                doorScript.enabled = true;
+        if (getkey != null && getkey.isDoorLocked == false) // fixed comparison
+        {
+            if (colliderObject) colliderObject.SetActive(false);
+
+            var doorScript = door ? door.GetComponent<EasyDoor>() : null;
+            if (doorScript) doorScript.enabled = true;
         }
     }
 }

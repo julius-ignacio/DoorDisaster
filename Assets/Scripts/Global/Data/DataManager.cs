@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+[DefaultExecutionOrder(-100)] // initialize before most other scripts
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance;
 
-    // 🔹 New structured data for DB
+    // New structured data for DB
     public PlayerData playerData = new PlayerData();
 
-    // 🔹 Legacy/global fields (for quick access in scripts)
+    // Legacy/global fields (for quick access in scripts)
     public int quizScore;
     public int wrongAnswers;
     public int factsDiscovered;
@@ -17,10 +17,9 @@ public class DataManager : MonoBehaviour
 
     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
 
-
-    [Header("Current Trial")]
-    public int currentTrial;
-
+    [Header("Current Trial Info")]
+    public int currentTrial; // 0 = Fire, 1 = Water, 2 = Earth
+    public int currentMode;  // 0 = Normal, 1 = Hard
 
     private void Awake()
     {
@@ -36,6 +35,8 @@ public class DataManager : MonoBehaviour
         }
     }
 
+     // NEW: consumed by WorldLoader after Restart to skip loading once
+    [HideInInspector] public bool skipNextWorldLoad = false;
 
 
     public void InitPlayerData()
@@ -43,47 +44,166 @@ public class DataManager : MonoBehaviour
         if (playerData == null)
             playerData = new PlayerData();
 
+        // Initialize player info if new
         if (string.IsNullOrEmpty(playerData.playerId))
         {
-            playerData.playerId = FirebaseAuth.UserLocalId;
+            // Guard: FirebaseAuth may not be set yet; keep empty if so
+            playerData.playerId = string.IsNullOrEmpty(FirebaseAuth.UserLocalId) ? "" : FirebaseAuth.UserLocalId;
             playerData.playerName = "Player";
-            playerData.trials = new TrialData[3];
 
-            for (int i = 0; i < playerData.trials.Length; i++)
+            // Initialize modes (Normal & Hard)
+            for (int m = 0; m < playerData.Mode.Length; m++)
             {
-                playerData.trials[i] = new TrialData();
-            }
+                if (playerData.Mode[m] == null)
+                    playerData.Mode[m] = new ModeData();
 
+                // Initialize 3 trials for each mode
+                for (int t = 0; t < playerData.Mode[m].trials.Length; t++)
+                {
+                    if (playerData.Mode[m].trials[t] == null)
+                        playerData.Mode[m].trials[t] = new TrialData();
+                }
+            }
         }
     }
 
-public void SaveTrialData(int trialIndex)
-{
-    var trial = playerData.trials[trialIndex];
-
-    trial.quizScore = quizScore;
-    trial.questionsAnswered = totalQuestionsAnswered;
-    trial.factsDiscovered = factsDiscovered;
-    trial.totalScore = trial.quizScore + trial.factsDiscovered;
-
-    // ✅ Set the correct finished flag
-    switch (currentTrial)
+    // Called on pause/quit/end to write globals into PlayerData
+    public void SaveTrialData(int trialIndex, int modeIndex)
     {
-        case 0:
-            playerData.isEarthFinished = true;
-            break;
+        var trial = playerData.Mode[modeIndex].trials[trialIndex];
+        trial.quizScore = quizScore;
+        trial.questionsAnswered = totalQuestionsAnswered;
+        trial.factsDiscovered = factsDiscovered;
+        trial.totalScore = trial.quizScore + trial.factsDiscovered;
+    }
 
-        case 1:
-            playerData.isWaterFinished = true;
-            break;
+    // Optional: pull a saved trial’s stats back into the quick-access globals for UI
+    public void LoadTrialStatsIntoGlobals(int trialIndex, int modeIndex)
+    {
+        var trial = playerData.Mode[modeIndex].trials[trialIndex];
+        quizScore = trial.quizScore;
+        totalQuestionsAnswered = trial.questionsAnswered;
+        factsDiscovered = trial.factsDiscovered;
+        // wrongAnswers and Npcs_saved are session-scoped; reset or track separately as needed
+        wrongAnswers = 0;
+        Npcs_saved = 0;
+    }
 
-        case 2:
-            playerData.isFireFinished = true;
-            break;
+    // Optional: reset globals when starting a brand-new run of a trial
+    public void ResetGlobalsForNewRun()
+    {
+        quizScore = 0;
+        wrongAnswers = 0;
+        factsDiscovered = 0;
+        totalQuestionsAnswered = 0;
+        Npcs_saved = 0;
+        npcScores.Clear();
+    }
+
+    // Optional: single entry to begin a trial, with fallback if no local world save exists
+    public void BeginTrial(int trialIndex, int modeIndex, bool resetIfNoLocalSave)
+    {
+        currentTrial = trialIndex;
+        currentMode = modeIndex;
+
+        // If you want the UI to reflect last recorded trial stats immediately:
+        LoadTrialStatsIntoGlobals(trialIndex, modeIndex);
+
+        // If there is no local world save and you want a fresh run, reset globals
+        if (resetIfNoLocalSave && !WorldSaveSystem.HasSaveData(trialIndex, modeIndex))
+        {
+            ResetGlobalsForNewRun();
+        }
     }
 }
 
 
 
 
-}
+
+
+
+
+
+
+// using System.Collections.Generic;
+// using UnityEngine;
+
+// public class DataManager : MonoBehaviour
+// {
+//     public static DataManager Instance;
+
+//     // New structured data for DB
+//     public PlayerData playerData = new PlayerData();
+
+//     // Legacy/global fields (for quick access in scripts)
+//     public int quizScore;
+//     public int wrongAnswers;
+//     public int factsDiscovered;
+//     public int totalQuestionsAnswered;
+//     public int Npcs_saved;
+
+//     public Dictionary<int, int> npcScores = new Dictionary<int, int>();
+
+//     [Header("Current Trial Info")]
+//     public int currentTrial; // 0 = Fire, 1 = Water, 2 = Earth
+//     public int currentMode;  // 0 = Normal, 1 = Hard
+
+//     private void Awake()
+//     {
+//         if (Instance == null)
+//         {
+//             Instance = this;
+//             DontDestroyOnLoad(gameObject);
+//             InitPlayerData();
+//         }
+//         else
+//         {
+//             Destroy(gameObject);
+//         }
+//     }
+
+
+
+
+//     public void InitPlayerData()
+//     {
+//         if (playerData == null)
+//             playerData = new PlayerData();
+
+//         // Initialize player info if new
+//         if (string.IsNullOrEmpty(playerData.playerId))
+//         {
+//             playerData.playerId = FirebaseAuth.UserLocalId; // your Firebase ID getter
+//             playerData.playerName = "Player";
+
+//             // Initialize modes (Normal & Hard)
+//             for (int m = 0; m < playerData.Mode.Length; m++)
+//             {
+//                 if (playerData.Mode[m] == null)
+//                     playerData.Mode[m] = new ModeData();
+
+//                 // Initialize 3 trials for each mode
+//                 for (int t = 0; t < playerData.Mode[m].trials.Length; t++)
+//                 {
+//                     if (playerData.Mode[m].trials[t] == null)
+//                         playerData.Mode[m].trials[t] = new TrialData();
+//                 }
+//             }
+//         }
+//     }
+
+
+//     public void SaveTrialData(int trialIndex, int modeIndex)
+//     {
+//         var trial = playerData.Mode[modeIndex].trials[trialIndex];
+
+//         trial.quizScore = quizScore;
+//         trial.questionsAnswered = totalQuestionsAnswered;
+//         trial.factsDiscovered = factsDiscovered;
+//         trial.totalScore = trial.quizScore + trial.factsDiscovered;
+//     }
+
+
+
+// }

@@ -3,8 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class EnterTrial : MonoBehaviour
 {
-    public string sceneName;
     public int trialIndex;
+    public GameObject levelSelectUI;
 
 
 public void OnTriggerEnter(Collider other)
@@ -15,11 +15,16 @@ public void OnTriggerEnter(Collider other)
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.StopAll(); // or StopLoop(), depending on your AudioManager
-                    AudioManager.Instance.StopAll();
+                AudioManager.Instance.StopAll();
             }
 
+            levelSelectUI.SetActive(true);
             DataManager.Instance.currentTrial = trialIndex;
-            SceneManager.LoadScene(sceneName);
+        }
+
+        else
+        {
+            levelSelectUI.SetActive(false);
         }
     }
 

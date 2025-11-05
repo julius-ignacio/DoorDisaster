@@ -2,39 +2,21 @@ using UnityEngine;
 
 public class UnCoverMechanic : MonoBehaviour
 {
+    [Tooltip("Reference to the CoverMechanic that manages cover state")]
+    public CoverMechanic cover; // assign in Inspector
 
-    public GameObject Model, CoverBtn, UnCoverBtn, joystick, jumpbtn;
-    public Camera CoverCamera, playerCamera;
-    public GameObject footsteps_enable;
-
-    public Movements PlayerMovements;
-    public AudioManager aud;
-
-    void Start()
+    void Awake()
     {
-        UnCoverBtn.SetActive(false);
+        if (cover == null)
+            cover = GetComponentInParent<CoverMechanic>() ?? FindObjectOfType<CoverMechanic>(true);
     }
+
+    // Hook this to the UnCover button OnClick
     public void OnButtonClick()
     {
-        Debug.Log("Button was clicked!");
-        Model.SetActive(false); // Show the cover model
-        CoverCamera.enabled = false; // Disable the cover camera
-        playerCamera.enabled = true; // Enable the player camera
-        //PlayerMovements.GetComponent<Movements>().enabled = true; // Disable player movement
-
-        CoverBtn.SetActive(true); // Hide the button after clicking
-        UnCoverBtn.SetActive(false); // Hide the button after clicking
-
-        joystick.SetActive(true); // Show the joystick
-        jumpbtn.SetActive(true); // Show the jump button
-
-        
-
-    // Re-enable footsteps
-    PlayerMovements.footstepsEnabled = true;
-
-
-        PlayerMovements.speed = 3f;
-        PlayerMovements.jumpHeight = 1f;
+        if (cover != null)
+            cover.ApplyCoveredState(false);
+        else
+            Debug.LogError("[UnCoverMechanic] Missing CoverMechanic reference.");
     }
 }

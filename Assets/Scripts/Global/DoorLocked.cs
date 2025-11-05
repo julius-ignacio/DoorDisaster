@@ -1,5 +1,6 @@
 using EasyDoorSystem;
 using UnityEngine;
+using System.Collections;
 
 public class DoorLocked : MonoBehaviour
 {
@@ -9,30 +10,47 @@ public class DoorLocked : MonoBehaviour
 
     void Start()
     {
-        colliderObject.SetActive(true);
-        doorlockPrompt.SetActive(true);
+        StartCoroutine(RefreshFromSavedState());
     }
 
+    private IEnumerator RefreshFromSavedState()
+    {
+        // Wait one frame so WorldLoader has applied activeSelf to the Key object
+        yield return null;
+
+        bool keyCollected = false;
+        if (getkey != null && getkey.Key != null)
+            keyCollected = !getkey.Key.activeSelf; // inactive key means it was collected
+
+        if (keyCollected)
+            UnlockNow();
+        else
+            LockNow();
+    }
+
+    private void UnlockNow()
+    {
+        if (colliderObject) colliderObject.SetActive(false);
+        if (doorlockPrompt) doorlockPrompt.SetActive(false);
+
+        var d = door ? door.GetComponent<EasyDoor>() : null;
+        if (d) d.enabled = true;
+    }
+
+    private void LockNow()
+    {
+        if (colliderObject) colliderObject.SetActive(true);
+        if (doorlockPrompt) doorlockPrompt.SetActive(true);
+
+        var d = door ? door.GetComponent<EasyDoor>() : null;
+        if (d) d.enabled = false;
+    }
 
     void OnTriggerEnter(Collider other)
     {
-        if (getkey.isDoorLocked == false) // ✅ check global flag
-        {
-            colliderObject.SetActive(false);
+        if (!other.CompareTag("Player")) return;
 
-            doorlockPrompt.SetActive(false);
-
-            // var doorScript = door.GetComponent<EasyDoorSystem.EasyDoor>();
-            // doorScript.enabled = true;
-
-            door.GetComponent<EasyDoorSystem.EasyDoor>().enabled = true;
-        }
-        
-                else // ✅ check global flag
-        {
-            colliderObject.SetActive(true);
-            doorlockPrompt.SetActive(true);
-                door.GetComponent <EasyDoorSystem.EasyDoor>().enabled = false;
-        }
+        bool keyCollected = (getkey != null && getkey.Key != null && !getkey.Key.activeSelf);
+        if (keyCollected) UnlockNow(); else LockNow();
     }
 }

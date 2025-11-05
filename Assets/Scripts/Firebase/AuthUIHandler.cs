@@ -17,11 +17,28 @@ public class AuthUIHandler : MonoBehaviour
     public TMP_Text feedbackTextlog, feedbackTextReg;
 
     [Header("Verification Panel")]
-    public GameObject verifyPanel;
+    public GameObject verifyPanel, switcher;
 
 
     [Header("Panel for switching IF successful")]
     public GameObject login, register;
+
+    void Update()
+    {
+      if (verifyPanel != null && verifyPanel.activeSelf)  // ✅ Checks if it's ACTIVE
+        {
+            switcher.SetActive(false);
+        }
+        else
+        {
+            switcher.SetActive(true);
+        }
+    }
+
+    void Start()
+    {
+        switcher.SetActive(true);
+    }
 
     public void OnRegisterButton()
     {

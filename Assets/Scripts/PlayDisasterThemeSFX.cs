@@ -10,6 +10,8 @@ public class PlayDisasterThemeSFX : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
+        
+
         // Stop any currently playing loop before starting a new one
         AudioManager.Instance.audLoop.Stop();
         AudioManager.Instance.audLoopSecondary.Stop();

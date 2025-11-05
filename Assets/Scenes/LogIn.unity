@@ -1827,7 +1827,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 772204353}
         m_TargetAssemblyTypeName: AuthUIHandler, Assembly-CSharp
-        m_MethodName: OnLoginButton
+        m_MethodName: OnResendVerificationButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4456,6 +4456,7 @@ MonoBehaviour:
   feedbackTextlog: {fileID: 2034897308}
   feedbackTextReg: {fileID: 1965893601}
   verifyPanel: {fileID: 1907175131}
+  switcher: {fileID: 1132240424}
   login: {fileID: 200038165}
   register: {fileID: 1547450250}
   verifyFeedbackText: {fileID: 1499314060}
@@ -5597,7 +5598,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 772204353}
         m_TargetAssemblyTypeName: AuthUIHandler, Assembly-CSharp
-        m_MethodName: OnLoginButton
+        m_MethodName: OnVerifyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6470,6 +6471,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   register: {fileID: 1547450250}
   login: {fileID: 200038165}
+  verify: {fileID: 0}
   switchertextbtn: {fileID: 113501135}
 --- !u!114 &1068012771
 MonoBehaviour:
@@ -6870,6 +6872,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   register: {fileID: 1547450250}
   login: {fileID: 200038165}
+  verify: {fileID: 0}
   switchertextbtn: {fileID: 1371634000}
 --- !u!1 &1184207996
 GameObject:

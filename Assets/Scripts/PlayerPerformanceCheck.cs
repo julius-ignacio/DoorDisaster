@@ -1,10 +1,15 @@
+using MilkShake;
 using UnityEngine;
 
 public class PlayerPerformanceCheck : MonoBehaviour
 {
-    public GameObject warning, barrier, DestroyBtn3;
+    public GameObject warning, barrier, DestroyBtn3, trigger;
     private bool isObjectivesCompleted = false;
 
+    public ConsistentQuake consistentQuake;
+    public Shaker shake;
+    public GameObject panicmeterUI;
+    public PanicMeterScript panicMeterScript;
     void Start()
     {
         barrier.SetActive(true);
@@ -47,6 +52,34 @@ public class PlayerPerformanceCheck : MonoBehaviour
         {
             barrier.SetActive(false);
             AudioManager.Instance.PlaySFX(22);
+            trigger.SetActive(false);
+            DestroyBtn3.SetActive(false);
+
+
+                    // Audio switching logic (this part always runs)
+        AudioClip temp = AudioManager.Instance.Clips[2];
+        AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];
+        AudioManager.Instance.Clips[1] = temp;
+
+        AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
+            AudioManager.Instance.audLoop.volume = 0.5f;
+        
+
+                // Safely handle quake + shake
+        if (shake != null)
+            shake.enabled = false;
+
+        if (consistentQuake != null)
+        {
+            consistentQuake.enabled = false;
+            consistentQuake.PauseQuakes();
+        }
+
+               if (panicMeterScript != null)
+        {
+            panicMeterScript.currHealth = 0;
+            panicmeterUI.SetActive(false);
+        }
         }
         else
         {

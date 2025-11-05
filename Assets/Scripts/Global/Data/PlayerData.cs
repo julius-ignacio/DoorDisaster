@@ -1,3 +1,5 @@
+using UnityEngine;
+
 [System.Serializable]
 public class PlayerData
 {
@@ -8,8 +10,15 @@ public class PlayerData
     public int age;
     public int gradeLevel;
 
+    [Header("Normal / Hard")]
+    public ModeData[] Mode = new ModeData[2];
+    
     // Game progress
-    public TrialData[] trials = new TrialData[3];
-    public bool isEarthFinished, isWaterFinished, isFireFinished, isSurveyDone;
-    public bool isVerified;
-}
+    public bool isSurveyDone, isFireFinished, isWaterFinished, isEarthFinished;
+
+
+    public PlayerData()
+    {
+        Mode = new ModeData[2] { new ModeData(), new ModeData() };
+    }
+} 

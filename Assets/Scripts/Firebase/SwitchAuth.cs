@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public class SwitchAuth : MonoBehaviour
 {
-    public GameObject register, login;
+    public GameObject register, login, verify;
 
     public TextMeshProUGUI switchertextbtn; // Assign TMP text directly in Inspector
 
@@ -13,6 +13,7 @@ public class SwitchAuth : MonoBehaviour
     {
         register.SetActive(false);
     }
+
 
     public void OnClick()
     {

@@ -8,7 +8,6 @@ public class UseWhistle : MonoBehaviour
     [Header("Whistle Settings")]
     public float outlineDuration = 5f;         // How long outlines stay visible
     public KeyCode whistleKey = KeyCode.F;     // Which key activates the whistle
-
     [Header("Targets")]
     public GameObject[] outlinedObjects;       // Objects to highlight
 

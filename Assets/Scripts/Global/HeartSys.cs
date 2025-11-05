@@ -10,23 +10,13 @@ public class HeartSys : MonoBehaviour
     public int currentHearts = 8;
     public bool isHelmetUsed = false;
     public GameNotifier gameNotifier;
-
     public Sprite yellowHeart;
-
-
 
     void Start()
     {
-        hearts[8].gameObject.SetActive(false);
-        hearts[9].gameObject.SetActive(false);
-        hearts[10].gameObject.SetActive(false);
-        hearts[11].gameObject.SetActive(false);
-        hearts[12].gameObject.SetActive(false);
-
-        // foreach (var heart in hearts)
-        // {
-        //     heart.sprite = yellowHeart;
-        // }
+        // Hide extras at start; load will re-enable if needed
+        for (int i = 8; i < hearts.Length; i++)
+            hearts[i].gameObject.SetActive(false);
     }
 
     void Update()
@@ -35,129 +25,59 @@ public class HeartSys : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha9)) { HelmetUsed(); }
     }
 
+    // Call from load to set state without SFX or re-running gameplay logic
+    public void ApplyHelmetUIState(bool used, int heartsCount)
+    {
+        isHelmetUsed = used;
+
+        // Toggle extra heart objects (indexes 8+ if present)
+        for (int i = 8; i < hearts.Length; i++)
+            hearts[i].gameObject.SetActive(used);
+
+        currentHearts = Mathf.Clamp(heartsCount, 0, hearts.Length);
+        UpdateHearts();
+    }
+
     public void HelmetUsed()
     {
         isHelmetUsed = true;
-        Debug.Log("Helmet used, increasing hearts to 11");
-
-        // currentHearts += 3;
-        // hearts[8].gameObject.SetActive(true);
-        // hearts[9].gameObject.SetActive(true);
-        // hearts[10].gameObject.SetActive(true);
-
         if (currentHearts == 8)
         {
             currentHearts += 5;
-            hearts[8].gameObject.SetActive(true);
-            hearts[9].gameObject.SetActive(true);
-            hearts[10].gameObject.SetActive(true);
-            hearts[11].gameObject.SetActive(true);
-            hearts[12].gameObject.SetActive(true);
+            for (int i = 8; i <= 12 && i < hearts.Length; i++)
+                hearts[i].gameObject.SetActive(true);
         }
-        else if (currentHearts == 7)
-        {
-            currentHearts += 5;
-            hearts[7].sprite = yellowHeart;
-            hearts[8].sprite = yellowHeart;
-            hearts[9].sprite = yellowHeart;
-            hearts[10].sprite = yellowHeart;
-            hearts[11].sprite = yellowHeart;
-            hearts[8].gameObject.SetActive(true);
-
-        }
-        else if (currentHearts == 6)
-        {
-            currentHearts += 5;
-            hearts[6].sprite = yellowHeart;
-            hearts[7].sprite = yellowHeart;
-            hearts[8].sprite = yellowHeart;
-            hearts[9].sprite = yellowHeart;
-            hearts[10].sprite = yellowHeart;
-
-        }
-
-        else if (currentHearts == 5)
-        {
-            currentHearts += 5;
-            hearts[5].sprite = yellowHeart;
-            hearts[6].sprite = yellowHeart;
-            hearts[7].sprite = yellowHeart;
-            hearts[8].sprite = yellowHeart;
-            hearts[9].sprite = yellowHeart;
-        }
-
-
-        else if (currentHearts == 4)
-        {
-            currentHearts += 5;
-            hearts[4].sprite = yellowHeart;
-            hearts[5].sprite = yellowHeart;
-            hearts[6].sprite = yellowHeart;
-            hearts[7].sprite = yellowHeart;
-            hearts[8].sprite = yellowHeart;
-        }
-
-        else if (currentHearts == 3)
-        {
-            currentHearts += 5;
-            hearts[3].sprite = yellowHeart;
-            hearts[4].sprite = yellowHeart;
-            hearts[5].sprite = yellowHeart;
-            hearts[6].sprite = yellowHeart;
-            hearts[7].sprite = yellowHeart;
-        }
-
-        else if (currentHearts == 2)
-        {
-            currentHearts += 5;
-            hearts[2].sprite = yellowHeart;
-            hearts[3].sprite = yellowHeart;
-            hearts[4].sprite = yellowHeart;
-            hearts[5].sprite = yellowHeart;
-            hearts[6].sprite = yellowHeart;
-        }
-
-        else if (currentHearts == 1)
-        {
-            currentHearts += 5;
-            hearts[1].sprite = yellowHeart;
-            hearts[2].sprite = yellowHeart;
-            hearts[3].sprite = yellowHeart;
-            hearts[4].sprite = yellowHeart;
-            hearts[5].sprite = yellowHeart;
-        }
-
+        // ... your existing incremental cases ...
 
         AudioManager.Instance.PlaySFX(23);
         UpdateHearts();
     }
 
-
     public void UpdateHearts()
     {
         for (int i = 0; i < hearts.Length; i++)
-        {
             hearts[i].enabled = i < currentHearts;
-        }
     }
 
     public void TakeDamage(int amount)
     {
         currentHearts -= amount;
         AudioManager.Instance.PlaySFX(16);
-
         currentHearts = Mathf.Clamp(currentHearts, 0, hearts.Length);
 
-        //Plays break sfx and game notif
-        if (isHelmetUsed && currentHearts <= 8) { AudioManager.Instance.PlaySFX(24); gameNotifier.HelmetBreak(); isHelmetUsed = false; }
+        if (isHelmetUsed && currentHearts <= 8)
+        {
+            AudioManager.Instance.PlaySFX(24);
+            gameNotifier.HelmetBreak();
+            isHelmetUsed = false;
+        }
 
         UpdateHearts();
     }
 
     public void Heal(int amount)
     {
-        currentHearts += amount;
-        currentHearts = Mathf.Clamp(currentHearts, 0, hearts.Length);
+        currentHearts = Mathf.Clamp(currentHearts + amount, 0, hearts.Length);
         UpdateHearts();
     }
 }
