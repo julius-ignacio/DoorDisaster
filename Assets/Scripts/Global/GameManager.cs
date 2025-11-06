@@ -15,19 +15,36 @@ public class GameManager : MonoBehaviour
 
     [Header("Scripts")]
     public PanicMeterScript panicMeterScript;
+        public Movements movementscript;
     public HeartSys hearts;
-    public Movements movementscript;
+        [Header("Narrative/UI Managers")]
+    public SubtitleManager2 subtitleManager2;
 
     public static GameManager Instance;
 
+    /// /////////////////
+    [Header("Puzzle References")]
+    public BreakerPuzzle breakerPuzzle;
+    
+        [Header("Fire Extinguisher References")]
+    public FireExtinguisher fireExtinguisher;
+
+    // Track visibility states
+    private bool wasBreakerPuzzleVisible = false;
+    private bool wasFireExtinguisherPickupVisible = false;
+    private bool wasFireExtinguisherSprayVisible = false;
 
     public bool isPaused = false;
 
+
+/// ////////////////////////////
 
     [Header("HUD Handling")]
     public CanvasGroup hudCanvasGroup; // assign the HUD's CanvasGroup he
 
 
+
+//9999999999999999999999999999999999999999999999999
 
     private void Awake()
     {
@@ -43,6 +60,8 @@ public class GameManager : MonoBehaviour
     }
 
 
+
+/// 99999999999999999999999999999999999999
     void Start()
     {
         if (resumeBtn != null) resumeBtn.SetActive(false);
@@ -182,6 +201,43 @@ public class GameManager : MonoBehaviour
             hudCanvasGroup.blocksRaycasts = false;
         }
 
+        // Hide pickup button properly (handles ALL pickups including oxygen)
+        if (GenericPickupButton.Instance != null)
+            GenericPickupButton.Instance.OnPause();
+
+
+        // Hide breaker puzzle
+        if (breakerPuzzle != null && breakerPuzzle.breakerPanel != null)
+        {
+            wasBreakerPuzzleVisible = breakerPuzzle.breakerPanel.activeSelf;
+            if (wasBreakerPuzzleVisible)
+                breakerPuzzle.breakerPanel.SetActive(false);
+        }
+        
+
+        // Hide fire extinguisher UI
+        if (fireExtinguisher != null)
+        {
+            if (fireExtinguisher.pickupButton != null)
+            {
+                wasFireExtinguisherPickupVisible = fireExtinguisher.pickupButton.activeSelf;
+                if (wasFireExtinguisherPickupVisible)
+                    fireExtinguisher.pickupButton.SetActive(false);
+            }
+
+            if (fireExtinguisher.sprayButton != null)
+            {
+                wasFireExtinguisherSprayVisible = fireExtinguisher.sprayButton.activeSelf;
+                if (wasFireExtinguisherSprayVisible)
+                    fireExtinguisher.sprayButton.SetActive(false);
+            }
+        }
+
+
+        // Hide subtitles/objectives (SubtitleManager handles resume)
+        if (subtitleManager2 != null)
+            subtitleManager2.OnPause();
+
     }
 
 
@@ -211,6 +267,27 @@ public class GameManager : MonoBehaviour
             hudCanvasGroup.interactable = true;
             hudCanvasGroup.blocksRaycasts = true;
         }
+
+
+          // Restore pickup button (handles ALL pickups including oxygen)
+        if (GenericPickupButton.Instance != null)
+            GenericPickupButton.Instance.OnResume();
+
+        // Restore breaker puzzle if it was visible
+        if (wasBreakerPuzzleVisible && breakerPuzzle != null && breakerPuzzle.breakerPanel != null)
+            breakerPuzzle.breakerPanel.SetActive(true);
+
+        // Restore fire extinguisher UI if visible
+        if (wasFireExtinguisherPickupVisible && fireExtinguisher != null && fireExtinguisher.pickupButton != null)
+            fireExtinguisher.pickupButton.SetActive(true);
+
+        if (wasFireExtinguisherSprayVisible && fireExtinguisher != null && fireExtinguisher.sprayButton != null)
+            fireExtinguisher.sprayButton.SetActive(true);
+
+
+                    // Resume subtitles/objectives safely
+        if (subtitleManager2 != null)
+            subtitleManager2.OnResume();
     }
 
     IEnumerator LoadHubScene()
@@ -261,6 +338,21 @@ public class GameManager : MonoBehaviour
 
         if (movementscript != null) movementscript.enabled = false;
 
+
+                if (fireExtinguisher != null)
+        {
+            if (fireExtinguisher.pickupButton != null)
+                fireExtinguisher.pickupButton.SetActive(false);
+            if (fireExtinguisher.sprayButton != null)
+                fireExtinguisher.sprayButton.SetActive(false);
+        }
+
+        // Hide pickup UI on game over (handles ALL pickups)
+        if (GenericPickupButton.Instance != null)
+            GenericPickupButton.Instance.HidePickupPrompt();
+        // Also hide subtitles on death
+        if (subtitleManager2 != null)
+            subtitleManager2.HideAll();
     }
 
 
@@ -294,3 +386,27 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Game saved for {mode} Trial {trialIndex}");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

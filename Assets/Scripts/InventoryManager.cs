@@ -33,7 +33,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public void ToggleInventory()
+    public void     ToggleInventory()
     {
         inventoryUI.SetActive(!inventoryUI.activeSelf);
         medkitCounter.text = medkit.ToString();

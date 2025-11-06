@@ -53,7 +53,7 @@ public class OpenLevelSelection : MonoBehaviour
     {
         switch (trial)
         {
-            // case 0: return "Fire";
+            case 0: return "Fire";
             // case 1: return "Water";
             case 2: return "Earth";
             default:
