@@ -16,8 +16,18 @@ public class GameNotifier : MonoBehaviour
 
     public void EarnedPoints(int points, float duration = 3f)
     {
-        StartCoroutine(ShowNotificationCoroutine($"+{points} Points Earned!", duration));
+        if (points > 1)
+        {
+            StartCoroutine(ShowNotificationCoroutine($"+{points} Points Earned!", duration));
+
+        }
+
+        else
+        {
+            StartCoroutine(ShowNotificationCoroutine($"+{points} Point Earned!", duration));
+        }
     }
+
     
         public void ObtainedItem(int points, string itemName, float duration = 3f)
     {

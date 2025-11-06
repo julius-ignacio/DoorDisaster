@@ -7,7 +7,8 @@ public class WorldSaveSystem : MonoBehaviour
     public static void SaveWorld(int trialIndex, int mode)
     {
         // Include inactive objects so we persist everything that changed
-        SavableObject[] allObjects = GameObject.FindObjectsOfType<SavableObject>(true);
+        SavableObject[] allObjects =
+            Object.FindObjectsByType<SavableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         List<ObjectState> states = new List<ObjectState>(allObjects.Length);
 
         foreach (var so in allObjects)
@@ -35,37 +36,62 @@ public class WorldSaveSystem : MonoBehaviour
         // Collect player state
         var ps = new PlayerState();
 
-        var hearts = Object.FindObjectsOfType<HeartSys>(true);
+        var hearts = Object.FindObjectsByType<HeartSys>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (hearts.Length > 0)
         {
             ps.hearts = hearts[0].currentHearts;
             ps.isHelmetUsed = hearts[0].isHelmetUsed;
         }
 
-        var panic = Object.FindObjectsOfType<PanicMeterScript>(true);
+        var panic = Object.FindObjectsByType<PanicMeterScript>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (panic.Length > 0) ps.panic = panic[0].currHealth;
 
-        var inv = Object.FindObjectsOfType<InventoryManager>(true);
+        var inv = Object.FindObjectsByType<InventoryManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (inv.Length > 0)
         {
             ps.medkits = inv[0].medkit;
             ps.water = inv[0].water;
         }
 
-        var whistle = Object.FindObjectsOfType<UseWhistle>(true);
+        var whistle = Object.FindObjectsByType<UseWhistle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (whistle.Length > 0 && whistle[0].ButtonSkill != null)
             ps.hasWhistle = whistle[0].ButtonSkill.gameObject.activeSelf;
 
-        var cover = Object.FindObjectsOfType<CoverMechanic>(true);
+        var cover = Object.FindObjectsByType<CoverMechanic>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (cover.Length > 0 && cover[0].CoverCamera != null)
             ps.isCovered = cover[0].CoverCamera.enabled;
+
+        // Collect behaviour/object flags (enabled / activeSelf)
+        var flagComps = Object.FindObjectsByType<SavableFlag>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        var flagStates = new List<FlagState>(flagComps.Length);
+        foreach (var f in flagComps)
+        {
+            var fs = new FlagState { id = f.id };
+
+            if (f.behaviours != null && f.behaviours.Length > 0)
+            {
+                fs.behavioursEnabled = new bool[f.behaviours.Length];
+                for (int i = 0; i < f.behaviours.Length; i++)
+                    fs.behavioursEnabled[i] = f.behaviours[i] != null && f.behaviours[i].enabled;
+            }
+
+            if (f.objects != null && f.objects.Length > 0)
+            {
+                fs.objectsActive = new bool[f.objects.Length];
+                for (int i = 0; i < f.objects.Length; i++)
+                    fs.objectsActive[i] = f.objects[i] != null && f.objects[i].activeSelf;
+            }
+
+            flagStates.Add(fs);
+        }
 
         WorldSaveData saveData = new WorldSaveData
         {
             trialIndex = trialIndex,
             mode = mode,
             objects = states.ToArray(),
-            player = ps
+            player = ps,
+            flags = flagStates.ToArray()
         };
 
         string path = Path.Combine(Application.persistentDataPath, $"save_trial{trialIndex}_mode{mode}.json");
@@ -79,7 +105,6 @@ public class WorldSaveSystem : MonoBehaviour
         return File.Exists(path);
     }
 
-        // NEW: delete only the save for a specific trial/mode
     public static void DeleteSave(int trial, int mode)
     {
         string path = Path.Combine(Application.persistentDataPath, $"save_trial{trial}_mode{mode}.json");
@@ -103,7 +128,8 @@ public class WorldSaveSystem : MonoBehaviour
         WorldSaveData saveData = JsonUtility.FromJson<WorldSaveData>(json);
 
         // Include inactive objects so we can restore them too
-        SavableObject[] allObjects = GameObject.FindObjectsOfType<SavableObject>(true);
+        SavableObject[] allObjects =
+            Object.FindObjectsByType<SavableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         // Build a map for fast id lookup
         var map = new Dictionary<string, SavableObject>(allObjects.Length);
@@ -150,36 +176,71 @@ public class WorldSaveSystem : MonoBehaviour
         var ps = saveData.player;
         if (ps != null)
         {
-            var hearts = Object.FindObjectsOfType<HeartSys>(true);
+            var hearts = Object.FindObjectsByType<HeartSys>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (hearts.Length > 0)
                 hearts[0].ApplyHelmetUIState(ps.isHelmetUsed, ps.hearts);
 
-            var panic = Object.FindObjectsOfType<PanicMeterScript>(true);
+            var panic = Object.FindObjectsByType<PanicMeterScript>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (panic.Length > 0)
                 panic[0].currHealth = ps.panic;
 
-            var inv = Object.FindObjectsOfType<InventoryManager>(true);
+            var inv = Object.FindObjectsByType<InventoryManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (inv.Length > 0)
             {
                 inv[0].medkit = ps.medkits;
                 inv[0].water = ps.water;
             }
 
-            var whistle = Object.FindObjectsOfType<UseWhistle>(true);
+            var whistle = Object.FindObjectsByType<UseWhistle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (whistle.Length > 0 && whistle[0].ButtonSkill != null)
             {
                 whistle[0].ButtonSkill.gameObject.SetActive(ps.hasWhistle);
                 if (whistle[0].cooldownUI != null) whistle[0].cooldownUI.SetActive(false);
             }
 
-          // APPLY COVERED STATE ON LOAD (missing in your current code)
-            var cover = Object.FindObjectsOfType<CoverMechanic>(true);
+            var cover = Object.FindObjectsByType<CoverMechanic>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (cover.Length > 0)
                 cover[0].ApplyCoveredState(ps.isCovered);
-
-                
         }
 
-        Debug.Log($"Loaded world state from {path}. Restored {applied}/{saveData.objects.Length} objects.");
+        // APPLY behaviour/object flags
+        if (saveData.flags != null && saveData.flags.Length > 0)
+        {
+            var flagComps = Object.FindObjectsByType<SavableFlag>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var flagMap = new Dictionary<string, SavableFlag>(flagComps.Length);
+            foreach (var f in flagComps)
+            {
+                if (!string.IsNullOrEmpty(f.id) && !flagMap.ContainsKey(f.id))
+                    flagMap.Add(f.id, f);
+            }
+
+            foreach (var fs in saveData.flags)
+            {
+                if (fs == null || string.IsNullOrEmpty(fs.id)) continue;
+                if (!flagMap.TryGetValue(fs.id, out var f)) continue;
+
+                if (f.behaviours != null && fs.behavioursEnabled != null)
+                {
+                    int n = Mathf.Min(f.behaviours.Length, fs.behavioursEnabled.Length);
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (f.behaviours[i] != null)
+                            f.behaviours[i].enabled = fs.behavioursEnabled[i];
+                    }
+                }
+
+                if (f.objects != null && fs.objectsActive != null)
+                {
+                    int n = Mathf.Min(f.objects.Length, fs.objectsActive.Length);
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (f.objects[i] != null)
+                            f.objects[i].SetActive(fs.objectsActive[i]);
+                    }
+                }
+            }
+        }
+
+        Debug.Log($"Loaded world state from {path}. Restored {applied}/{saveData.objects.Length} objects and {(saveData.flags?.Length ?? 0)} flag groups.");
     }
 }

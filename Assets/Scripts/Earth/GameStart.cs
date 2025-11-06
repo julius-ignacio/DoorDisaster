@@ -103,15 +103,4 @@ public class GameStart : MonoBehaviour  //, IPointerClickHandler
         PlayerMovements.speed = 3f;
         PlayerMovements.jumpHeight = 1f;
     }
-
-
-    // private IEnumerator StartSequence()
-    // {
-
-    //     // Wait another 1 second, then trigger the quake and panic meter
-    //     yield return new WaitForSeconds(1f);
-
-
-
-    // }
 }

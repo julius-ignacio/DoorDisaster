@@ -3,58 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System;
 using MilkShake;
 
 public class QuizScript : MonoBehaviour
 {
-
-    public GameObject helpBtn; //opens quiz panel
-    public GameObject quizUI; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
-    public GameObject hud; //quiz panel.. drag and drop in inspector the quiz panel OBJECT hereee
-
+    public GameObject helpBtn; // opens quiz panel
+    public GameObject quizUI;  // quiz panel
+    public GameObject hud;     // HUD root (ideally has a CanvasGroup)
 
     [Header("UI")]
     public TMP_Text questionText;
-    public Button[] choiceButtons;            // assign in inspector (e.g. 3 buttons)
-    public TMP_Text scoreText;               // shows player score
-                                             // public TMP_Text Scoree;                  // result text you used wala lang to pang test langggg ignore this
+    public Button[] choiceButtons;   // assign in inspector (e.g. 3 buttons)
+    public TMP_Text scoreText;       // shows player score
 
-    [Header("Colors & Timing")] //Ignore these
+    [Header("Colors & Timing")]
     public Color correctColor = new Color(0.2f, 0.8f, 0.2f); // green
-    public Color wrongColor = new Color(0.9f, 0.3f, 0.3f); // red
-    public float feedbackDelay = 1f;                       // seconds to show color. Delay to each after quiz question
+    public Color wrongColor = new Color(0.9f, 0.3f, 0.3f);   // red
+    public float feedbackDelay = 1f;
 
-
-    [Header("Disable movements and quake whent taking quiz")]
+    [Header("Disable movements and quake when taking quiz")]
     public Movements movements;
     public ConsistentQuake consistentQuake;
     public Shaker shake;
 
+    private List<QuizQuestion> currentQuestions;
+    private int currentIndex = 0;
+    public int score = 0;
+    private Color[] originalButtonColors;
 
-
-    private List<QuizQuestion> currentQuestions; // Rereference to current quiz questions
-    private int currentIndex = 0; // which question we are on
-    public int score = 0; // how many correct so far... 
-    private Color[] originalButtonColors; //ignore
-    public GameObject[] disablePlaneAfterQuiz; //
-
-
-    public int currentNpcId; // To track which NPC is being helped
-    public ObjectBehaviorEvent[] objectBehaviorEvent; // Reference to NpcAnimation script
-
-
+    public GameObject[] disablePlaneAfterQuiz;
+    public int currentNpcId; // which NPC/item
+    public ObjectBehaviorEvent[] objectBehaviorEvent;
 
     void Start()
     {
-        quizUI.SetActive(false);
-        helpBtn.SetActive(false);
+        if (quizUI != null) quizUI.SetActive(false);
+        if (helpBtn != null) helpBtn.SetActive(false);
     }
-
 
     void Awake()
     {
-        // cache original button background colors so we can restore them..     ignoreeeeeeee
         originalButtonColors = new Color[choiceButtons.Length];
         for (int i = 0; i < choiceButtons.Length; i++)
         {
@@ -63,60 +51,73 @@ public class QuizScript : MonoBehaviour
         }
     }
 
+    // Map your ids (1..15) to QuizGroup
+    private QuizGroup ResolveGroup(int id)
+    {
+        switch (id)
+        {
+            case 1:  return QuizGroup.NPC1;
+            case 2:  return QuizGroup.NPC2;
+            case 3:  return QuizGroup.NPC3;
+            case 4:  return QuizGroup.NPC4;
+            case 5:  return QuizGroup.NPC5;
 
+            case 6:  return QuizGroup.Medkit1;
+            case 7:  return QuizGroup.Medkit2;
+            case 8:  return QuizGroup.Medkit3;
+            case 9:  return QuizGroup.Medkit4;
+
+            case 10: return QuizGroup.Water1;
+            case 11: return QuizGroup.Water2;
+            case 12: return QuizGroup.Water3;
+            case 13: return QuizGroup.Water4;
+
+            case 14: return QuizGroup.Whistle1;
+            case 15: return QuizGroup.SafetyHelmet;
+            default:
+                Debug.LogWarning($"Unknown currentNpcId {id}, defaulting to NPC1.");
+                return QuizGroup.NPC1;
+        }
+    }
 
     public void OnHelpButtonClick()
     {
-        helpBtn.SetActive(false);
-        quizUI.SetActive(true);
+        if (helpBtn) helpBtn.SetActive(false);
+        if (quizUI) quizUI.SetActive(true);
 
-        List<QuizQuestion> questions = null;
-        switch (currentNpcId)
-        {
-            case 1: questions = QuizDatabase.NPC1; break;
-            case 2: questions = QuizDatabase.NPC2; break;
-            case 3: questions = QuizDatabase.NPC3; break;
-            case 4: questions = QuizDatabase.NPC4; break;
-            case 5: questions = QuizDatabase.NPC5; break;
-            case 6: questions = QuizDatabase.Medkit; break;
-            case 7: questions = QuizDatabase.Medkit2; break;
-            case 8: questions = QuizDatabase.Medkit3; break;
-            case 9: questions = QuizDatabase.Medkit4; break;
-            case 10: questions = QuizDatabase.Water1; break;
-            case 11: questions = QuizDatabase.Water2; break;
-            case 12: questions = QuizDatabase.Water3; break;
-            case 13: questions = QuizDatabase.Water4; break;
-            case 14: questions = QuizDatabase.Whistle1; break;
-            case 15: questions = QuizDatabase.SafetyHelmet; break;
+        // Read mode from DataManager and fetch the appropriate question set
+        int mode = 0;
+        if (DataManager.Instance != null)
+            mode = Mathf.Clamp(DataManager.Instance.currentMode, 0, 1);
 
-        }
-
+        var group = ResolveGroup(currentNpcId);
+        List<QuizQuestion> questions = QuizDatabase.Get(group, mode);
         BeginQuiz(questions);
     }
 
-
-
-
-    //Is called when the player clicks the BUTTON in the other script 
+    // Called when starting the quiz
     public void BeginQuiz(List<QuizQuestion> questions)
     {
-        movements.enabled = false;
+        if (movements) movements.enabled = false;
+        if (shake) shake.enabled = false;
 
-        shake.enabled = false;
-        consistentQuake.enabled = false;
+        if (consistentQuake != null)
+        {
+            consistentQuake.PauseQuakes();
+            consistentQuake.enabled = false;
+        }
 
-        CanvasGroup hudCanvas = hud.GetComponent<CanvasGroup>();
-if (hudCanvas != null)
-{
-    hudCanvas.alpha = 0;
-    hudCanvas.interactable = false;
-    hudCanvas.blocksRaycasts = false;
-}
-
-
-
-        consistentQuake.PauseQuakes();
-
+        var hudCanvas = hud ? hud.GetComponent<CanvasGroup>() : null;
+        if (hudCanvas != null)
+        {
+            hudCanvas.alpha = 0;
+            hudCanvas.interactable = false;
+            hudCanvas.blocksRaycasts = false;
+        }
+        else if (hud != null)
+        {
+            hud.SetActive(false);
+        }
 
         if (questions == null || questions.Count == 0)
         {
@@ -124,18 +125,16 @@ if (hudCanvas != null)
             return;
         }
 
-        //Set up. passing the questions from the other script
         currentQuestions = new List<QuizQuestion>(questions);
         currentIndex = 0;
         score = 0;
-        UpdateScoreUI(); //Update methods
+        UpdateScoreUI();
         ShowQuestion();
         gameObject.SetActive(true);
     }
 
-    void ShowQuestion()  //can just copy paste this method
+    void ShowQuestion()
     {
-        // finished?
         if (currentIndex >= currentQuestions.Count)
         {
             EndQuiz(currentNpcId);
@@ -143,120 +142,68 @@ if (hudCanvas != null)
         }
 
         QuizQuestion q = currentQuestions[currentIndex];
+        if (questionText) questionText.text = q.question;
 
-        // show text
-        questionText.text = q.question;
-
-        // populate buttons, remove old listeners, reset colors and interactability
         for (int i = 0; i < choiceButtons.Length; i++)
         {
             Button btn = choiceButtons[i];
 
-            // If question has fewer choices than number of buttons: hide extras
             if (i < q.choices.Length)
             {
                 btn.gameObject.SetActive(true);
+
                 TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
                 if (btnText != null) btnText.text = q.choices[i];
 
-                // reset color
                 Image img = btn.GetComponent<Image>();
                 if (img != null) img.color = originalButtonColors[i];
 
-                // reset interactivity
                 btn.interactable = true;
-
-                Debug.Log($"Button {i} interactable={btn.interactable}, hasListener={btn.onClick.GetPersistentEventCount()}");
-
-                // remove previous listeners then add new one
                 btn.onClick.RemoveAllListeners();
-
-                Debug.Log($"Button {i} interactable={btn.interactable}, hasListener={btn.onClick.GetPersistentEventCount()}");
 
                 int choiceIndex = i; // capture
                 btn.onClick.AddListener(() => OnChoiceButtonClicked(choiceIndex));
-
-                Debug.Log($"Setting up button {i}: active={btn.gameObject.activeSelf}, choiceIndex={i}, choices.Length={q.choices.Length}");
             }
             else
             {
-                // hide unused buttons (if any)
                 btn.gameObject.SetActive(false);
             }
         }
 
-
-
-
-
         Debug.Log($"Question: {q.question}, Choices={q.choices.Length}, Buttons={choiceButtons.Length}, CorrectIndex={q.correctIndex}");
-
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // central handler for button clicks
     public void OnChoiceButtonClicked(int choiceIndex)
     {
-        Debug.Log($"Answer clicked for NPC {currentNpcId}, writing to index {currentNpcId - 1}");
-
-        Debug.Log($"OnChoiceButtonClicked called with index {choiceIndex}, buttons={choiceButtons.Length}, choices={currentQuestions[currentIndex].choices.Length}");
         if (currentQuestions == null || currentIndex >= currentQuestions.Count) return;
         if (choiceIndex < 0 || choiceIndex >= choiceButtons.Length)
         {
-            Debug.LogError($"Choice index {choiceIndex} is out of bounds for choiceButtons.Length={choiceButtons.Length}");
+            Debug.LogError($"Choice index {choiceIndex} out of bounds for buttons length {choiceButtons.Length}");
             return;
         }
+
         QuizQuestion q = currentQuestions[currentIndex];
         if (choiceIndex >= q.choices.Length)
         {
-            Debug.LogError($"Choice index {choiceIndex} is out of bounds for choices.Length={q.choices.Length}");
+            Debug.LogError($"Choice index {choiceIndex} out of bounds for choices length {q.choices.Length}");
             return;
         }
-        bool correct = choiceIndex == q.correctIndex;
 
-
-        // if (currentQuestions == null || currentIndex >= currentQuestions.Count) return; 
-
-
-
-        // QuizQuestion q = currentQuestions[currentIndex]; 
-        // bool correct = (choiceIndex == q.correctIndex);
-
+        bool correct = (choiceIndex == q.correctIndex);
 
         if (correct)
         {
             score++;
-            Debug.Log($"Correct answer for NPC {currentNpcId}");
-
-            // ✅ Only track GLOBAL score here
-            DataManager.Instance.quizScore++;
+            if (DataManager.Instance != null) DataManager.Instance.quizScore++;
         }
         else
         {
-            DataManager.Instance.wrongAnswers++;
+            if (DataManager.Instance != null) DataManager.Instance.wrongAnswers++;
         }
 
-
-        // disable buttons
         for (int i = 0; i < choiceButtons.Length; i++)
             choiceButtons[i].interactable = false;
 
-
-        // color feedback
         Image chosenImg = choiceButtons[choiceIndex].GetComponent<Image>();
         if (chosenImg != null) chosenImg.color = correct ? correctColor : wrongColor;
 
@@ -266,33 +213,15 @@ if (hudCanvas != null)
             if (correctImg != null) correctImg.color = correctColor;
         }
 
-        Debug.Log($"OnChoiceButtonClicked fired! choiceIndex={choiceIndex}, correct={correct}");
-
-
-
-
         UpdateScoreUI();
         UpdateDataManager();
 
         StartCoroutine(AdvanceAfterDelay(feedbackDelay));
     }
 
-
-
-
-
-
-
-
-
-
-
     IEnumerator AdvanceAfterDelay(float delay)
     {
-        // Wait scaled time. If you pause the game with Time.timeScale = 0 during quizzes,
-        // change this to WaitForSecondsRealtime(delay).
         yield return new WaitForSeconds(delay);
-
         currentIndex++;
         ShowQuestion();
     }
@@ -300,88 +229,53 @@ if (hudCanvas != null)
     void UpdateScoreUI()
     {
         if (scoreText != null) scoreText.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
-        //  if (Scoree != null) Scoree.text = $"Score: {score}/{currentQuestions?.Count ?? 0}";
     }
 
     void UpdateDataManager()
     {
-        // DataManager.Instance.playerScore += score; //Adds current score to the total score
-
-        DataManager.Instance.totalQuestionsAnswered++; // current question index (1-based)
+        if (DataManager.Instance != null)
+            DataManager.Instance.totalQuestionsAnswered++;
     }
-
-
 
     void EndQuiz(int idToDisableTriggers)
     {
         Debug.Log($"Quiz finished. NPC {currentNpcId}, Score={score}");
 
-        // ✅ Save this NPC's score
-        DataManager.Instance.npcScores[currentNpcId] = score;
+        if (DataManager.Instance != null)
+            DataManager.Instance.npcScores[currentNpcId] = score;
 
-        disablePlaneAfterQuiz[idToDisableTriggers - 1].SetActive(false);
-        objectBehaviorEvent[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+        int idx = idToDisableTriggers - 1;
+        if (disablePlaneAfterQuiz != null && idx >= 0 && idx < disablePlaneAfterQuiz.Length && disablePlaneAfterQuiz[idx] != null)
+            disablePlaneAfterQuiz[idx].SetActive(false);
+
+        if (objectBehaviorEvent != null && currentNpcId - 1 >= 0 &&
+            currentNpcId - 1 < objectBehaviorEvent.Length && objectBehaviorEvent[currentNpcId - 1] != null)
+        {
+            objectBehaviorEvent[currentNpcId - 1].PlayAndDisappear(currentNpcId);
+        }
 
         gameObject.SetActive(false);
-        helpBtn.SetActive(false);
+        if (helpBtn) helpBtn.SetActive(false);
 
+        if (consistentQuake != null)
+        {
+            consistentQuake.enabled = true;
+            consistentQuake.ResumeQuakes();
+        }
 
-       ///////////////////// npcAnimation[currentNpcId - 1].ReactToScore(score);
+        var hudCanvas = hud ? hud.GetComponent<CanvasGroup>() : null;
+        if (hudCanvas != null)
+        {
+            hudCanvas.alpha = 1;
+            hudCanvas.interactable = true;
+            hudCanvas.blocksRaycasts = true;
+        }
+        else if (hud != null)
+        {
+            hud.SetActive(true);
+        }
 
-        // if (score > 0)
-        // {
-        //     if (currentNpcId > 0 && currentNpcId <= 5)
-        //     {
-        //         gameNotifier.EarnedPoints(score);
-        //         AudioManager.Instance.PlaySFX(8); //points
-
-        //         if (npcsaved != null) { npcsaved.makeIconActive(); }
-        //     }
-
-        //     else if (currentNpcId >= 6 && currentNpcId <= 8)
-        //     {
-        //         AudioManager.Instance.PlaySFX(19); //medkit
-        //         AudioManager.Instance.PlaySFX(8); //points
-        //         gameNotifier.EarnedPoints(score);
-
-
-        //     }
-
-        //     else if (currentNpcId >= 9 && currentNpcId <= 11)
-        //     {
-        //         AudioManager.Instance.PlaySFX(18); //drink water
-        //         AudioManager.Instance.PlaySFX(8); //points
-        //         gameNotifier.EarnedPoints(score);
-
-
-        //     }
-
-
-        //     else if (currentNpcId >= 12)
-        //     {
-        //         gameNotifier.ObtainedItem(2, "Whistle");
-        //         AudioManager.Instance.PlaySFX(8); //points
-        //     }
-
-        // }
-
-
-        consistentQuake.enabled = true;
-consistentQuake.ResumeQuakes();
-
-        CanvasGroup hudCanvas = hud.GetComponent<CanvasGroup>();
-
-
-
-        hudCanvas.alpha = 1;
-hudCanvas.interactable = true;
-hudCanvas.blocksRaycasts = true;
-
-
-        shake.enabled = true;
-        movements.enabled = true;
-
+        if (shake) shake.enabled = true;
+        if (movements) movements.enabled = true;
     }
-
-
 }

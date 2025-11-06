@@ -8,7 +8,7 @@ public class PlayerPerformanceCheck : MonoBehaviour
 
     public ConsistentQuake consistentQuake;
     public Shaker shake;
-    public GameObject panicmeterUI;
+    public GameObject panicmeterUI, quakeIcon, InventoryBtn, hearts, whistlecd, whistleskill, ObjectivesUI;
     public PanicMeterScript panicMeterScript;
     void Start()
     {
@@ -56,31 +56,62 @@ public class PlayerPerformanceCheck : MonoBehaviour
             DestroyBtn3.SetActive(false);
 
 
-                    // Audio switching logic (this part always runs)
-        AudioClip temp = AudioManager.Instance.Clips[2];
-        AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];
-        AudioManager.Instance.Clips[1] = temp;
+            // Audio switching logic (this part always runs)
+            AudioClip temp = AudioManager.Instance.Clips[2];
+            AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];
+            AudioManager.Instance.Clips[1] = temp;
 
-        AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
+            AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
             AudioManager.Instance.audLoop.volume = 0.5f;
-        
 
-                // Safely handle quake + shake
-        if (shake != null)
-            shake.enabled = false;
 
-        if (consistentQuake != null)
+            // Safely handle quake + shake
+            if (shake != null)
+                shake.enabled = false;
+
+            if (consistentQuake != null)
+            {
+                consistentQuake.enabled = false;
+                consistentQuake.PauseQuakes();
+            }
+
+            if (panicMeterScript != null)
+            {
+                panicMeterScript.currHealth = 0;
+                panicmeterUI.SetActive(false);
+            }
+
+            if (quakeIcon != null)
+                quakeIcon.SetActive(false);
+        }
+
+        if (InventoryBtn != null)
         {
-            consistentQuake.enabled = false;
-            consistentQuake.PauseQuakes();
+            InventoryBtn.SetActive(false);
         }
 
-               if (panicMeterScript != null)
+        if (hearts != null)
         {
-            panicMeterScript.currHealth = 0;
-            panicmeterUI.SetActive(false);
+            hearts.SetActive(false);
         }
+
+        if (whistlecd != null)
+        {
+            whistlecd.SetActive(false);
         }
+
+              if (ObjectivesUI != null)
+        {
+            ObjectivesUI.SetActive(false);
+        }
+
+
+        if (whistleskill != null)
+        {
+            whistleskill.SetActive(false);
+        }
+
+
         else
         {
             warning.SetActive(true);

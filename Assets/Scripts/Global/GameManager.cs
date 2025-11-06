@@ -7,9 +7,10 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject pauseUI, pauseBtn, resumeBtn, RestartBtn, ExitBtn, blackOverlay, HUD; // Drag your PauseUI here in Inspector
+    public GameObject pauseUI, pauseBtn, resumeBtn, RestartBtn, ExitBtn, blackOverlay, HUD, RestartConfirmationUI; // Drag your PauseUI here in Inspector
 
     public GameObject Joystick, Jumpbtn, GameOverUI, PanicMeterUI, CoverBtn, uncoverBtm, PauseUI, heartsys, InventoryUI;
+
     public TMP_Text panicText, injurtyText;
 
     [Header("Scripts")]
@@ -50,6 +51,7 @@ public class GameManager : MonoBehaviour
         if (RestartBtn != null) RestartBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(false);
         if (InventoryUI != null) InventoryUI.SetActive(false);
+        if (RestartConfirmationUI != null) RestartConfirmationUI.SetActive(false);
 
         // Make sure HUD starts visible
         if (hudCanvasGroup != null)
@@ -71,6 +73,21 @@ public class GameManager : MonoBehaviour
         }
 
 
+    }
+
+    public void RestartConfirmation()
+    {
+        if (RestartConfirmationUI != null)
+        {
+            RestartConfirmationUI.SetActive(true);
+        }
+    }
+    
+      public void NoRestartConf()
+    {
+        if (RestartConfirmationUI != null) {
+            RestartConfirmationUI.SetActive(false); 
+        }
     }
 
     void PlayerInjured_Death()

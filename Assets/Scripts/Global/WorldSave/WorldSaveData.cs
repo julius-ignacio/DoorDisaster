@@ -23,6 +23,17 @@ public class PlayerState
     public bool isCovered;
 }
 
+
+// NEW: behaviour + object active state bundle
+[System.Serializable]
+public class FlagState
+{
+    public string id;
+    public bool[] behavioursEnabled; // aligns with SavableFlag.behaviours
+    public bool[] objectsActive;     // aligns with SavableFlag.objects
+}
+
+
 [System.Serializable]
 public class WorldSaveData
 {
@@ -30,4 +41,7 @@ public class WorldSaveData
     public int trialIndex;
     public ObjectState[] objects;
     public PlayerState player;         // added
+
+        public FlagState[] flags;
 }
+

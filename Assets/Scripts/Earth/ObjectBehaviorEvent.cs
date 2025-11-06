@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class ObjectBehaviorEvent : MonoBehaviour
 {
@@ -40,9 +41,12 @@ public class ObjectBehaviorEvent : MonoBehaviour
         // aud = FindObjectOfType<AudioManager>();
     }
 
+
     public void PlayAndDisappear(int currentNpcId)
     {
         int score = 0;
+
+        
 
 
         if (DataManager.Instance.npcScores.TryGetValue(currentNpcId, out score))
@@ -91,6 +95,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
 
                 DataManager.Instance.Npcs_saved++; // increment global NPCs saved count
+
 
                 gameNotifier.EarnedPoints(score);
                 if (npcsaved != null) { npcsaved.makeIconActive(); }
@@ -143,6 +148,8 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
         StartCoroutine(DisappearAfterDelay(disappearDelay));
     }
+    
+ 
 
 
 
