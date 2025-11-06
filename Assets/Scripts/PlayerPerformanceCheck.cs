@@ -1,6 +1,7 @@
 using MilkShake;
 using UnityEngine;
 
+[DefaultExecutionOrder(0)]
 public class PlayerPerformanceCheck : MonoBehaviour
 {
     public GameObject warning, barrier, DestroyBtn3, trigger;
@@ -8,13 +9,14 @@ public class PlayerPerformanceCheck : MonoBehaviour
 
     public ConsistentQuake consistentQuake;
     public Shaker shake;
-    public GameObject panicmeterUI, quakeIcon, InventoryBtn, hearts, whistlecd, whistleskill, ObjectivesUI;
+    public GameObject panicmeterUI, quakeIcon, InventoryBtn, hearts, whistlecd, whistleskill, ObjectivesUI, IntroPanelGuide, HUD, PauseBtn;
     public PanicMeterScript panicMeterScript;
+
     void Start()
     {
-        barrier.SetActive(true);
-        warning.SetActive(true);
-        DestroyBtn3.SetActive(false);
+        if (barrier) barrier.SetActive(true);
+        if (warning) warning.SetActive(true);
+        if (DestroyBtn3) DestroyBtn3.SetActive(false);
     }
 
     void Update()
@@ -24,97 +26,103 @@ public class PlayerPerformanceCheck : MonoBehaviour
             if (!isObjectivesCompleted)
             {
                 isObjectivesCompleted = true;
-                warning.SetActive(false); // ✅ Hide warning when objectives are completed
+                if (warning) warning.SetActive(false);
             }
+
+            // Keep HUD visible once objectives are met during this session
+            if (HUD) HUD.SetActive(true);
+            if (PauseBtn) PauseBtn.SetActive(true);
         }
         else
         {
             isObjectivesCompleted = false;
-            warning.SetActive(true);
+            if (warning) warning.SetActive(true);
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-            DestroyBtn3.SetActive(true);
+        if (!other.CompareTag("Player")) return;
+
+        // Only show the destroy button when objectives are complete
+        if (isObjectivesCompleted)
+        {
+            if (DestroyBtn3) DestroyBtn3.SetActive(true);
+            if (warning) warning.SetActive(false);
+        }
+        else
+        {
+            if (DestroyBtn3) DestroyBtn3.SetActive(false);
+            if (warning) warning.SetActive(true);
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && DestroyBtn3)
             DestroyBtn3.SetActive(false);
     }
 
     public void DestroyWall()
     {
-        if (isObjectivesCompleted)
+        // Guard: only proceed if objectives are complete
+        if (!isObjectivesCompleted)
         {
-            barrier.SetActive(false);
-            AudioManager.Instance.PlaySFX(22);
-            trigger.SetActive(false);
-            DestroyBtn3.SetActive(false);
-
-
-            // Audio switching logic (this part always runs)
-            AudioClip temp = AudioManager.Instance.Clips[2];
-            AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];
-            AudioManager.Instance.Clips[1] = temp;
-
-            AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
-            AudioManager.Instance.audLoop.volume = 0.5f;
-
-
-            // Safely handle quake + shake
-            if (shake != null)
-                shake.enabled = false;
-
-            if (consistentQuake != null)
-            {
-                consistentQuake.enabled = false;
-                consistentQuake.PauseQuakes();
-            }
-
-            if (panicMeterScript != null)
-            {
-                panicMeterScript.currHealth = 0;
-                panicmeterUI.SetActive(false);
-            }
-
-            if (quakeIcon != null)
-                quakeIcon.SetActive(false);
+            if (warning) warning.SetActive(true);
+            return;
         }
 
-        if (InventoryBtn != null)
+        if (barrier) barrier.SetActive(false);
+        AudioManager.Instance.PlaySFX(22);
+        if (trigger) trigger.SetActive(false);
+        if (DestroyBtn3) DestroyBtn3.SetActive(false);
+
+        // Swap/adjust audio
+        AudioClip temp = AudioManager.Instance.Clips[2];
+        AudioManager.Instance.Clips[2] = AudioManager.Instance.Clips[1];
+        AudioManager.Instance.Clips[1] = temp;
+        AudioManager.Instance.PlayLoop(AudioManager.Instance.Clips[20]);
+        AudioManager.Instance.audLoop.volume = 0.5f;
+
+        // Stop shake and quakes
+        if (shake != null)
         {
-            InventoryBtn.SetActive(false);
+            // Reset pose once so disabling doesn’t leave a residual offset
+            shake.transform.localPosition = Vector3.zero;
+            shake.transform.localEulerAngles = Vector3.zero;
+            shake.enabled = false;
         }
 
-        if (hearts != null)
+        if (consistentQuake != null)
         {
-            hearts.SetActive(false);
+            consistentQuake.enabled = false;
+            consistentQuake.PauseQuakes();
         }
 
-        if (whistlecd != null)
+        // UI off as desired
+        if (panicMeterScript != null)
         {
-            whistlecd.SetActive(false);
+            panicMeterScript.currHealth = 0;
         }
+        if (panicmeterUI) panicmeterUI.SetActive(false);
+        if (quakeIcon) quakeIcon.SetActive(false);
+        if (InventoryBtn) InventoryBtn.SetActive(false);
+        if (hearts) hearts.SetActive(false);
+        if (whistlecd) whistlecd.SetActive(false);
+        if (ObjectivesUI) ObjectivesUI.SetActive(false);
+        if (whistleskill) whistleskill.SetActive(false);
 
-              if (ObjectivesUI != null)
+        // Intro guide off; HUD and Pause stay on
+        if (IntroPanelGuide) IntroPanelGuide.SetActive(false);
+        if (HUD) HUD.SetActive(true);
+        if (PauseBtn) PauseBtn.SetActive(true);
+
+        // Persist immediately so the intro stays hidden next time and HUD/Pause are on
+        var dm = DataManager.Instance;
+        if (dm != null)
         {
-            ObjectivesUI.SetActive(false);
-        }
-
-
-        if (whistleskill != null)
-        {
-            whistleskill.SetActive(false);
-        }
-
-
-        else
-        {
-            warning.SetActive(true);
+            dm.SaveTrialData(dm.currentTrial, dm.currentMode);
+            WorldSaveSystem.SaveWorld(dm.currentTrial, dm.currentMode);
         }
     }
 }
