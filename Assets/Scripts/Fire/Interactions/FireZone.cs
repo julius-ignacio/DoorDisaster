@@ -5,10 +5,10 @@ using System.Collections;
 
 public class FireZone : MonoBehaviour
 {
-    public int fireDamage = 5;
-    public float damageInterval = 2f;
+    public int fireDamage = 1;
+    public float damageInterval = 3f;
     private float nextDamageTime;
-    public float flashDuration = 0.3f;
+    public float flashDuration = 0.4f;
     public Color flashColor = new Color(1f, 0f, 0f, 0.5f); // semi-transparent red
                private Color originalColor;
 

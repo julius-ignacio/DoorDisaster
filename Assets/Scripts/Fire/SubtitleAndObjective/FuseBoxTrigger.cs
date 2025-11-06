@@ -4,6 +4,7 @@ public class FuseBoxTrigger : MonoBehaviour
 {
     public SubtitleManager2 subtitleManager;
     private bool hasTriggered = false;
+    private bool playerInside = false;
 
     void Start()
     {
@@ -21,13 +22,39 @@ public class FuseBoxTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"FuseBoxTrigger: Something entered! Tag: {other.tag}, Name: {other.name}");
-
-        // ✅ Only trigger if door has been opened with towel AND subtitles finished
-        if (other.CompareTag("Player") && !hasTriggered && HotDoorHandle.DoorOpenedWithTowel)
+        if (other.CompareTag("Player"))
         {
-            Debug.Log("FuseBoxTrigger: Player detected! Showing subtitle...");
+            Debug.Log($"FuseBoxTrigger: Player entered! Tag: {other.tag}, Name: {other.name}");
+            playerInside = true;
+            TryTriggerSubtitle();
+        }
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player") && playerInside && !hasTriggered)
+        {
+            TryTriggerSubtitle();
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("FuseBoxTrigger: Player exited");
+            playerInside = false;
+        }
+    }
+
+    void TryTriggerSubtitle()
+    {
+        // Only trigger if door has been opened with towel AND hasn't triggered yet
+        if (!hasTriggered && HotDoorHandle.DoorOpenedWithTowel)
+        {
+            Debug.Log("FuseBoxTrigger: Conditions met! Showing subtitle...");
             hasTriggered = true;
+            playerInside = false; // Prevent multiple triggers
 
             FuseBoxInteraction.FuseBoxObjectiveActive = true;
             Debug.Log("FuseBoxTrigger: Fuse box outline activated!");
@@ -46,9 +73,9 @@ public class FuseBoxTrigger : MonoBehaviour
                 }
             );
         }
-        else if (other.CompareTag("Player") && !HotDoorHandle.DoorOpenedWithTowel)
+        else if (!HotDoorHandle.DoorOpenedWithTowel)
         {
-            Debug.Log("FuseBoxTrigger: Player entered but door subtitles not finished yet");
+            Debug.Log("FuseBoxTrigger: Player inside but waiting for door subtitles to finish...");
         }
     }
 

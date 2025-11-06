@@ -123,6 +123,13 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
             yield break;
         }
 
+        // 🔥 RESUME FIRE SPREADING AFTER TELEPORT
+        if (FireSpreadManager.Instance != null)
+        {
+            FireSpreadManager.Instance.ResumeFireSpread();
+            Debug.Log("MrKittyPickup: Resumed fire spreading in House A");
+        }
+
         yield return new WaitForSeconds(0.2f);
 
         // 3️⃣ Fade in

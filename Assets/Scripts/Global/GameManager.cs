@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     [Header("Fire Extinguisher References")]
     public FireExtinguisher fireExtinguisher;
 
-    [Header("Inventory References")] // ✅ NEW - Added this section
+    [Header("Inventory References")]
     public InventoryManager inventoryManager;
 
     [Header("Text")]
@@ -116,16 +116,18 @@ public class GameManager : MonoBehaviour
     {
         if (isPaused) return;
 
-        if (pauseUI != null) pauseUI.SetActive(true);
-        Time.timeScale = 0f;
         isPaused = true;
-
+        Time.timeScale = 0f;
         AudioListener.pause = true;
 
+        // Hide pause menu buttons first
+        if (pauseBtn != null) pauseBtn.SetActive(false);
+
+        // Show pause UI and buttons
+        if (pauseUI != null) pauseUI.SetActive(true);
         if (resumeBtn != null) resumeBtn.SetActive(true);
         if (ExitBtn != null) ExitBtn.SetActive(true);
         if (RestartBtn != null) RestartBtn.SetActive(true);
-        if (pauseBtn != null) pauseBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(true);
 
         if (hudCanvasGroup != null)
@@ -140,11 +142,11 @@ public class GameManager : MonoBehaviour
         if (CoverBtn != null) CoverBtn.SetActive(false);
         if (uncoverBtm != null) uncoverBtm.SetActive(false);
 
-        // 🔸 Hide pickup button properly (handles ALL pickups including oxygen)
+        // Hide pickup button properly (handles ALL pickups including oxygen)
         if (GenericPickupButton.Instance != null)
             GenericPickupButton.Instance.OnPause();
 
-        // 🔸 Hide breaker puzzle
+        // Hide breaker puzzle
         if (breakerPuzzle != null && breakerPuzzle.breakerPanel != null)
         {
             wasBreakerPuzzleVisible = breakerPuzzle.breakerPanel.activeSelf;
@@ -152,7 +154,7 @@ public class GameManager : MonoBehaviour
                 breakerPuzzle.breakerPanel.SetActive(false);
         }
 
-        // 🔸 Hide fire extinguisher UI
+        // Hide fire extinguisher UI
         if (fireExtinguisher != null)
         {
             if (fireExtinguisher.pickupButton != null)
@@ -170,11 +172,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // ✅ NEW - Hide inventory UI when pausing
+        // Hide inventory UI when pausing
         if (inventoryManager != null)
             inventoryManager.OnPause();
 
-        // 🔸 Hide subtitles/objectives (SubtitleManager handles resume)
+        // Hide subtitles/objectives (SubtitleManager handles resume)
         if (subtitleManager2 != null)
             subtitleManager2.OnPause();
     }
@@ -183,19 +185,21 @@ public class GameManager : MonoBehaviour
     {
         if (!isPaused) return;
 
-        if (pauseUI != null) pauseUI.SetActive(false);
-        Time.timeScale = 1f;
         isPaused = false;
-
+        Time.timeScale = 1f;
         AudioListener.pause = false;
 
+        // Hide pause UI and buttons first
+        if (pauseUI != null) pauseUI.SetActive(false);
         if (resumeBtn != null) resumeBtn.SetActive(false);
         if (ExitBtn != null) ExitBtn.SetActive(false);
-        if (pauseBtn != null) pauseBtn.SetActive(true);
         if (RestartBtn != null) RestartBtn.SetActive(false);
         if (blackOverlay != null) blackOverlay.SetActive(false);
+
+        // Restore HUD
         if (HUD != null) HUD.SetActive(true);
 
+        // Restore HUD canvas group
         if (hudCanvasGroup != null)
         {
             hudCanvasGroup.alpha = 1f;
@@ -203,31 +207,39 @@ public class GameManager : MonoBehaviour
             hudCanvasGroup.blocksRaycasts = true;
         }
 
+        // Show pause button AFTER HUD is restored
+        if (pauseBtn != null)
+        {
+            pauseBtn.SetActive(true);
+            Debug.Log("Pause button activated");
+        }
+
+        // Restore game controls
         if (Joystick != null) Joystick.SetActive(true);
         if (Jumpbtn != null) Jumpbtn.SetActive(true);
         if (CoverBtn != null) CoverBtn.SetActive(true);
         if (uncoverBtm != null) uncoverBtm.SetActive(true);
 
-        // 🔹 Restore pickup button (handles ALL pickups including oxygen)
+        // Restore pickup button (handles ALL pickups including oxygen)
         if (GenericPickupButton.Instance != null)
             GenericPickupButton.Instance.OnResume();
 
-        // 🔹 Restore breaker puzzle if it was visible
+        // Restore breaker puzzle if it was visible
         if (wasBreakerPuzzleVisible && breakerPuzzle != null && breakerPuzzle.breakerPanel != null)
             breakerPuzzle.breakerPanel.SetActive(true);
 
-        // 🔹 Restore fire extinguisher UI if visible
+        // Restore fire extinguisher UI if visible
         if (wasFireExtinguisherPickupVisible && fireExtinguisher != null && fireExtinguisher.pickupButton != null)
             fireExtinguisher.pickupButton.SetActive(true);
 
         if (wasFireExtinguisherSprayVisible && fireExtinguisher != null && fireExtinguisher.sprayButton != null)
             fireExtinguisher.sprayButton.SetActive(true);
 
-        // ✅ NEW - Restore inventory UI when resuming
+        // Restore inventory UI when resuming
         if (inventoryManager != null)
             inventoryManager.OnResume();
 
-        // 🔹 Resume subtitles/objectives safely
+        // Resume subtitles/objectives safely
         if (subtitleManager2 != null)
             subtitleManager2.OnResume();
     }
@@ -309,15 +321,15 @@ public class GameManager : MonoBehaviour
                 fireExtinguisher.sprayButton.SetActive(false);
         }
 
-        // ✅ Hide pickup UI on game over (handles ALL pickups)
+        // Hide pickup UI on game over (handles ALL pickups)
         if (GenericPickupButton.Instance != null)
             GenericPickupButton.Instance.HidePickupPrompt();
 
-        // ✅ NEW - Close inventory on game over
+        // Close inventory on game over
         if (inventoryManager != null && inventoryManager.inventoryPanel != null)
             inventoryManager.inventoryPanel.SetActive(false);
 
-        // ✅ Also hide subtitles on death
+        // Also hide subtitles on death
         if (subtitleManager2 != null)
             subtitleManager2.HideAll();
     }

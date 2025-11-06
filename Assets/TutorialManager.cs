@@ -88,7 +88,7 @@ public class TutorialManager : MonoBehaviour
     {
         // Slide 1
         if (headerLine != null)
-            headerLine.text = "Trial of Fire: Escape the Inferno — Will You Survive?";
+            headerLine.text = "Trial of Fire: Escape the Flames";
 
         if (body1Text != null)
             body1Text.text = "A fire has broken out in your home! Navigate through smoke and flames, rescue Mr. Kitty, and find your way to safety. Remember your fire safety training — your survival depends on it. Stay calm and think fast!";
@@ -147,7 +147,7 @@ public class TutorialManager : MonoBehaviour
             header3.text = "Objectives:";
 
         if (body3Text != null)
-            body3Text.text = "Your journey is guided by key objectives. Each one must be completed to move forward. Pay attention, act quickly, and stay focused. Your progress depends on it.";
+            body3Text.text = "Your journey is guided by key objectives. Each one must be completed to move forward. Pay attention and stay focused. Your progress depends on it. <size=145%><color=#FF4444>BE QUICK</color></size> <color=white>the fire is spreading.</color>";
 
         // Remove objective lines
         if (linesBody3Container != null)
@@ -158,7 +158,7 @@ public class TutorialManager : MonoBehaviour
             }
         }
     }
-
+        
     void DisplaySlide(int index)
     {
         foreach (GameObject slide in bodySlides)

@@ -8,27 +8,28 @@ public class GameNotifier : MonoBehaviour
 {
     public GameObject gameTextNotify;
     //public QuizScript quizScript; // assign in Inspector
+
     void Start()
     {
         gameTextNotify.SetActive(false);
     }
 
-
     public void EarnedPoints(int points, float duration = 3f)
     {
-        StartCoroutine(ShowNotificationCoroutine($"+{points} Points Earned!", duration));
-    }
-    
-        public void ObtainedItem(int points, string itemName, float duration = 3f)
-    {
-        StartCoroutine(ShowNotificationCoroutine($"{itemName} obtained. You earned {points} point!", duration));
+        string pointWord = points == 1 ? "Point" : "Points";
+        StartCoroutine(ShowNotificationCoroutine($"+{points} {pointWord} Earned!", duration));
     }
 
-public void PanicWarning(float duration = 3f)
+    public void ObtainedItem(int points, string itemName, float duration = 3f)
+    {
+        string pointWord = points == 1 ? "point" : "points";
+        StartCoroutine(ShowNotificationCoroutine($"{itemName} obtained. You earned {points} {pointWord}!", duration));
+    }
+
+    public void PanicWarning(float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine("Panic meter critical! Stay calm — you've got this!", duration));
     }
-
 
     public void BarrierRemoved(float duration = 5f)
     {
@@ -43,33 +44,24 @@ public void PanicWarning(float duration = 3f)
         ));
     }
 
-
-public void cantHeal_FullHealth(float duration = 5f)
-{
-    StartCoroutine(ShowNotificationCoroutine(
-        "Health is full.",
-        duration
-    ));
-}
-
-
-
-
-
+    public void cantHeal_FullHealth(float duration = 5f)
+    {
+        StartCoroutine(ShowNotificationCoroutine(
+            "Health is full.",
+            duration
+        ));
+    }
 
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
     }
 
-private IEnumerator ShowNotificationCoroutine(string message, float duration)
-{
-    gameTextNotify.SetActive(true);
-    gameTextNotify.GetComponent<TMP_Text>().text = message;
-
-    yield return new WaitForSeconds(duration);
-
-    gameTextNotify.SetActive(false);
-}
-
+    private IEnumerator ShowNotificationCoroutine(string message, float duration)
+    {
+        gameTextNotify.SetActive(true);
+        gameTextNotify.GetComponent<TMP_Text>().text = message;
+        yield return new WaitForSeconds(duration);
+        gameTextNotify.SetActive(false);
+    }
 }

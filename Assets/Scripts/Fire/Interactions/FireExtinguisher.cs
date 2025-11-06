@@ -36,7 +36,7 @@ public class FireExtinguisher : MonoBehaviour
     private bool isSpraying = false;
     private bool allFiresExtinguished = false;
     private ParticleSystem sprayParticleSystem;
-    private bool sprayButtonDestroyed = false; // ✅ NEW: Track if button is destroyed
+    private bool sprayButtonDestroyed = false;
 
     private Dictionary<SpreadFire, Coroutine> firesBeingExtinguished = new Dictionary<SpreadFire, Coroutine>();
 
@@ -98,13 +98,13 @@ public class FireExtinguisher : MonoBehaviour
 
     void Update()
     {
-        // ✅ Ensure spray button stays hidden if fires are done
+        // Ensure spray button stays hidden if fires are done
         if (allFiresExtinguished && sprayButton != null && sprayButton.activeSelf)
         {
             sprayButton.SetActive(false);
         }
 
-        // ✅ Don't allow spraying if all fires are extinguished
+        // Don't allow spraying if all fires are extinguished
         if (!canSpray || allFiresExtinguished) return;
 
         if (isSpraying || Input.GetKey(KeyCode.F))
@@ -144,7 +144,7 @@ public class FireExtinguisher : MonoBehaviour
 
     public void OnSprayButtonPress()
     {
-        // ✅ Don't allow spraying if all fires are done
+        // Don't allow spraying if all fires are done
         if (allFiresExtinguished) return;
 
         isSpraying = true;
@@ -201,7 +201,7 @@ public class FireExtinguisher : MonoBehaviour
             QuizQuestion2 quiz = QuizDatabase2.GetQuiz(quizIDs[i]);
             if (quiz != null)
             {
-                quizManager.SetLastQuestion(i == quizIDs.Length - 1);
+                // ✅ REMOVED: quizManager.SetLastQuestion(i == quizIDs.Length - 1);
 
                 bool quizDone = false;
                 quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () => quizDone = true);
@@ -215,7 +215,7 @@ public class FireExtinguisher : MonoBehaviour
 
         canSpray = true;
 
-        // ✅ Only show spray button if fires aren't already extinguished
+        // Only show spray button if fires aren't already extinguished
         if (sprayButton != null && !allFiresExtinguished)
             sprayButton.SetActive(true);
 
@@ -288,9 +288,9 @@ public class FireExtinguisher : MonoBehaviour
             }
         }
 
-        if (!anyFireActive && canSpray && !allFiresExtinguished) // ✅ Check flag
+        if (!anyFireActive && canSpray && !allFiresExtinguished)
         {
-            allFiresExtinguished = true; // ✅ Set flag permanently
+            allFiresExtinguished = true;
             canSpray = false;
             Debug.Log("All fires extinguished!");
             StartCoroutine(OnAllFiresExtinguished());
@@ -307,19 +307,19 @@ public class FireExtinguisher : MonoBehaviour
         if (heldInstance != null)
             heldInstance.SetActive(false);
 
-        // ✅ AGGRESSIVELY hide and disable spray button
+        // AGGRESSIVELY hide and disable spray button
         if (sprayButton != null && !sprayButtonDestroyed)
         {
             sprayButton.SetActive(false);
 
-            // ✅ Disable all components to prevent re-activation
+            // Disable all components to prevent re-activation
             Button btn = sprayButton.GetComponent<Button>();
             if (btn != null) btn.interactable = false;
 
             EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
             if (trigger != null) trigger.enabled = false;
 
-            // ✅ Move it far away as extra safety
+            // Move it far away as extra safety
             RectTransform rect = sprayButton.GetComponent<RectTransform>();
             if (rect != null) rect.anchoredPosition = new Vector2(10000, 10000);
 

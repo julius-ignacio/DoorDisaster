@@ -19,12 +19,10 @@ public class FireSafetyQuiz : MonoBehaviour
     public GameObject healthBar;
     public GameObject oxygenBar;
 
-    private int numberOfCorrectAnswers = 0;
-
+    private bool answeredCorrectly = false;
     private int correctAnswerIndex;
     private System.Action onQuizComplete;
     public GameNotifier gameNotifier;
-
 
     void Start()
     {
@@ -39,13 +37,13 @@ public class FireSafetyQuiz : MonoBehaviour
         }
     }
 
-    private bool isLastQuestion = false;
-
     public void ShowQuiz(string question, string[] answers, int correctIndex, System.Action onComplete = null)
     {
         Debug.Log("ShowQuiz called with question: " + question);
         Debug.Log("Number of answers: " + answers.Length);
 
+        // Reset for new question
+        answeredCorrectly = false;
         onQuizComplete = onComplete;
         correctAnswerIndex = correctIndex;
 
@@ -102,26 +100,20 @@ public class FireSafetyQuiz : MonoBehaviour
         }
     }
 
-    // Call this to mark that the next quiz is the last one
-    public void SetLastQuestion(bool isLast)
-    {
-        isLastQuestion = isLast;
-    }
-
     void OnAnswerSelected(int selectedIndex)
     {
         Debug.Log("OnAnswerSelected called with index: " + selectedIndex);
         Debug.Log("Correct answer index is: " + correctAnswerIndex);
 
+        // Disable all buttons to prevent multiple clicks
         foreach (Button btn in answerButtons)
             btn.interactable = false;
 
         if (selectedIndex == correctAnswerIndex)
         {
             Debug.Log("Correct answer selected!");
-            numberOfCorrectAnswers++; //////////////////////////////////////////////////////////////////////////////////////
+            answeredCorrectly = true;
 
-    
             Image btnImage = answerButtons[selectedIndex].GetComponent<Image>();
             if (btnImage != null)
                 btnImage.color = Color.green;
@@ -131,11 +123,14 @@ public class FireSafetyQuiz : MonoBehaviour
         else
         {
             Debug.Log("Wrong answer selected!");
+            answeredCorrectly = false;
 
+            // Show wrong answer in red
             Image wrongBtnImage = answerButtons[selectedIndex].GetComponent<Image>();
             if (wrongBtnImage != null)
                 wrongBtnImage.color = Color.red;
 
+            // Show correct answer in green
             Image correctBtnImage = answerButtons[correctAnswerIndex].GetComponent<Image>();
             if (correctBtnImage != null)
                 correctBtnImage.color = Color.green;
@@ -151,26 +146,30 @@ public class FireSafetyQuiz : MonoBehaviour
         Debug.Log("Starting close quiz delay: " + delay + " seconds");
         yield return new WaitForSeconds(delay);
 
-
-
-        if (numberOfCorrectAnswers != 0)
+        // Award 1 point ONLY if answered correctly
+        if (answeredCorrectly)
         {
-            DataManager.Instance.quizScore += numberOfCorrectAnswers;
+            DataManager.Instance.quizScore += 1;
+            DataManager.Instance.totalQuestionsAnswered += 1;
+
             AudioManager.Instance.PlaySFX(8);
-            gameNotifier.EarnedPoints(numberOfCorrectAnswers, 3f);//////////////////////////////////////////////////
-            
+
+            if (gameNotifier != null)
+            {
+                gameNotifier.EarnedPoints(1, 3f); // Always shows "+1 Point Earned!"
+            }
+
+            Debug.Log($"Awarded 1 point. Total quiz score: {DataManager.Instance.quizScore}");
         }
-
-        
-        
-
-
-
-
-        
+        else
+        {
+            // Wrong answer - 0 points awarded
+            Debug.Log("Wrong answer - 0 points awarded");
+        }
 
         Debug.Log("Closing quiz now");
 
+        // Reset button colors and interactivity
         foreach (Button btn in answerButtons)
         {
             Image btnImage = btn.GetComponent<Image>();
@@ -183,23 +182,23 @@ public class FireSafetyQuiz : MonoBehaviour
         Debug.Log("Executing quiz complete callback");
         onQuizComplete?.Invoke();
 
-        // Hide quiz panel ALWAYS
+        // Hide quiz panel
         if (quizPanel != null)
             quizPanel.SetActive(false);
 
-        // Always restore player control and UI after any quiz
+        // Restore player control and UI
         if (playerMovement != null)
         {
             playerMovement.enabled = true;
             Debug.Log("Player movement re-enabled");
         }
 
-        Cursor.lockState = CursorLockMode.None;
-        Debug.Log("Cursor locked again");
-
         if (healthBar != null)
             healthBar.SetActive(true);
         if (oxygenBar != null)
             oxygenBar.SetActive(true);
+
+        // Reset for next quiz
+        answeredCorrectly = false;
     }
 }

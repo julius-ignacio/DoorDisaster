@@ -17,6 +17,12 @@ public class GameOverManager : MonoBehaviour
     public Movements2 playerMovement;
     public PlayerOxygen playerOxygen;
 
+    [Header("UI to Hide on Death")]
+    public GameObject pauseButton;
+    public GameObject inventoryButton;
+    public GameObject healthBar;
+    public GameObject oxygenBar;
+
     [Header("Fade Settings")]
     public float fadeDuration = 1.5f;
 
@@ -107,12 +113,6 @@ public class GameOverManager : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        // ✅ REMOVED - PlayerOxygen now handles its own death
-        // No need to check oxygen here anymore
-    }
-
     void SetupCanvasGroup(GameObject obj, out CanvasGroup cg)
     {
         if (obj == null)
@@ -144,13 +144,8 @@ public class GameOverManager : MonoBehaviour
         isGameOver = true;
         Debug.Log("Setting isGameOver to true");
 
-        // ✅ Hide pickup button if visible when player dies
-        if (GenericPickupButton.Instance != null)
-            GenericPickupButton.Instance.HidePickupPrompt();
-
-        // ✅ Close inventory if open
-        if (InventoryManager.Instance != null && InventoryManager.Instance.inventoryPanel != null)
-            InventoryManager.Instance.inventoryPanel.SetActive(false);
+        // Hide all UI elements
+        HideGameUI();
 
         // Disable player controls
         if (playerMovement != null)
@@ -169,6 +164,76 @@ public class GameOverManager : MonoBehaviour
 
         // Start fade-in sequence
         StartCoroutine(GameOverSequence(title, reason));
+    }
+
+    void HideGameUI()
+    {
+        // Hide pickup button if visible
+        if (GenericPickupButton.Instance != null)
+            GenericPickupButton.Instance.HidePickupPrompt();
+
+        // Close inventory panel if open
+        if (InventoryManager.Instance != null && InventoryManager.Instance.inventoryPanel != null)
+            InventoryManager.Instance.inventoryPanel.SetActive(false);
+
+        // Hide pause button
+        if (pauseButton != null)
+        {
+            pauseButton.SetActive(false);
+            Debug.Log("Pause button hidden");
+        }
+
+        // Hide inventory/backpack button
+        if (inventoryButton != null)
+        {
+            inventoryButton.SetActive(false);
+            Debug.Log("Inventory button hidden");
+        }
+
+        // Hide health bar
+        if (healthBar != null)
+        {
+            healthBar.SetActive(false);
+            Debug.Log("Health bar hidden");
+        }
+
+        // Hide oxygen bar
+        if (oxygenBar != null)
+        {
+            oxygenBar.SetActive(false);
+            Debug.Log("Oxygen bar hidden");
+        }
+    }
+
+    void ShowGameUI()
+    {
+        // Show pause button
+        if (pauseButton != null)
+        {
+            pauseButton.SetActive(true);
+            Debug.Log("Pause button shown");
+        }
+
+        // Show inventory/backpack button
+        if (inventoryButton != null)
+        {
+            inventoryButton.SetActive(true);
+            Debug.Log("Inventory button shown");
+        }
+
+        // Show health bar
+        if (healthBar != null)
+        {
+            healthBar.SetActive(true);
+            Debug.Log("Health bar shown");
+        }
+
+        // Show oxygen bar
+        if (oxygenBar != null)
+        {
+            oxygenBar.SetActive(true);
+            Debug.Log("Oxygen bar shown");
+        }
     }
 
     System.Collections.IEnumerator GameOverSequence(string title, string reason)
@@ -243,7 +308,7 @@ public class GameOverManager : MonoBehaviour
         Debug.Log("Restarting game...");
         Time.timeScale = 1f;
 
-        // ✅ Check if player died during hallway chase
+        // Check if player died during hallway chase
         if (PlayerOxygen.InHallwayChase && hallwaySpawnPoint != null && player != null)
         {
             Debug.Log("Respawning at hallway checkpoint!");
@@ -254,6 +319,9 @@ public class GameOverManager : MonoBehaviour
             // Hide game over UI
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
             if (darkOverlay != null) darkOverlay.SetActive(false);
+
+            // Restore game UI
+            ShowGameUI();
 
             // Teleport player to hallway spawn
             CharacterController cc = player.GetComponent<CharacterController>();
@@ -271,16 +339,16 @@ public class GameOverManager : MonoBehaviour
                 if (cc != null) cc.enabled = true;
             }
 
-            // ✅ Refill oxygen (this also resets hasTriggeredDeath flag)
+            // Refill oxygen (this also resets hasTriggeredDeath flag)
             if (playerOxygen != null)
             {
                 playerOxygen.RefillOxygen();
                 playerOxygen.ShowOxygenBar();
             }
 
-            // Hide cursor
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            // Hide cursor for gameplay
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
             Debug.Log("Hallway checkpoint restart complete!");
         }
