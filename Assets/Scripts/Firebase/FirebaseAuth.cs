@@ -14,10 +14,10 @@ public class FirebaseAuth : MonoBehaviour
     public PlayerData playerData;
 
     [System.Serializable]
-public class AccountInfoResponse
-{
-    public UserInfo[] users;
-}
+    public class AccountInfoResponse
+    {
+        public UserInfo[] users;
+    }
 
     [System.Serializable]
     public class UserInfo
@@ -25,60 +25,58 @@ public class AccountInfoResponse
         public bool emailVerified;
     }
 
-
-[System.Serializable]
-public class VerifyEmailRequest
-{
-    public string requestType;
-    public string idToken;
-}
-
-
-public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
-{
-    if (string.IsNullOrEmpty(idToken))
+    [System.Serializable]
+    public class VerifyEmailRequest
     {
-        Debug.LogError("❌ CheckEmailVerified called with EMPTY idToken!");
-        callback(false);
-        yield break;
+        public string requestType;
+        public string idToken;
     }
 
-    string url = "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey;
-
-    // --- CHANGE STARTS HERE ---
-    LookupAccountRequest requestData = new LookupAccountRequest { idToken = idToken };
-    string jsonData = JsonUtility.ToJson(requestData);
-    // --- CHANGE ENDS HERE ---
-
-    UnityWebRequest request = new UnityWebRequest(url, "POST");
-    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
-
-    yield return request.SendWebRequest();
-
-    if (request.result == UnityWebRequest.Result.Success)
+    // NEW: proper serializable payload for password reset
+    [System.Serializable]
+    public class PasswordResetRequest
     {
-        var info = JsonUtility.FromJson<AccountInfoResponse>(request.downloadHandler.text);
-        bool verified = info.users[0].emailVerified;
-        callback(verified);
+        public string requestType; // must be "PASSWORD_RESET"
+        public string email;       // the user's email
     }
-    else
+
+    public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
     {
-        Debug.LogError("Error checking verification: " + request.downloadHandler.text);
-        callback(false);
+        if (string.IsNullOrEmpty(idToken))
+        {
+            Debug.LogError("❌ CheckEmailVerified called with EMPTY idToken!");
+            callback(false);
+            yield break;
+        }
+
+        string url = "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=" + apiKey;
+
+        LookupAccountRequest requestData = new LookupAccountRequest { idToken = idToken };
+        string jsonData = JsonUtility.ToJson(requestData);
+
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var info = JsonUtility.FromJson<AccountInfoResponse>(request.downloadHandler.text);
+            bool verified = info.users != null && info.users.Length > 0 && info.users[0].emailVerified;
+            callback(verified);
+        }
+        else
+        {
+            Debug.LogError("Error checking verification: " + request.downloadHandler.text);
+            callback(false);
+        }
     }
-}
 
-
-
-
-
-    // Register
     public IEnumerator RegisterUser(string email, string password, string name, int age, int gradeLevel, Action<bool, string, string> callback)
     {
-
         if (DataManager.Instance == null)
         {
             Debug.LogError("❌ DataManager is not ready yet!");
@@ -88,12 +86,10 @@ public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
         if (DataManager.Instance.playerData == null)
         {
             DataManager.Instance.playerData = new PlayerData();
-            DataManager.Instance.InitPlayerData(); // Make InitPlayerData public
+            DataManager.Instance.InitPlayerData();
         }
 
-
         string registerUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + apiKey;
-
 
         RegisterRequest requestData = new RegisterRequest { email = email, password = password };
         string jsonData = JsonUtility.ToJson(requestData);
@@ -104,7 +100,6 @@ public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
@@ -113,14 +108,12 @@ public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
             UserIdToken = authResponse.idToken;
             UserLocalId = authResponse.localId;
 
-            // Initialize player data
             DataManager.Instance.playerData.playerId = UserLocalId;
             DataManager.Instance.playerData.playerName = name;
             DataManager.Instance.playerData.email = email;
             DataManager.Instance.playerData.age = age;
             DataManager.Instance.playerData.gradeLevel = gradeLevel;
 
-            // Save to DB as PlayerData (not separate profile)
             yield return DataManager.Instance.StartCoroutine(
                 FindObjectOfType<FirebaseDatabase>().SaveData(UserIdToken, UserLocalId, DataManager.Instance.playerData)
             );
@@ -128,7 +121,6 @@ public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
             Debug.Log("✅ Registered and PlayerData saved!");
             callback(true, authResponse.idToken, authResponse.localId);
         }
-
         else
         {
             Debug.LogError("❌ Register error: " + request.error + "\n" + request.downloadHandler.text);
@@ -136,23 +128,57 @@ public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
         }
     }
 
-
-public IEnumerator SendEmailVerification(string idToken, System.Action<bool, string> callback)
-{
-    string url = $"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={apiKey}";
-
-    // ✅ Use a real serializable class
-    VerifyEmailRequest payload = new VerifyEmailRequest
+    public IEnumerator SendEmailVerification(string idToken, System.Action<bool, string> callback)
     {
-        requestType = "VERIFY_EMAIL",
-        idToken = idToken
-    };
+        string url = $"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={apiKey}";
 
-    string jsonData = JsonUtility.ToJson(payload);
-    Debug.Log("SendEmailVerification payload: " + jsonData); // for debugging
+        VerifyEmailRequest payload = new VerifyEmailRequest
+        {
+            requestType = "VERIFY_EMAIL",
+            idToken = idToken
+        };
 
-    using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        string jsonData = JsonUtility.ToJson(payload);
+        Debug.Log("SendEmailVerification payload: " + jsonData);
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("✅ Verification email sent!");
+                callback?.Invoke(true, "Verification email sent successfully!");
+            }
+            else
+            {
+                string errorMsg = request.downloadHandler.text;
+                Debug.LogError($"❌ Failed to send verification email: {errorMsg}");
+                callback?.Invoke(false, errorMsg);
+            }
+        }
+    }
+
+    public IEnumerator LoginUser(string email, string password, Action<bool, string, string> callback)
     {
+        string loginUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
+
+        RegisterRequest requestData = new RegisterRequest
+        {
+            email = email,
+            password = password,
+            returnSecureToken = true
+        };
+
+        string jsonData = JsonUtility.ToJson(requestData);
+        Debug.Log("Login payload: " + jsonData);
+
+        UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
@@ -162,99 +188,78 @@ public IEnumerator SendEmailVerification(string idToken, System.Action<bool, str
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("✅ Verification email sent!");
-            callback?.Invoke(true, "Verification email sent successfully!");
+            Debug.Log("Login response: " + request.downloadHandler.text);
+            AuthResponse authResponse = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
+
+            if (string.IsNullOrEmpty(authResponse.idToken))
+            {
+                Debug.LogError("❌ Login success but idToken missing!");
+                callback(false, null, null);
+                yield break;
+            }
+
+            UserIdToken = authResponse.idToken;
+            UserLocalId = authResponse.localId;
+
+            Debug.Log("✅ Login successful! idToken: " + UserIdToken);
+            callback(true, authResponse.idToken, authResponse.localId);
         }
         else
         {
-            string errorMsg = request.downloadHandler.text;
-            Debug.LogError($"❌ Failed to send verification email: {errorMsg}");
-            callback?.Invoke(false, errorMsg);
-        }
-    }
-}
-
-
-public IEnumerator LoginUser(string email, string password, Action<bool, string, string> callback)
-{
-    string loginUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + apiKey;
-
-    RegisterRequest requestData = new RegisterRequest
-    {
-        email = email,
-        password = password,
-        returnSecureToken = true // ✅ must be included
-    };
-
-    string jsonData = JsonUtility.ToJson(requestData);
-    Debug.Log("Login payload: " + jsonData);
-
-    UnityWebRequest request = new UnityWebRequest(loginUrl, "POST");
-    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-    request.downloadHandler = new DownloadHandlerBuffer();
-    request.SetRequestHeader("Content-Type", "application/json");
-
-    yield return request.SendWebRequest();
-
-    if (request.result == UnityWebRequest.Result.Success)
-    {
-        Debug.Log("Login response: " + request.downloadHandler.text);
-        AuthResponse authResponse = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
-
-        if (string.IsNullOrEmpty(authResponse.idToken))
-        {
-            Debug.LogError("❌ Login success but idToken missing!");
+            Debug.LogError("❌ Login error: " + request.error + "\n" + request.downloadHandler.text);
             callback(false, null, null);
-            yield break;
         }
-
-        UserIdToken = authResponse.idToken;
-        UserLocalId = authResponse.localId;
-
-        Debug.Log("✅ Login successful! idToken: " + UserIdToken);
-        callback(true, authResponse.idToken, authResponse.localId);
     }
-    else
-    {
-        Debug.LogError("❌ Login error: " + request.error + "\n" + request.downloadHandler.text);
-        callback(false, null, null);
-    }
-}
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public IEnumerator SendPasswordResetEmail(string email, Action<bool, string> callback)
     {
         string resetUrl = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + apiKey;
 
-        var requestData = new
+        // FIX: use a serializable payload so JsonUtility includes the fields
+        PasswordResetRequest payload = new PasswordResetRequest
         {
             requestType = "PASSWORD_RESET",
             email = email
         };
 
-        string jsonData = JsonUtility.ToJson(requestData);
-        UnityWebRequest request = new UnityWebRequest(resetUrl, "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
+        string jsonData = JsonUtility.ToJson(payload);
+        Debug.Log("SendPasswordReset payload: " + jsonData);
 
-        yield return request.SendWebRequest();
+        using (UnityWebRequest request = new UnityWebRequest(resetUrl, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
 
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("✅ Password reset email sent to: " + email);
-            callback(true, "Password reset email sent!");
-        }
-        else
-        {
-            Debug.LogError("❌ Password reset failed: " + request.error + "\n" + request.downloadHandler.text);
-            callback(false, request.downloadHandler.text);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("✅ Password reset email sent to: " + email);
+                callback(true, "Password reset email sent!");
+            }
+            else
+            {
+                string raw = request.downloadHandler.text;
+                Debug.LogError("❌ Password reset failed: " + request.error + "\n" + raw);
+
+                // Optional: friendlier messages for common Firebase errors
+                string friendly = MapPasswordResetError(raw);
+                callback(false, friendly);
+            }
         }
     }
 
-
+    private string MapPasswordResetError(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return "Request failed. Please try again.";
+        // Cheap string checks to avoid JSON model; expand as needed
+        if (raw.Contains("EMAIL_NOT_FOUND")) return "No account found with that email.";
+        if (raw.Contains("INVALID_EMAIL")) return "Email address is invalid.";
+        if (raw.Contains("MISSING_EMAIL")) return "Please enter your email.";
+        if (raw.Contains("TOO_MANY_ATTEMPTS_TRY_LATER")) return "Too many attempts. Try again later.";
+        if (raw.Contains("MISSING_REQ_TYPE")) return "Internal error forming request (missing requestType). Please try again.";
+        return "Failed to send reset email. Please check the email and try again.";
+    }
 }

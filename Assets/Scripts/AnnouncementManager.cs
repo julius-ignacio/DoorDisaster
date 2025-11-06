@@ -4,7 +4,7 @@ using UnityEngine;
 public class AnnouncementManager : MonoBehaviour
 {
     public GameObject subs, isFireDone, isWaterDone, isEarthDone;
-    public Achievement_Almanac_Manager achievementsManager;
+    public Achievement_Almanac_Manager_Profile achievementsManager;
 
     void Start()
     {

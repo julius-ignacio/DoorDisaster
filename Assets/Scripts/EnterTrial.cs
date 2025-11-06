@@ -7,7 +7,7 @@ public class EnterTrial : MonoBehaviour
     public GameObject levelSelectUI;
 
 
-public void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
@@ -22,10 +22,17 @@ public void OnTriggerEnter(Collider other)
             DataManager.Instance.currentTrial = trialIndex;
         }
 
-        else
+    }
+    
+
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
         {
             levelSelectUI.SetActive(false);
         }
+
     }
 
 }

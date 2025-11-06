@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class Achievement_Almanac_Manager : MonoBehaviour
+public class Achievement_Almanac_Manager_Profile : MonoBehaviour
 {
-    public GameObject AllDoorsCompleted, firedone, waterdone, earthdone, AchievementsUI, AlmanacUI;
+    public GameObject AllDoorsCompleted, firedone, waterdone, earthdone, AchievementsUI, AlmanacUI, ProfileUI;
 
     // Update is called once per frame
     void Update()
@@ -83,10 +83,23 @@ public class Achievement_Almanac_Manager : MonoBehaviour
     public void ToggleAlmanac()
     {
         AlmanacUI.SetActive(!AlmanacUI.activeSelf);
+        ProfileUI.SetActive(false);
+        AchievementsUI.SetActive(false);
+
+
+    }
+
+        public void ToggleProfile()
+    {
+        ProfileUI.SetActive(!ProfileUI.activeSelf);
+        AlmanacUI.SetActive(false);
+        AchievementsUI.SetActive(false);
     }
 
        public void ToggleAchieve()
     {
         AchievementsUI.SetActive(!AchievementsUI.activeSelf);
+        AlmanacUI.SetActive(false);
+        ProfileUI.SetActive(false);
     }
 }
