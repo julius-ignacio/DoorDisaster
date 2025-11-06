@@ -11,8 +11,8 @@ public class InventoryManager : MonoBehaviour
     public HeartSys heal;
     public PanicMeterScript panic;
     public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
-    public int water = 1;
-    public int medkit = 1;
+    public int water = 0;
+    public int medkit = 0;
     public GameNotifier gameNotifier;
 
     public TextMeshProUGUI medkitCounter, waterCounter;
@@ -20,6 +20,17 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         inventoryUI.SetActive(false);
+
+        if(DataManager.Instance.currentMode == 0) //easy mode
+        {
+            medkit = 1;
+            water = 1;
+        }
+        else if (DataManager.Instance.currentMode == 1) //hard mode
+        {
+            medkit = 0;
+            water = 0;
+        }
     }
 
     public void ToggleInventory()

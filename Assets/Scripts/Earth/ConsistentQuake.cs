@@ -29,9 +29,15 @@ public class ConsistentQuake : MonoBehaviour
         audi = GetComponent<AudioSource>();
         quakeRoutine = StartCoroutine(QuakeRoutine());
 
-        if(DataManager.Instance.currentMode == 1){ quakeDuration = 20f; } else
+          if(DataManager.Instance.currentMode == 0) //easy mode
         {
-            quakeDuration = 10f;
+            quakeDuration = 15f;
+            quakeInterval = 25f; 
+        }
+        else if (DataManager.Instance.currentMode == 1) //hard mode
+        {
+            quakeDuration = 25f;
+            quakeInterval = 15f; 
         }
     }
 
