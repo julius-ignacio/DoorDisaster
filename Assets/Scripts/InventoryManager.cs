@@ -21,7 +21,7 @@ public class InventoryManager : MonoBehaviour
     {
         inventoryUI.SetActive(false);
 
-        if(DataManager.Instance.currentMode == 0) //easy mode
+        if (DataManager.Instance.currentMode == 0) //easy mode
         {
             medkit = 1;
             water = 1;
@@ -31,6 +31,13 @@ public class InventoryManager : MonoBehaviour
             medkit = 0;
             water = 0;
         }
+    }
+    
+
+
+    void Update()
+    {
+        
     }
 
     public void     ToggleInventory()

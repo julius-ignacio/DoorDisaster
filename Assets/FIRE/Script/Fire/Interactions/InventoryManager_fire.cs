@@ -11,6 +11,9 @@ public class InventoryManager_fire : MonoBehaviour
     public GameObject inventoryPanel;
     public GameObject backpackButton;
 
+    [Header("Backpack Model Reference")]
+    public GameObject backpack_model;
+
     [Header("Oxygen Slot")]
     public GameObject oxygenSlot;
     public Image oxygenIcon;
@@ -39,6 +42,8 @@ public class InventoryManager_fire : MonoBehaviour
         else
             Destroy(gameObject);
     }
+
+
 
     void Start()
     {
@@ -81,6 +86,14 @@ public class InventoryManager_fire : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
+
+                    if(backpack_model != null)
+        {
+            if(!backpack_model.activeSelf)
+            {
+                backpackButton.SetActive(true);
+            }
+        }
 
         if (!isBackpackUnlocked)
             return;

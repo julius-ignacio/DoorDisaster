@@ -12,15 +12,23 @@ public class ObjectState
 [System.Serializable]
 public class PlayerState
 {
+    //earth
     public int hearts;
     public float panic;
     public int medkits;
     public int water;
     public bool isHelmetUsed;
-
-    // NEW
     public bool hasWhistle;
     public bool isCovered;
+
+
+    // Fire trial progression flags
+    public bool tutorialDone;       // NEW
+    public bool wakeUpDone;
+    public bool phonePickedUp;
+    public bool hotlineCalled;
+    public bool backpackPickedUp;   // NEW
+    public bool doorClothPickedUp;  // NEW
 }
 
 

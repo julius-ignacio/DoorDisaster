@@ -23,7 +23,6 @@ public class SubtitleManager2 : MonoBehaviour
     [Header("Story Settings")]
     public bool autoStartStory = true;
 
-    // ✅ Flags
     public static bool IntroStoryComplete { get; private set; } = false;
     public static bool IsSubtitleActive { get; private set; } = false;
     public static bool CallObjectiveActive { get; set; } = false;
@@ -54,8 +53,50 @@ public class SubtitleManager2 : MonoBehaviour
         if (healthBar != null) healthBar.SetActive(false);
         if (oxygenBar != null) oxygenBar.SetActive(false);
 
+        // NEW: If wake-up is already done/disabled, skip the story and bring up HUD/objective
+        var wake = FindObjectOfType<WakeUpController>(true);
+        if ((wake == null || !wake.enabled) && !IntroStoryComplete)
+        {
+            ForceIntroComplete();
+            return; // Don't start the story
+        }
+
         if (autoStartStory)
             StartCoroutine(PlayWakeUpStory());
+    }
+
+    public static void ForceIntroComplete()
+    {
+        if (IntroStoryComplete) return;
+        IntroStoryComplete = true;
+
+        var player = FindObjectOfType<Movements2>(true);
+        if (player != null)
+        {
+            if (!player.gameObject.activeSelf) player.gameObject.SetActive(true);
+            if (!player.enabled) player.enabled = true;
+            var cc = player.GetComponent<CharacterController>();
+            if (cc != null && !cc.enabled) cc.enabled = true;
+        }
+
+        var inst = FindObjectOfType<SubtitleManager2>(true);
+        if (inst != null)
+        {
+            Cursor.lockState = CursorLockMode.None;
+
+            if (inst.healthBar != null)
+                inst.healthBar.SetActive(true);
+
+            if (inst.oxygenBar != null)
+                inst.oxygenBar.SetActive(true);
+
+            var oxygenSystem = FindObjectOfType<PlayerOxygen>(true);
+            if (oxygenSystem != null)
+                oxygenSystem.ShowOxygenBar();
+
+            CallObjectiveActive = true;
+            inst.ShowObjective("Find the phone and call for help!");
+        }
     }
 
     public IEnumerator PlayWakeUpStory()
@@ -70,23 +111,21 @@ public class SubtitleManager2 : MonoBehaviour
         }
 
         IntroStoryComplete = true;
-        Debug.Log("Intro story complete - pickups now enabled");
-
         Cursor.lockState = CursorLockMode.None;
 
-        Movements2 player = FindObjectOfType<Movements2>();
+        var player = FindObjectOfType<Movements2>(true);
         if (player != null)
-            player.ForceEnable();
+        {
+            if (!player.enabled) player.enabled = true;
+            var cc = player.GetComponent<CharacterController>();
+            if (cc != null && !cc.enabled) cc.enabled = true;
+        }
 
-        if (healthBar != null)
-            healthBar.SetActive(true);
+        if (healthBar != null) healthBar.SetActive(true);
+        if (oxygenBar != null) oxygenBar.SetActive(true);
 
-        if (oxygenBar != null)
-            oxygenBar.SetActive(true);
-
-        PlayerOxygen oxygenSystem = FindObjectOfType<PlayerOxygen>();
-        if (oxygenSystem != null)
-            oxygenSystem.ShowOxygenBar();
+        var oxygenSystem = FindObjectOfType<PlayerOxygen>(true);
+        if (oxygenSystem != null) oxygenSystem.ShowOxygenBar();
 
         CallObjectiveActive = true;
         ShowObjective("Find the phone and call for help!");
@@ -94,8 +133,7 @@ public class SubtitleManager2 : MonoBehaviour
 
     IEnumerator ShowSubtitle(string text, float displayTime, Action onComplete = null)
     {
-        if (subtitlePanel != null)
-            subtitlePanel.SetActive(true);
+        if (subtitlePanel != null) subtitlePanel.SetActive(true);
 
         IsSubtitleActive = true;
         subtitleJustFinished = false;
@@ -105,16 +143,11 @@ public class SubtitleManager2 : MonoBehaviour
         if (subtitleText != null)
         {
             subtitleText.text = "";
-
-            if (currentTyping != null)
-                StopCoroutine(currentTyping);
-
+            if (currentTyping != null) StopCoroutine(currentTyping);
             currentTyping = StartCoroutine(TypeText(text));
-
             yield return currentTyping;
 
-            if (subtitleText != null)
-                subtitleText.text = text;
+            if (subtitleText != null) subtitleText.text = text;
 
             float elapsedTime = 0f;
             while (elapsedTime < displayTime)
@@ -135,9 +168,7 @@ public class SubtitleManager2 : MonoBehaviour
     {
         for (int i = 0; i <= text.Length; i++)
         {
-            if (subtitleText != null)
-                subtitleText.text = text.Substring(0, i);
-
+            if (subtitleText != null) subtitleText.text = text.Substring(0, i);
             float elapsed = 0f;
             while (elapsed < typingSpeed)
             {
@@ -165,24 +196,19 @@ public class SubtitleManager2 : MonoBehaviour
 
     public void HideObjective()
     {
-        if (objectivePanel != null)
-            objectivePanel.SetActive(false);
+        if (objectivePanel != null) objectivePanel.SetActive(false);
     }
 
     public void RestoreLastObjective()
     {
-        if (!string.IsNullOrEmpty(lastObjective))
-            ShowObjective(lastObjective);
+        if (!string.IsNullOrEmpty(lastObjective)) ShowObjective(lastObjective);
     }
 
     public void OnPause()
     {
         objectiveWasVisibleBeforePause = (objectivePanel != null && objectivePanel.activeSelf);
-
-        if (subtitlePanel != null && subtitlePanel.activeSelf)
-            subtitlePanel.SetActive(false);
-        if (objectivePanel != null && objectivePanel.activeSelf)
-            objectivePanel.SetActive(false);
+        if (subtitlePanel != null && subtitlePanel.activeSelf) subtitlePanel.SetActive(false);
+        if (objectivePanel != null && objectivePanel.activeSelf) objectivePanel.SetActive(false);
     }
 
     public void OnResume()
@@ -191,9 +217,7 @@ public class SubtitleManager2 : MonoBehaviour
             subtitlePanel.SetActive(true);
 
         if (objectiveWasVisibleBeforePause && !string.IsNullOrEmpty(lastObjective))
-        {
             objectivePanel.SetActive(true);
-        }
 
         objectiveWasVisibleBeforePause = false;
     }
@@ -201,11 +225,8 @@ public class SubtitleManager2 : MonoBehaviour
     public void OnInventoryOpen()
     {
         wasTypingBeforeInventoryOpen = IsSubtitleActive;
-
         if (IsSubtitleActive && subtitlePanel != null)
-        {
             Debug.Log("Inventory opened during subtitle - subtitle continues");
-        }
     }
 
     public void OnInventoryClose()
@@ -215,14 +236,10 @@ public class SubtitleManager2 : MonoBehaviour
 
     public void HideAll()
     {
-        if (subtitlePanel != null)
-            subtitlePanel.SetActive(false);
-        if (objectivePanel != null)
-            objectivePanel.SetActive(false);
-        if (subtitleText != null)
-            subtitleText.text = "";
-        if (objectiveText != null)
-            objectiveText.text = "";
+        if (subtitlePanel != null) subtitlePanel.SetActive(false);
+        if (objectivePanel != null) objectivePanel.SetActive(false);
+        if (subtitleText != null) subtitleText.text = "";
+        if (objectiveText != null) objectiveText.text = "";
         IsSubtitleActive = false;
         subtitleJustFinished = true;
     }

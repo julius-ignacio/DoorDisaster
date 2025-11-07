@@ -10,12 +10,12 @@ public class WakeUpController : MonoBehaviour
     public bool playOnStart = true;
 
     [Header("Visual Effects")]
-    public Image fadeOverlay; // Drag the black UI panel here
+    public Image fadeOverlay; 
     public float additionalFadeTime = 1f;
 
     [Header("References")]
-    public Transform mainCamera; // Drag your MainCamera here
-    public Movements2 movements; // Drag your movement script here
+    public Transform mainCamera; 
+    public Movements2 movements; 
 
     [Header("Audio (Optional)")]
     public AudioSource audioSource;
@@ -27,17 +27,13 @@ public class WakeUpController : MonoBehaviour
 
     void Start()
     {
-        // Try to find MainCamera if not assigned
         if (mainCamera == null)
         {
             Transform fpCamera = transform.Find("FirstPersonCamera");
             if (fpCamera != null)
-            {
                 mainCamera = fpCamera.Find("MainCamera");
-            }
         }
 
-        // Start with black screen if fade overlay exists
         if (fadeOverlay != null)
         {
             Color color = fadeOverlay.color;
@@ -46,76 +42,51 @@ public class WakeUpController : MonoBehaviour
         }
 
         if (playOnStart)
-        {
-            // Small delay to ensure everything is initialized
-            Invoke("StartWakeUpAnimation", 0.1f);
-        }
+            Invoke(nameof(StartWakeUpAnimation), 0.1f);
     }
 
     public void StartWakeUpAnimation()
     {
         if (!isWakingUp && !hasWokenUp)
-        {
             StartCoroutine(WakeUpSequence());
-        }
     }
 
     IEnumerator WakeUpSequence()
     {
         isWakingUp = true;
 
-        Debug.Log("Starting wake up animation...");
+        if (movements != null) movements.enabled = false;
 
-        // Disable player movement
-        if (movements != null)
-        {
-            movements.enabled = false;
-            Debug.Log("Player movement disabled");
-        }
-
-
-    
-
-        // Set initial rotation - looking up while lying down (-60 degrees pitch = looking up)
-        // Set final rotation - looking forward at eye level (0 degrees pitch)
         Quaternion startRotation = Quaternion.Euler(-60f, 0f, 0f);
-        Quaternion endRotation = Quaternion.Euler(0f, 0f, 0f);
+        Quaternion endRotation   = Quaternion.Euler(0f, 0f, 0f);
 
         if (mainCamera != null)
         {
-            // Preserve the Y rotation (left/right look)
-            float currentYRotation = mainCamera.localEulerAngles.y;
-            startRotation = Quaternion.Euler(-60f, currentYRotation, 0f);
-            endRotation = Quaternion.Euler(0f, currentYRotation, 0f);
-
+            float currentY = mainCamera.localEulerAngles.y;
+            startRotation = Quaternion.Euler(-60f, currentY, 0f);
+            endRotation   = Quaternion.Euler(0f,    currentY, 0f);
             mainCamera.localRotation = startRotation;
         }
 
         float totalTime = wakeUpDuration + additionalFadeTime;
         float elapsedTime = 0f;
 
-        // Brief pause before starting
         yield return new WaitForSeconds(0.5f);
 
-        // Play wake up sound
         if (audioSource != null && wakeUpSound != null)
-        {
             audioSource.PlayOneShot(wakeUpSound);
-        }
 
         while (elapsedTime < totalTime)
         {
             float progress = elapsedTime / totalTime;
 
-            // Camera rotation (happens in first part of animation)
             if (elapsedTime < wakeUpDuration && mainCamera != null)
             {
                 float rotationProgress = elapsedTime / wakeUpDuration;
-                float curvedProgress = wakeUpCurve.Evaluate(rotationProgress);
-                mainCamera.localRotation = Quaternion.Slerp(startRotation, endRotation, curvedProgress);
+                float curved = wakeUpCurve.Evaluate(rotationProgress);
+                mainCamera.localRotation = Quaternion.Slerp(startRotation, endRotation, curved);
             }
 
-            // Fade effect (happens throughout entire duration)
             if (fadeOverlay != null)
             {
                 Color color = fadeOverlay.color;
@@ -127,11 +98,8 @@ public class WakeUpController : MonoBehaviour
             yield return null;
         }
 
-        // Finalize everything
         if (mainCamera != null)
-        {
             mainCamera.localRotation = endRotation;
-        }
 
         if (fadeOverlay != null)
         {
@@ -140,14 +108,8 @@ public class WakeUpController : MonoBehaviour
             fadeOverlay.color = color;
         }
 
-        // Re-enable movement
-        if (movements != null)
-        {
-            movements.enabled = true;
-            Debug.Log("Player movement re-enabled");
-        }
+        if (movements != null) movements.enabled = true;
 
-        // Play breathing or ambient sound
         if (audioSource != null && breathingSound != null)
         {
             audioSource.clip = breathingSound;
@@ -158,16 +120,15 @@ public class WakeUpController : MonoBehaviour
         hasWokenUp = true;
         isWakingUp = false;
 
-        Debug.Log("Wake up animation complete!");
+        // === IMPORTANT: Mark intro complete and persist that this script is done ===
+        SubtitleManager2.ForceIntroComplete();
+
+        // Disable the wake-up script so SavableFlag captures enabled=false and it stays skipped on reload
+        enabled = false;
     }
 
-    // Public method to check if animation is complete
-    public bool HasWokenUp()
-    {
-        return hasWokenUp;
-    }
+    public bool HasWokenUp() => hasWokenUp;
 
-    // Method to manually trigger wake up (useful for cutscenes)
     public void TriggerWakeUp()
     {
         playOnStart = false;

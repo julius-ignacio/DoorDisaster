@@ -59,7 +59,7 @@ public class PhonePickup : MonoBehaviour, IPickupable
 
         // Optional: hide the phone model
         if (phoneModel != null)
-            phoneModel.SetActive(false);
+            phoneModel.SetActive(true);
 
         // Trigger the hotline call system
         if (hotlineCall != null)
