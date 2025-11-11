@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System;
-using Unity.VisualScripting;
 using System.Collections;
 
 public class WordPuzzle : MonoBehaviour
@@ -20,18 +18,38 @@ public class WordPuzzle : MonoBehaviour
 
     public GameObject quizPanel, barrier, quizButton;
 
+    // store original ColorBlocks so ResetWord can fully restore visuals
+    private Dictionary<Button, ColorBlock> originalColorBlocks = new Dictionary<Button, ColorBlock>();
+
+
+
+
+
+    //WATER PUZZLE
+    public Objectives_water objectivesWater;
+    public GameObject objectToManipulate;
+
     void Start()
     {
-        quizButton.SetActive(false);
-        quizPanel.SetActive(false);
-        feedbackText.text = "";
+        if (quizButton != null) quizButton.SetActive(false);
+        if (quizPanel != null) quizPanel.SetActive(false);
+        if (feedbackText != null) feedbackText.text = "";
+
+        // cache original ColorBlocks and bind listeners that capture the actual button
         foreach (Button btn in letterButtons)
         {
-            string letter = btn.GetComponentInChildren<TextMeshProUGUI>().text; // assumes button text is the letter
-            btn.onClick.AddListener(() => OnLetterClick(letter));
+            if (btn == null) continue;
+
+            originalColorBlocks[btn] = btn.colors;
+
+            // capture the current button and its letter in local variables
+            string letter = btn.GetComponentInChildren<TextMeshProUGUI>().text;
+            Button capturedBtn = btn;
+
+            // pass both the letter and the specific button to the handler
+            capturedBtn.onClick.AddListener(() => OnLetterClick(capturedBtn, letter));
         }
     }
-
 
     void Update()
     {
@@ -41,99 +59,123 @@ public class WordPuzzle : MonoBehaviour
         }
     }
 
-
     public void OpenQuiz()
     {
-        quizPanel.SetActive(true);
-        quizButton.SetActive(false);
+        if (quizPanel != null) quizPanel.SetActive(true);
+        if (quizButton != null) quizButton.SetActive(false);
         ResetWord();
-        feedbackText.text = "";
+        if (feedbackText != null) feedbackText.text = "";
     }
-public void OnLetterClick(string letter)
-{
-    // Find which button was clicked (based on letter)
-    Button clickedButton = letterButtons.Find(b => 
-        b.GetComponentInChildren<TextMeshProUGUI>().text == letter && b.interactable);
 
-    if (clickedButton != null)
+    // Now receives the exact clicked button + letter
+    public void OnLetterClick(Button clickedButton, string letter)
     {
-        // Gray out and disable the clicked button
+        if (clickedButton == null) return;
+
+        // disable only the button that was clicked
         clickedButton.interactable = false;
 
+        // optionally update its appearance to "used"
         ColorBlock colors = clickedButton.colors;
-        colors.normalColor = new Color(0.5f, 0.5f, 0.5f); // gray
-        colors.highlightedColor = colors.normalColor;
-        colors.pressedColor = colors.normalColor;
-        colors.selectedColor = colors.normalColor;
+        Color usedColor = new Color(0.5f, 0.5f, 0.5f); // gray
+        colors.normalColor = usedColor;
+        colors.highlightedColor = usedColor;
+        colors.pressedColor = usedColor;
+        colors.selectedColor = usedColor;
         clickedButton.colors = colors;
+
+        // Add letter to current word
+        currentWord += letter;
+        if (currentWordText != null) currentWordText.text = currentWord;
+
+        // Check if player reached full word
+        if (currentWord.Length == correctWord.Length)
+        {
+            CheckAnswer();
+        }
     }
-
-    // Add letter to current word
-    currentWord += letter;
-    currentWordText.text = currentWord;
-
-    // Check if player reached full word
-    if (currentWord.Length == correctWord.Length)
-    {
-        CheckAnswer();
-    }
-}
-
 
     void CheckAnswer()
     {
         if (currentWord.Equals(correctWord, System.StringComparison.OrdinalIgnoreCase))
         {
-            feedbackText.text = "✅ Correct!";
-            // You can trigger next question or scene here
+            if (feedbackText != null) feedbackText.text = "✅ Correct!";
             DisableButtons();
+
+            if(objectivesWater != null)
+            {
+                objectivesWater.breakerTurnedOFF = true;
+                quizButton.SetActive(false);
+                objectToManipulate.GetComponent<Outline>().enabled = false;
+                objectToManipulate.GetComponent<BoxCollider>().enabled = false;
+            }
 
             StartCoroutine(CorrectAnswer(1.5f));
         }
         else
         {
-            feedbackText.text = "❌ Try again!";
-            ResetWord();
+            if (feedbackText != null) feedbackText.text = "❌ Try again!";
+            // small delay so player sees the "Try again" text (optional)
+            StartCoroutine(ResetAfterDelay(0.5f));
         }
     }
-public void ResetWord()
-{
-    currentWord = "";
-    currentWordText.text = "";
 
-    foreach (Button btn in letterButtons)
+    private IEnumerator ResetAfterDelay(float delay)
     {
-        btn.interactable = true;
-
-        ColorBlock colors = btn.colors;
-        colors.normalColor = Color.white;
-        colors.highlightedColor = Color.white;
-        btn.colors = colors;
+        yield return new WaitForSeconds(delay);
+        ResetWord();
+        if (feedbackText != null) feedbackText.text = "";
     }
-}
+
+    public void ResetWord()
+    {
+        currentWord = "";
+        if (currentWordText != null) currentWordText.text = "";
+
+        foreach (Button btn in letterButtons)
+        {
+            if (btn == null) continue;
+
+            btn.interactable = true;
+
+            // restore the entire original ColorBlock (if we saved one)
+            if (originalColorBlocks.TryGetValue(btn, out ColorBlock original))
+            {
+                btn.colors = original;
+            }
+            else
+            {
+                // fallback: set default white
+                ColorBlock colors = btn.colors;
+                colors.normalColor = Color.white;
+                colors.highlightedColor = Color.white;
+                colors.pressedColor = Color.white;
+                colors.selectedColor = Color.white;
+                btn.colors = colors;
+            }
+        }
+    }
 
     void DisableButtons()
     {
         foreach (Button btn in letterButtons)
-            btn.interactable = false;
+            if (btn != null) btn.interactable = false;
     }
-
 
     public void Close()
     {
-        quizPanel.SetActive(false);
+        if (quizPanel != null) quizPanel.SetActive(false);
         ResetWord();
-        feedbackText.text = "";
+        if (feedbackText != null) feedbackText.text = "";
     }
-
 
     private IEnumerator CorrectAnswer(float duration)
     {
-        currentWordText.color = Color.green;
+        if (currentWordText != null) currentWordText.color = Color.green;
         yield return new WaitForSeconds(duration);
-        quizPanel.SetActive(false);
-        barrier.SetActive(false);
+        if (quizPanel != null) quizPanel.SetActive(false);
+        if (barrier != null) barrier.SetActive(false);
         AudioManager.Instance.PlaySFX(22);
-        DataManager.Instance.factsDiscovered ++;
+        DataManager.Instance.factsDiscovered++;
     }
 }

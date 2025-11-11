@@ -17,6 +17,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
     public GameNotifier gameNotifier;
     public Objectives objectives;
     public InventoryManager inventory;
+    public string itemName;
 
 
     [Header("Npc icons")]
@@ -30,12 +31,17 @@ public class ObjectBehaviorEvent : MonoBehaviour
         if (npcModel == null)
             npcModel = this.gameObject;
 
-        whistleCD_UI.SetActive(false);
+        if (whistleCD_UI != null)
+            whistleCD_UI.SetActive(false);
 
+        if (GreenFlashEffect != null)
+            GreenFlashEffect.SetActive(false);
 
-        GreenFlashEffect.SetActive(false);
-        BlueFlashEffect.SetActive(false);
-        YellowFlashEffect.SetActive(false);
+        if (BlueFlashEffect != null)
+            BlueFlashEffect.SetActive(false);
+
+        if (YellowFlashEffect != null)
+            YellowFlashEffect.SetActive(false);
 
         // if (aud == null)
         // aud = FindObjectOfType<AudioManager>();
@@ -46,7 +52,7 @@ public class ObjectBehaviorEvent : MonoBehaviour
     {
         int score = 0;
 
-        
+
 
 
         if (DataManager.Instance.npcScores.TryGetValue(currentNpcId, out score))
@@ -148,8 +154,51 @@ public class ObjectBehaviorEvent : MonoBehaviour
 
         StartCoroutine(DisappearAfterDelay(disappearDelay));
     }
-    
- 
+
+
+    public void PlayAndDisappear_water(int currentNpcId)
+    {
+        int score = 0;
+
+
+
+
+        if (DataManager.Instance.npcScores.TryGetValue(currentNpcId, out score))
+        {
+            Debug.Log($"NPC {currentNpcId} score found: {score}");
+        }
+        else
+        {
+            Debug.LogWarning($"No score found for NPC {currentNpcId}, defaulting to 0");
+        }
+
+
+        if (score == 0) //medkit
+        {
+            AudioManager.Instance.PlaySFX(8); //points
+            gameNotifier.ObtainedItem(score, itemName, 3f);
+        }
+
+        else if (score == 1 || score == 2) //waterbottle
+        {
+            AudioManager.Instance.PlaySFX(8); //points
+                        gameNotifier.ObtainedItem(score, itemName, 3f);
+
+        }
+
+        else
+        {
+            AudioManager.Instance.PlaySFX(8); //points
+                       gameNotifier.ObtainedItem(score, itemName, 3f);
+
+        }
+
+
+
+        StartCoroutine(DisappearAfterDelay(disappearDelay));
+    }
+
+
 
 
 
@@ -170,60 +219,6 @@ public class ObjectBehaviorEvent : MonoBehaviour
         flashGroup.gameObject.SetActive(false);
     }
 
-
-
-
-    // public void DrinkWater()
-    // {
-    //     if (panic.currHealth != 0 && panic.currHealth >= 20)
-    //     {
-    //         water--;
-    //         waterCounter.text = water.ToString();
-
-    //         inventoryUI.SetActive(false);
-    //         panic.currHealth -= 20;
-    //         AudioManager.Instance.PlaySFX(18);
-
-    //         BlueFlashEffect.SetActive(true);
-    //         StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
-    //     }
-
-    //     else if(panic.currHealth < 20)
-    //     {
-    //         water--;
-    //         waterCounter.text = water.ToString();
-
-    //         inventoryUI.SetActive(false);
-    //         panic.currHealth = 0;
-    //         AudioManager.Instance.PlaySFX(18);
-
-    //         BlueFlashEffect.SetActive(true);
-    //         StartCoroutine(FlashFade(BlueFlashEffect.GetComponent<CanvasGroup>(), 1f));
-    //     }
-    // }
-
-
-
-    // public void ReactToScore(int score)
-    // {
-    //     if (score == 3)
-    //     {
-    //         npcAnimator.SetTrigger("Victory");
-    //         AudioManager.Instance.PlaySFX(11);
-    //     }
-    //     else if (score == 0)
-    //     {
-    //         npcAnimator.SetTrigger("Death");
-    //         AudioManager.Instance.PlaySFX(9);
-    //     }
-    //     else
-    //     {
-    //         npcAnimator.SetTrigger("Clap");
-    //         AudioManager.Instance.PlaySFX(10);
-    //     }
-
-    //     // other conditions based on npcId
-    // }
 
 
 }

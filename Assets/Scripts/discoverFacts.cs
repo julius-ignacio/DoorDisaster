@@ -20,8 +20,6 @@ public class discoverFacts : MonoBehaviour
     public Slider DecipherSlider;
     public Image fill;
 
-    [Header("Selection crosshair pointer")]
-    public GameObject pointer;
     public GameManager gameManager;
 
     void Start()
@@ -41,7 +39,6 @@ public class discoverFacts : MonoBehaviour
         DecipherText.text = "Deciphering...";
 
         // ✅ Hide/disable UI states
-        pointer.SetActive(false);
         ReadBtn.SetActive(false);
         Trigger[factIndex].SetActive(false);
 
@@ -88,7 +85,6 @@ public class discoverFacts : MonoBehaviour
 
         // ✅ Continue logic
         ReadFacts(factIndex);
-        pointer.SetActive(true);
     }
 
     void ReadFacts(int index)
