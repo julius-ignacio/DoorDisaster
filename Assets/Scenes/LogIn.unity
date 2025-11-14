@@ -4008,6 +4008,7 @@ MonoBehaviour:
     isFireFinished: 0
     isWaterFinished: 0
     isEarthFinished: 0
+    tutorialDone: 0
 --- !u!224 &772204355
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4017,14 +4018,14 @@ RectTransform:
   m_GameObject: {fileID: 772204352}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.40437502, y: 0.40437502, z: 0.40437502}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1195005084}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -4.5000186}
+  m_AnchoredPosition: {x: 959.99994, y: 639.4081}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &786008863
@@ -5312,6 +5313,7 @@ MonoBehaviour:
     isFireFinished: 0
     isWaterFinished: 0
     isEarthFinished: 0
+    tutorialDone: 0
   quizScore: 0
   wrongAnswers: 0
   factsDiscovered: 0
@@ -6062,7 +6064,6 @@ RectTransform:
   m_Children:
   - {fileID: 621835001}
   - {fileID: 935541632}
-  - {fileID: 772204355}
   - {fileID: 1293868071}
   - {fileID: 419941252}
   m_Father: {fileID: 0}
@@ -11327,5 +11328,6 @@ SceneRoots:
   - {fileID: 40376238}
   - {fileID: 1013441638}
   - {fileID: 1857669824}
+  - {fileID: 772204355}
   - {fileID: 1195005084}
   - {fileID: 1291743145}

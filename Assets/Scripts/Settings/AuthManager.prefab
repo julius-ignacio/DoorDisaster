@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5181317714325440885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9120930873831651684}
+  - component: {fileID: 7590071428100317377}
+  m_Layer: 5
+  m_Name: AuthManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9120930873831651684
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5181317714325440885}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.40437502, y: 0.40437502, z: 0.40437502}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 959.99994, y: 639.4081}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7590071428100317377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5181317714325440885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a65508bca565c9eb4018099c9931e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    playerId: 
+    playerName: 
+    email: 
+    age: 0
+    gradeLevel: 0
+    Mode:
+    - trials:
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+    - trials:
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+      - quizScore: 0
+        wrongAnswers: 0
+        questionsAnswered: 0
+        factsDiscovered: 0
+        totalScore: 0
+        hasSeenIntro: 0
+    isSurveyDone: 0
+    isFireFinished: 0
+    isWaterFinished: 0
+    isEarthFinished: 0
+    tutorialDone: 0

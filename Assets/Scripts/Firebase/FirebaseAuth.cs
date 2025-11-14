@@ -6,12 +6,28 @@ using UnityEngine.SocialPlatforms.Impl;
 
 public class FirebaseAuth : MonoBehaviour
 {
+    public static FirebaseAuth Instance;
+
     [Header("Firebase Config")]
     private string apiKey = "AIzaSyBB5GZXI2FlYMbfg_JH-FJU60Mj5zSVk5E";
 
     public static string UserIdToken;
     public static string UserLocalId;
     public PlayerData playerData;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            Debug.Log("✅ FirebaseAuth singleton initialized");
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     [System.Serializable]
     public class AccountInfoResponse
@@ -38,6 +54,82 @@ public class FirebaseAuth : MonoBehaviour
     {
         public string requestType; // must be "PASSWORD_RESET"
         public string email;       // the user's email
+    }
+
+    // Add these classes to your FirebaseAuth.cs file (after the other serializable classes)
+
+    [System.Serializable]
+    public class ChangePasswordRequest
+    {
+        public string idToken;
+        public string password;        // The new password
+        public bool returnSecureToken; // Set to true to get a new token
+    }
+
+    [System.Serializable]
+    public class ChangePasswordResponse
+    {
+        public string idToken;
+        public string refreshToken;
+        public string expiresIn;
+    }
+
+    // Add this method to your FirebaseAuth class
+    public IEnumerator ChangePassword(string idToken, string newPassword, System.Action<bool, string> callback)
+    {
+        string changePasswordUrl = "https://identitytoolkit.googleapis.com/v1/accounts:update?key=" + apiKey;
+
+        ChangePasswordRequest requestData = new ChangePasswordRequest
+        {
+            idToken = idToken,
+            password = newPassword,
+            returnSecureToken = true
+        };
+
+        string jsonData = JsonUtility.ToJson(requestData);
+        Debug.Log("ChangePassword payload: " + jsonData);
+
+        using (UnityWebRequest request = new UnityWebRequest(changePasswordUrl, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("✅ Password changed successfully!");
+
+                // Update the stored token with the new one
+                ChangePasswordResponse response = JsonUtility.FromJson<ChangePasswordResponse>(request.downloadHandler.text);
+                UserIdToken = response.idToken;
+
+                callback?.Invoke(true, "Password changed successfully!");
+            }
+            else
+            {
+                string errorMsg = request.downloadHandler.text;
+                Debug.LogError($"❌ Failed to change password: {errorMsg}");
+
+                // Map common errors to friendly messages
+                string friendlyError = MapChangePasswordError(errorMsg);
+                callback?.Invoke(false, friendlyError);
+            }
+        }
+    }
+
+    private string MapChangePasswordError(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return "Request failed. Please try again.";
+
+        if (raw.Contains("INVALID_ID_TOKEN")) return "Session expired. Please login again.";
+        if (raw.Contains("WEAK_PASSWORD")) return "Password is too weak. Please use a stronger password.";
+        if (raw.Contains("TOKEN_EXPIRED")) return "Session expired. Please login again.";
+        if (raw.Contains("USER_NOT_FOUND")) return "User account not found.";
+
+        return "Failed to change password. Please try again.";
     }
 
     public IEnumerator CheckEmailVerified(string idToken, Action<bool> callback)
