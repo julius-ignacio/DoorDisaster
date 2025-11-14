@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using Unity.Android.Gradle.Manifest;
 using System.Collections;
 using System;
 

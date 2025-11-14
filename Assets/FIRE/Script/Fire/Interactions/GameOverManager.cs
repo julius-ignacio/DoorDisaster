@@ -20,15 +20,12 @@ public class GameOverManager : MonoBehaviour
     [Header("UI to Hide on Death")]
     public GameObject pauseButton;
     public GameObject inventoryButton;
+    public GameObject tutorialButton;
     public GameObject healthBar;
     public GameObject oxygenBar;
 
     [Header("Fade Settings")]
     public float fadeDuration = 1.5f;
-
-    [Header("Hallway Checkpoint")]
-    public Transform hallwaySpawnPoint;
-    public Transform player;
 
     private CanvasGroup panelCanvasGroup;
     private CanvasGroup overlayCanvasGroup;
@@ -190,6 +187,13 @@ public class GameOverManager : MonoBehaviour
             Debug.Log("Inventory button hidden");
         }
 
+        // ✅ Hide tutorial button
+        if (tutorialButton != null)
+        {
+            tutorialButton.SetActive(false);
+            Debug.Log("Tutorial button hidden");
+        }
+
         // Hide health bar
         if (healthBar != null)
         {
@@ -203,36 +207,13 @@ public class GameOverManager : MonoBehaviour
             oxygenBar.SetActive(false);
             Debug.Log("Oxygen bar hidden");
         }
-    }
 
-    void ShowGameUI()
-    {
-        // Show pause button
-        if (pauseButton != null)
+        // ✅ Hide subtitles/objectives
+        SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
+        if (subtitleManager != null)
         {
-            pauseButton.SetActive(true);
-            Debug.Log("Pause button shown");
-        }
-
-        // Show inventory/backpack button
-        if (inventoryButton != null)
-        {
-            inventoryButton.SetActive(true);
-            Debug.Log("Inventory button shown");
-        }
-
-        // Show health bar
-        if (healthBar != null)
-        {
-            healthBar.SetActive(true);
-            Debug.Log("Health bar shown");
-        }
-
-        // Show oxygen bar
-        if (oxygenBar != null)
-        {
-            oxygenBar.SetActive(true);
-            Debug.Log("Oxygen bar shown");
+            subtitleManager.HideAll();
+            Debug.Log("Subtitles/objectives hidden");
         }
     }
 
@@ -286,77 +267,60 @@ public class GameOverManager : MonoBehaviour
         Debug.Log("GameOver panel, title, and reason faded in");
     }
 
-    System.Collections.IEnumerator FadeCanvas(CanvasGroup cg, float from, float to, float duration)
-    {
-        if (cg == null) yield break;
-
-        float elapsed = 0f;
-        cg.alpha = from;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            cg.alpha = Mathf.Lerp(from, to, elapsed / duration);
-            yield return null;
-        }
-
-        cg.alpha = to;
-    }
-
     public void RestartGame()
     {
-        Debug.Log("Restarting game...");
+        Debug.Log("🔄 Restarting game - FULL HARD RESET");
+
+        // Stop audio and unpause time/audio
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopAll();
+            AudioManager.Instance.StopLoop();
+        }
         Time.timeScale = 1f;
+        AudioListener.pause = false;
 
-        // Check if player died during hallway chase
-        if (PlayerOxygen.InHallwayChase && hallwaySpawnPoint != null && player != null)
+        var dm = DataManager.Instance;
+
+        // ✅ Get trial/mode info
+        int trialIndex = (dm != null) ? dm.currentTrial : 0;
+        int mode = (dm != null) ? dm.currentMode : 0;
+
+        // ✅ CLEAR SAVE AND RESET ALL FLAGS (same as GameManager.RestartLevelHard)
+        WorldSaveSystem.ClearSaveForNewTrial(trialIndex, mode);
+        Debug.Log($"🔄 Called ClearSaveForNewTrial({trialIndex}, {mode})");
+
+        if (dm != null)
         {
-            Debug.Log("Respawning at hallway checkpoint!");
+            // Reset in-memory quick globals (fresh run)
+            dm.ResetGlobalsForNewRun();
 
-            // Reset game over state
-            isGameOver = false;
-
-            // Hide game over UI
-            if (gameOverPanel != null) gameOverPanel.SetActive(false);
-            if (darkOverlay != null) darkOverlay.SetActive(false);
-
-            // Restore game UI
-            ShowGameUI();
-
-            // Teleport player to hallway spawn
-            CharacterController cc = player.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-
-            player.position = hallwaySpawnPoint.position;
-            player.rotation = Quaternion.Euler(0f, 270f, 0f);
-
-            if (cc != null) cc.enabled = true;
-
-            // Re-enable player movement
-            if (playerMovement != null)
+            // Reset this trial's stored stats (so Almanac shows zero)
+            var trial = dm.playerData?.Mode?[dm.currentMode]?.trials?[dm.currentTrial];
+            if (trial != null)
             {
-                playerMovement.enabled = true;
-                if (cc != null) cc.enabled = true;
+                trial.quizScore = 0;
+                trial.questionsAnswered = 0;
+                trial.factsDiscovered = 0;
+                trial.totalScore = 0;
             }
 
-            // Refill oxygen (this also resets hasTriggeredDeath flag)
-            if (playerOxygen != null)
-            {
-                playerOxygen.RefillOxygen();
-                playerOxygen.ShowOxygenBar();
-            }
-
-            // Hide cursor for gameplay
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            Debug.Log("Hallway checkpoint restart complete!");
+            // Ensure no world load happens
+            dm.skipNextWorldLoad = true;
         }
-        else
-        {
-            // Regular restart - reload entire scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+
+        // ✅ Diagnostic check
+        Debug.Log($"After clear: HasSaveData = {WorldSaveSystem.HasSaveData(trialIndex, mode)}");
+        Debug.Log($"After clear: SavedObjectiveStage = {ObjectiveManager.SavedObjectiveStage}");
+        Debug.Log($"After clear: ItemCount = {ItemPickup.GetPickedUpCount()}");
+        Debug.Log($"After clear: DoorFireShown = {DoorFireTrigger.FireMessageShown}");
+        Debug.Log($"After clear: CatRescued = {MrKittyPickup.CatRescued}");
+        Debug.Log($"After clear: WindowTried = {WindowEscape.WindowTried}");
+
+        // ✅ Reload scene from the beginning (wake-up story)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        Debug.Log("🔁 Full hard restart complete - returning to wake-up story");
     }
 
     // Static method so other scripts can call it easily

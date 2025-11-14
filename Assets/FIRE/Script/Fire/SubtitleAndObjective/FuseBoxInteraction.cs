@@ -8,7 +8,7 @@ public class FuseBoxInteraction : MonoBehaviour, IPickupable
     [Header("Outline Settings")]
     private Outline outline;
 
-    // ✅ NEW: Static flag set by FuseBoxTrigger
+    // ✅ Static flag set by FuseBoxTrigger
     public static bool FuseBoxObjectiveActive { get; set; } = false;
 
     private bool hasInteracted = false;
@@ -16,6 +16,9 @@ public class FuseBoxInteraction : MonoBehaviour, IPickupable
 
     void Start()
     {
+        // ❌ DON'T reset - this flag needs to persist when loading saves
+        // BreakerPuzzleComplete = false;  // REMOVED
+
         // Get outline component
         outline = GetComponent<Outline>();
         if (outline != null)
@@ -37,7 +40,7 @@ public class FuseBoxInteraction : MonoBehaviour, IPickupable
             Debug.LogError("FuseBoxInteraction: BreakerPuzzle is not assigned!");
         }
 
-        Debug.Log("FuseBoxInteraction: Ready and waiting for player");
+        Debug.Log($"FuseBoxInteraction.Start(): BreakerPuzzleComplete={BreakerPuzzle.BreakerPuzzleComplete}");
     }
 
     void Update()
@@ -115,6 +118,27 @@ public class FuseBoxInteraction : MonoBehaviour, IPickupable
         {
             Debug.LogError("FuseBoxInteraction: BreakerPuzzle reference is missing!");
         }
+    }
+
+    /// <summary>
+    /// Check if the breaker puzzle has been completed
+    /// </summary>
+    public bool IsTurnedOff()
+    {
+        return BreakerPuzzle.BreakerPuzzleComplete || hasInteracted;
+    }
+
+    /// <summary>
+    /// Restore the turned-off state when loading a save
+    /// </summary>
+    public void RestoreTurnedOffState()
+    {
+        hasInteracted = true;
+
+        if (outline != null)
+            outline.enabled = false;
+
+        Debug.Log("FuseBoxInteraction: Restored turned-off state from save");
     }
 
     // Visual debug in Scene view

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
@@ -61,6 +61,69 @@ public class WorldSaveSystem : MonoBehaviour
         if (cover.Length > 0 && cover[0].CoverCamera != null)
             ps.isCovered = cover[0].CoverCamera.enabled;
 
+        // ✅ Save static progression flags (EXISTING - works fine)
+        ps.hasTeleportedToHouseB = TowelPickup.HasTeleportedToHouseB;
+        ps.hasPickedUpExtinguisher = FireExtinguisher.HasPickedUpExtinguisher;
+        ps.hasCompletedExtinguisherQuizzes = FireExtinguisher.HasCompletedQuizzes;
+        ps.allFiresOut = FireExtinguisher.AllFiresOut;
+
+        Debug.Log($"💾 Saving flags: Teleported={ps.hasTeleportedToHouseB}, Extinguisher={ps.hasPickedUpExtinguisher}, Quizzes={ps.hasCompletedExtinguisherQuizzes}, FiresOut={ps.allFiresOut}");
+
+        // ✅ NEW: Save Mr. Kitty rescue state
+        ps.mrKittyRescued = MrKittyPickup.CatRescued;
+        Debug.Log($"💾 Saving cat: Rescued={ps.mrKittyRescued}");
+
+        // ✅ NEW: Save picked up items
+        ps.pickedUpItemIDs = ItemPickup.GetPickedUpItems();
+        Debug.Log($"💾 Saving picked up items: {ps.pickedUpItemIDs.Length} items");
+
+        // ✅ NEW: Save oxygen state
+        var playerOxygen = Object.FindObjectsByType<PlayerOxygen>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (playerOxygen.Length > 0)
+        {
+            ps.currentOxygen = playerOxygen[0].GetCurrentOxygen();
+            ps.isTowelEquipped = PlayerOxygen.GetSavedTowelEquipped();
+        }
+        else
+        {
+            ps.currentOxygen = PlayerOxygen.GetSavedOxygenLevel();
+            ps.isTowelEquipped = PlayerOxygen.GetSavedTowelEquipped();
+        }
+        Debug.Log($"💾 Saving oxygen: {ps.currentOxygen}, towel={ps.isTowelEquipped}");
+
+        // ✅ NEW: Save hot door state
+        ps.doorOpenedWithTowel = HotDoorHandle.DoorOpenedWithTowel;
+        ps.touchedHotHandle = HotDoorHandle.touchedHotHandle;
+        Debug.Log($"💾 Saving hot door: OpenedWithTowel={ps.doorOpenedWithTowel}, Touched={ps.touchedHotHandle}");
+
+        // ✅ NEW: Save locked door state
+        ps.hasKey = LockedDoor.HasKey;
+        ps.doorUnlocked = LockedDoor.DoorUnlocked;
+        ps.hasTriedDoor = LockedDoor.HasTriedDoor;
+        ps.timerWasRunning = LockedDoor.TimerWasRunning;
+        ps.savedTime = LockedDoor.SavedTime;
+        Debug.Log($"💾 Saving locked door: Key={ps.hasKey}, Unlocked={ps.doorUnlocked}, Timer={ps.timerWasRunning}, Time={ps.savedTime}");
+
+        // ✅ NEW: Save breaker puzzle state
+        ps.breakerPuzzleComplete = BreakerPuzzle.BreakerPuzzleComplete;
+        Debug.Log($"💾 Saving breaker: Complete={ps.breakerPuzzleComplete}");
+
+        // ✅ NEW: Save door fire trigger state
+        ps.fireMessageShown = DoorFireTrigger.FireMessageShown;
+        Debug.Log($"💾 Saving fire message: Shown={ps.fireMessageShown}");
+
+        // ✅ NEW: Save SDR trigger state
+        ps.sdrTriggered = SDRTrigger.SDRTriggered;
+        Debug.Log($"💾 Saving SDR: Triggered={ps.sdrTriggered}");
+
+        // ✅ NEW: Save objective stage
+        ps.objectiveStage = ObjectiveManager.SavedObjectiveStage;
+        Debug.Log($"💾 Saving objective stage: {ps.objectiveStage}");
+
+        // ✅ NEW: Save window escape state
+        ps.windowTried = WindowEscape.WindowTried;
+        Debug.Log($"💾 Saving window: Tried={ps.windowTried}");
+
         // Collect behaviour/object flags (enabled / activeSelf)
         var flagComps = Object.FindObjectsByType<SavableFlag>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         var flagStates = new List<FlagState>(flagComps.Length);
@@ -96,7 +159,7 @@ public class WorldSaveSystem : MonoBehaviour
 
         string path = Path.Combine(Application.persistentDataPath, $"save_trial{trialIndex}_mode{mode}.json");
         File.WriteAllText(path, JsonUtility.ToJson(saveData));
-        Debug.Log($"Saved world state to {path}");
+        Debug.Log($"💾 Saved world state to {path}");
     }
 
     public static bool HasSaveData(int trial, int mode)
@@ -111,8 +174,31 @@ public class WorldSaveSystem : MonoBehaviour
         if (File.Exists(path))
         {
             File.Delete(path);
-            Debug.Log($"Deleted save file: {path}");
+            Debug.Log($"🗑️ Deleted save file: {path}");
         }
+    }
+
+    // ✅ NEW METHOD: Call this when starting a completely new trial (not continuing)
+    public static void ClearSaveForNewTrial(int trialIndex, int mode)
+    {
+        DeleteSave(trialIndex, mode);
+
+        // Reset all static flags to fresh state
+        TowelPickup.ResetTeleportProgress();
+        FireExtinguisher.ResetExtinguisherProgress();
+        MrKittyPickup.ResetCatProgress();
+        ItemPickup.ResetPickedUpItems();
+        PlayerOxygen.ResetOxygenProgress();
+        HotDoorHandle.ResetDoorProgress();
+        LockedDoor.ResetDoorProgress();
+        BreakerPuzzle.ResetBreakerProgress();
+        DoorFireTrigger.ResetFireMessageProgress();
+        SDRTrigger.ResetSDRProgress();
+        ObjectiveManager.ResetObjectiveProgress();
+        SubtitleManager2.ResetForNewTrial();
+        WindowEscape.WindowTried = false; // ✅ NEW
+
+        Debug.Log($"🔄 Cleared save data and reset all flags for trial {trialIndex} mode {mode}");
     }
 
     public static void LoadWorld(int trialIndex, int mode)
@@ -120,12 +206,73 @@ public class WorldSaveSystem : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, $"save_trial{trialIndex}_mode{mode}.json");
         if (!File.Exists(path))
         {
-            Debug.Log($"No saved world state found at {path}");
+            Debug.Log($"📂 No saved world state found at {path}");
             return;
         }
 
         string json = File.ReadAllText(path);
         WorldSaveData saveData = JsonUtility.FromJson<WorldSaveData>(json);
+
+        // ✅ Restore static progression flags FIRST (before any other scripts check them)
+        if (saveData.player != null)
+        {
+            // EXISTING - works fine
+            TowelPickup.RestoreTeleportState(saveData.player.hasTeleportedToHouseB);
+            FireExtinguisher.RestoreExtinguisherState(
+                saveData.player.hasPickedUpExtinguisher,
+                saveData.player.hasCompletedExtinguisherQuizzes,
+                saveData.player.allFiresOut
+            );
+
+            Debug.Log($"📂 Restored flags: Teleported={saveData.player.hasTeleportedToHouseB}, Extinguisher={saveData.player.hasPickedUpExtinguisher}, Quizzes={saveData.player.hasCompletedExtinguisherQuizzes}, FiresOut={saveData.player.allFiresOut}");
+
+            // ✅ NEW: Restore Mr. Kitty state
+            MrKittyPickup.RestoreCatState(saveData.player.mrKittyRescued);
+            Debug.Log($"📂 Restored cat: rescued={saveData.player.mrKittyRescued}");
+
+            // ✅ NEW: Restore picked up items
+            ItemPickup.RestorePickedUpItems(saveData.player.pickedUpItemIDs);
+            Debug.Log($"📂 Restored {saveData.player.pickedUpItemIDs?.Length ?? 0} picked up items");
+
+            // ✅ NEW: Restore oxygen state
+            PlayerOxygen.RestoreOxygenState(saveData.player.currentOxygen, saveData.player.isTowelEquipped);
+            Debug.Log($"📂 Restored oxygen: {saveData.player.currentOxygen}, towel={saveData.player.isTowelEquipped}");
+
+            // ✅ NEW: Restore hot door state
+            HotDoorHandle.RestoreDoorState(saveData.player.doorOpenedWithTowel, saveData.player.touchedHotHandle);
+            Debug.Log($"📂 Restored hot door: OpenedWithTowel={saveData.player.doorOpenedWithTowel}, Touched={saveData.player.touchedHotHandle}");
+
+            // ✅ NEW: Restore locked door state
+            LockedDoor.RestoreDoorState(
+                saveData.player.hasKey,
+                saveData.player.doorUnlocked,
+                saveData.player.hasTriedDoor,
+                saveData.player.timerWasRunning,
+                saveData.player.savedTime
+            );
+            Debug.Log($"📂 Restored locked door: Key={saveData.player.hasKey}, Unlocked={saveData.player.doorUnlocked}, Timer={saveData.player.timerWasRunning}, Time={saveData.player.savedTime}");
+
+            // ✅ NEW: Restore breaker puzzle state
+            BreakerPuzzle.RestoreBreakerState(saveData.player.breakerPuzzleComplete);
+            Debug.Log($"📂 Restored breaker: Complete={saveData.player.breakerPuzzleComplete}");
+
+            // ✅ NEW: Restore door fire trigger state
+            DoorFireTrigger.RestoreFireMessageState(saveData.player.fireMessageShown);
+            Debug.Log($"📂 Restored fire message: Shown={saveData.player.fireMessageShown}");
+
+            // ✅ NEW: Restore SDR trigger state
+            SDRTrigger.RestoreSDRState(saveData.player.sdrTriggered);
+            Debug.Log($"📂 Restored SDR: Triggered={saveData.player.sdrTriggered}");
+
+            // ✅ NEW: Restore objective stage
+            ObjectiveManager.RestoreObjectiveStage(saveData.player.objectiveStage);
+            Debug.Log($"📂 Restored objective stage: {saveData.player.objectiveStage}");
+
+            // ✅ NEW: Restore window escape state
+            WindowEscape.WindowTried = saveData.player.windowTried;
+            if (saveData.player.windowTried)
+                Debug.Log("✅ Restored window: Player already tried jammed window");
+        }
 
         // Include inactive objects so we can restore them too
         SavableObject[] allObjects =
@@ -241,6 +388,6 @@ public class WorldSaveSystem : MonoBehaviour
             }
         }
 
-        Debug.Log($"Loaded world state from {path}. Restored {applied}/{saveData.objects.Length} objects and {(saveData.flags?.Length ?? 0)} flag groups.");
+        Debug.Log($"📂 Loaded world state from {path}. Restored {applied}/{saveData.objects.Length} objects and {(saveData.flags?.Length ?? 0)} flag groups.");
     }
 }

@@ -12,7 +12,8 @@ public class LockedDoor : MonoBehaviour, IPickupable
     public GameObject timerUI;
     public SubtitleManager2 subtitleManager;
     public GameObject[] uiCanvases;
-    public float rescueTime = 60f; // Changed to 60 seconds (1 minute)
+    public GameObject pauseButton;
+    public float rescueTime = 60f;
     public Transform safeHouseSpawn;
     public GameOverManager gameOverManager;
 
@@ -28,11 +29,18 @@ public class LockedDoor : MonoBehaviour, IPickupable
     private bool timerRunning = false;
     private float currentTime;
     private bool playerInRange = false;
-    private bool hasTriedDoor = false; // Track if player already tried the door
+    private bool hasTriedDoor = false;
 
     private Quaternion closedRotation;
     private Quaternion openRotation;
     private bool isDoorOpen = false;
+
+    // ✅ Static flags for save system
+    public static bool HasKey { get; private set; } = false;
+    public static bool DoorUnlocked { get; private set; } = false;
+    public static bool HasTriedDoor { get; private set; } = false;
+    public static bool TimerWasRunning { get; private set; } = false;
+    public static float SavedTime { get; private set; } = 0f;
 
     void Start()
     {
@@ -41,11 +49,62 @@ public class LockedDoor : MonoBehaviour, IPickupable
 
         if (timerUI != null)
             timerUI.SetActive(false);
+
+        // ✅ Restore state from previous session
+        RestoreState();
+    }
+
+    // ✅ Restore door state
+    public void RestoreState()
+    {
+        hasKey = HasKey;
+        doorUnlocked = DoorUnlocked;
+        hasTriedDoor = HasTriedDoor;
+        timerRunning = TimerWasRunning;
+        currentTime = SavedTime;
+
+        if (doorUnlocked)
+        {
+            isDoorOpen = true;
+            transform.rotation = openRotation;
+            if (timerUI != null) timerUI.SetActive(false);
+            if (pauseButton != null) pauseButton.SetActive(true);
+        }
+        else if (timerRunning && currentTime > 0)
+        {
+            if (timerUI != null) timerUI.SetActive(true);
+            if (pauseButton != null) pauseButton.SetActive(false);
+            Debug.Log($"🔑 Resuming timer with {currentTime} seconds remaining");
+        }
+
+        Debug.Log($"🔑 LockedDoor restored: HasKey={hasKey}, Unlocked={doorUnlocked}, Tried={hasTriedDoor}, Timer={timerRunning}");
+    }
+
+
+    // ✅ Public method for save system
+    public static void RestoreDoorState(bool key, bool unlocked, bool tried, bool timer, float time)
+    {
+        HasKey = key;
+        DoorUnlocked = unlocked;
+        HasTriedDoor = tried;
+        TimerWasRunning = timer;
+        SavedTime = time;
+        Debug.Log($"🔑 Restored door state: key={key}, unlocked={unlocked}, tried={tried}, timer={timer}, time={time}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetDoorProgress()
+    {
+        HasKey = false;
+        DoorUnlocked = false;
+        HasTriedDoor = false;
+        TimerWasRunning = false;
+        SavedTime = 0f;
+        Debug.Log("🔑 Door progress reset");
     }
 
     void Update()
     {
-        // ✅ Don't update anything if game is paused
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
@@ -59,6 +118,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
         if (timerRunning)
         {
             currentTime -= Time.deltaTime;
+            SavedTime = currentTime; // ✅ Save time continuously
 
             if (timerUI != null)
             {
@@ -76,6 +136,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
             if (currentTime <= 0)
             {
                 timerRunning = false;
+                TimerWasRunning = false; // ✅ Update static flag
                 FailRescue();
             }
         }
@@ -87,7 +148,6 @@ public class LockedDoor : MonoBehaviour, IPickupable
         {
             playerInRange = true;
 
-            // Only show prompt if player has key OR hasn't tried the door yet
             if (hasKey)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Unlock Door");
@@ -114,12 +174,12 @@ public class LockedDoor : MonoBehaviour, IPickupable
 
         if (!hasKey)
         {
-            // Only trigger if player hasn't tried the door yet
             if (!hasTriedDoor)
             {
-                hasTriedDoor = true; // Mark as tried
+                hasTriedDoor = true;
+                HasTriedDoor = true; // ✅ Update static flag
                 AudioManager.Instance.PlaySFX(32);
-                GenericPickupButton.Instance.HidePickupPrompt(); // Hide button immediately
+                GenericPickupButton.Instance.HidePickupPrompt();
                 StartCoroutine(ShowLockedSequence());
             }
         }
@@ -131,45 +191,76 @@ public class LockedDoor : MonoBehaviour, IPickupable
 
     private IEnumerator ShowLockedSequence()
     {
+        // ✅ Hide pause button
+        if (pauseButton != null)
+            pauseButton.SetActive(false);
+
         // Hide HUD
         SetUICanvases(false);
 
-        // Wait for SFX to play
         yield return new WaitForSeconds(1.2f);
 
-        // Show subtitle
         ShowSubtitle("I need to hurry up and find the key!");
 
         // Show timer
         currentTime = rescueTime;
+        SavedTime = currentTime; // ✅ Save initial time
         if (timerUI != null) timerUI.SetActive(true);
         timerRunning = true;
+        TimerWasRunning = true; // ✅ Update static flag
+
+        // Update objective
+        if (subtitleManager != null)
+            subtitleManager.ShowObjective("Find the key before time runs out!");
     }
 
     private void UnlockDoor()
     {
         doorUnlocked = true;
+        DoorUnlocked = true; // ✅ Update static flag
         isDoorOpen = true;
+        timerRunning = false;
+        TimerWasRunning = false; // ✅ Update static flag
 
-        // Play door opening sound
         PlaySound(doorOpenSoundIndex);
 
-        // Show HUD again
+        // ✅ Show pause button again
+        if (pauseButton != null)
+            pauseButton.SetActive(true);
+
         SetUICanvases(true);
 
+        // ✅ Ensure oxygen drain resumes
+        if (player != null)
+        {
+            PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+            if (oxygen != null)
+            {
+                oxygen.EnsureOxygenDrainActive();
+                Debug.Log("🔓 Door unlocked - oxygen drain resumed");
+            }
+        }
+
         if (timerUI != null) timerUI.SetActive(false);
-        timerRunning = false;
         GenericPickupButton.Instance.HidePickupPrompt();
         ShowSubtitle("The door is open! Save Mr. Kitty!");
+
+        // Update objective
+        if (subtitleManager != null)
+            subtitleManager.ShowObjective("Rescue Mr. Kitty!");
     }
 
     public void OnKeyPickedUp()
     {
         hasKey = true;
+        HasKey = true; // ✅ Update static flag
         Debug.Log("LockedDoor: Key received!");
         ShowSubtitle("I found the key! Get back to the bedroom door.");
 
-        // Update button text if player is still in range
+        // Update objective
+        if (subtitleManager != null)
+            subtitleManager.ShowObjective("Return to the bedroom door and unlock it");
+
         if (playerInRange && GenericPickupButton.Instance != null)
         {
             GenericPickupButton.Instance.ShowPickupPrompt(this, "Unlock Door");
@@ -201,8 +292,23 @@ public class LockedDoor : MonoBehaviour, IPickupable
         if (timerUI != null)
             timerUI.SetActive(false);
 
+        // ✅ Show pause button again
+        if (pauseButton != null)
+            pauseButton.SetActive(true);
+
         timerRunning = false;
         SetUICanvases(true);
+
+        // ✅ Ensure oxygen drain resumes even on failure
+        if (player != null)
+        {
+            PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
+            if (oxygen != null)
+            {
+                oxygen.EnsureOxygenDrainActive();
+                Debug.Log("⏱️ Timer failed - oxygen drain resumed");
+            }
+        }
 
         GameOverManager.TriggerDeath(
             "TIME RAN OUT",

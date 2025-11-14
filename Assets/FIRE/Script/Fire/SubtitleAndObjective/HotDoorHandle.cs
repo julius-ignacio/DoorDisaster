@@ -5,7 +5,7 @@ using System.Collections;
 public class HotDoorHandle : MonoBehaviour, IPickupable
 {
     public static bool touchedHotHandle = false;
-    public static bool DoorOpenedWithTowel { get; private set; } = false; // ✅ NEW FLAG
+    public static bool DoorOpenedWithTowel { get; private set; } = false;
 
     [Header("References")]
     public Movements2 player;
@@ -39,9 +39,33 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
 
     void Start()
     {
-        DoorOpenedWithTowel = false; // ✅ Reset on start
         if (doorTransform != null)
             closedRotation = doorTransform.localRotation;
+
+        // ✅ Restore door state from static flag
+        if (DoorOpenedWithTowel)
+        {
+            doorLocked = false;
+            Debug.Log("✅ HotDoorHandle restored: Door already opened with towel, now freely interactable");
+        }
+
+        Debug.Log($"HotDoorHandle.Start(): DoorOpenedWithTowel={DoorOpenedWithTowel}, touchedHotHandle={touchedHotHandle}, doorLocked={doorLocked}");
+    }
+
+    // ✅ Public method for save system to restore state
+    public static void RestoreDoorState(bool openedWithTowel, bool touched)
+    {
+        DoorOpenedWithTowel = openedWithTowel;
+        touchedHotHandle = touched;
+        Debug.Log($"🚪 Restored door state: openedWithTowel={openedWithTowel}, touched={touched}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetDoorProgress()
+    {
+        DoorOpenedWithTowel = false;
+        touchedHotHandle = false;
+        Debug.Log("🚪 Door progress reset");
     }
 
     void OnTriggerEnter(Collider other)
@@ -109,6 +133,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             return;
         }
 
+        // ✅ If door was already opened with towel, allow free interaction
         if (doorLocked && player.HasTowel())
         {
             player.UseTowel();
@@ -116,7 +141,6 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             {
                 subtitleManager.ShowCustomMessage("I should close the door after me so the fire spreads slowly.", 4f, () =>
                 {
-                    // ✅ Set flag AFTER both subtitles finish
                     DoorOpenedWithTowel = true;
                     Debug.Log("HotDoorHandle: Door opened with towel - FuseBox can now trigger");
                     subtitleManager.ShowObjective("Exit the bedroom");
@@ -146,6 +170,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
             return;
         }
 
+        // ✅ Door is unlocked - allow free open/close
         if (!doorLocked)
         {
             GenericPickupButton.Instance.ShowPickupPrompt(this, "Interact");

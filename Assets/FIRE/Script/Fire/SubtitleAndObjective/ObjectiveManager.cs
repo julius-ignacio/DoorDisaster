@@ -22,10 +22,14 @@ public class ObjectiveManager : MonoBehaviour
     private Dictionary<string, bool> itemsCollected = new Dictionary<string, bool>();
     private Coroutine hintCoroutine;
 
+    // ✅ Track if we're loading from save to suppress duplicate messages
+    private bool isLoadingFromSave = false;
+
+    // ✅ Static property for objective stage persistence
+    public static int SavedObjectiveStage { get; private set; } = 0;
+
     void Start()
     {
-        objectiveStage = 0;
-
         // Initialize tracking for each item
         foreach (ItemPickup item in essentialItems)
         {
@@ -34,34 +38,153 @@ public class ObjectiveManager : MonoBehaviour
                 itemsCollected[item.itemName] = false;
             }
         }
+
+        // ✅ Check if we're loading from a save file
+        var dm = DataManager.Instance;
+        if (dm != null && WorldSaveSystem.HasSaveData(dm.currentTrial, dm.currentMode))
+        {
+            isLoadingFromSave = true;
+            Debug.Log("✅ ObjectiveManager: Loading from save, restoring progress");
+
+            // ✅ Restore objective stage first
+            objectiveStage = SavedObjectiveStage;
+            Debug.Log($"✅ Restored objective stage: {objectiveStage}");
+
+            // ✅ Restore collected items from ItemPickup's static data
+            RestoreCollectedItems();
+
+            // ✅ Show the correct objective based on stage
+            RestoreObjectiveUI();
+
+            // Re-enable messages after a brief delay
+            StartCoroutine(ReenableMessagesAfterLoad());
+        }
+        else
+        {
+            // ✅ Fresh start - explicitly reset stage
+            objectiveStage = 0;
+            SavedObjectiveStage = 0;
+            Debug.Log("✅ ObjectiveManager: Fresh start, stage = 0");
+        }
+    }
+
+    private void RestoreCollectedItems()
+    {
+        // Get all picked up item IDs from the static ItemPickup data
+        string[] pickedUpIDs = ItemPickup.GetPickedUpItems();
+
+        essentialItemsCollected = 0;
+
+        // Check which essential items were already picked up
+        foreach (ItemPickup item in essentialItems)
+        {
+            if (item != null)
+            {
+                bool wasPickedUp = System.Array.Exists(pickedUpIDs, id => id == item.uniqueItemID);
+
+                if (wasPickedUp)
+                {
+                    itemsCollected[item.itemName] = true;
+                    essentialItemsCollected++;
+                    Debug.Log($"✅ Restored item: {item.itemName} ({essentialItemsCollected}/{essentialItems.Length})");
+                }
+            }
+        }
+
+        Debug.Log($"✅ Restored progress: {essentialItemsCollected}/{essentialItems.Length} items collected");
+    }
+
+    private void RestoreObjectiveUI()
+    {
+        if (subtitleManager == null) return;
+
+        // ✅ Check if door fire was triggered - it overrides stage 2 objective
+        if (DoorFireTrigger.FireMessageShown)
+        {
+            // Fire blocks the door - show alternative escape objective
+            // The DoorFireTrigger will restore this objective in its Start()
+            Debug.Log("Fire triggered - DoorFireTrigger will restore alternative escape objective");
+            return; // Let DoorFireTrigger handle the objective
+        }
+
+        // Show the correct objective based on stage
+        if (objectiveStage == 0)
+        {
+            // No objective yet (before packing starts)
+            Debug.Log("Stage 0: No objective shown yet");
+        }
+        else if (objectiveStage == 1)
+        {
+            // Still collecting items
+            if (essentialItems.Length > 0)
+            {
+                subtitleManager.ShowObjective($"Collect essential items ({essentialItemsCollected}/{essentialItems.Length})");
+                Debug.Log($"Stage 1: Showing collect items objective ({essentialItemsCollected}/{essentialItems.Length})");
+            }
+        }
+        else if (objectiveStage >= 2)
+        {
+            // All items collected - escape objective
+            subtitleManager.ShowObjective("Find the nearest exit and escape the fire");
+            Debug.Log("Stage 2+: Showing escape objective");
+        }
+    }
+
+    private IEnumerator ReenableMessagesAfterLoad()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isLoadingFromSave = false;
+        Debug.Log("✅ ObjectiveManager: Re-enabled pickup messages for new items");
     }
 
     public void StartPackingObjective()
     {
         objectiveStage = 1;
+        SavedObjectiveStage = 1; // ✅ Save stage
 
         if (subtitleManager != null)
         {
-            subtitleManager.ShowCustomMessage(
-                "I need to pack my essentials and get out of here...",
-                2f,
-                () =>
+            // ✅ Don't show intro message if we already have items
+            if (essentialItemsCollected > 0)
+            {
+                // Just update the objective, skip the intro dialogue
+                if (essentialItems.Length > 0)
                 {
-                    if (essentialItems.Length > 0)
-                    {
-                        subtitleManager.ShowObjective($"Collect essential items ({essentialItemsCollected}/{essentialItems.Length})");
-
-                        // Start hint system
-                        if (hintCoroutine != null)
-                            StopCoroutine(hintCoroutine);
-                        hintCoroutine = StartCoroutine(HintSystem());
-                    }
-                    else
-                    {
-                        subtitleManager.ShowObjective("Find the nearest exit and escape");
-                    }
+                    subtitleManager.ShowObjective($"Collect essential items ({essentialItemsCollected}/{essentialItems.Length})");
                 }
-            );
+
+                // Start hint system if we still need items
+                if (essentialItemsCollected < essentialItems.Length)
+                {
+                    if (hintCoroutine != null)
+                        StopCoroutine(hintCoroutine);
+                    hintCoroutine = StartCoroutine(HintSystem());
+                }
+            }
+            else
+            {
+                // Fresh start - show intro message
+                subtitleManager.ShowCustomMessage(
+                    "I need to pack my essentials and get out of here...",
+                    2f,
+                    () =>
+                    {
+                        if (essentialItems.Length > 0)
+                        {
+                            subtitleManager.ShowObjective($"Collect essential items ({essentialItemsCollected}/{essentialItems.Length})");
+
+                            // Start hint system
+                            if (hintCoroutine != null)
+                                StopCoroutine(hintCoroutine);
+                            hintCoroutine = StartCoroutine(HintSystem());
+                        }
+                        else
+                        {
+                            subtitleManager.ShowObjective("Find the nearest exit and escape");
+                        }
+                    }
+                );
+            }
         }
     }
 
@@ -91,7 +214,6 @@ public class ObjectiveManager : MonoBehaviour
 
                 if (!string.IsNullOrEmpty(hint))
                 {
-                    // Show hint (removed the IsSubtitleActive check that might block hints)
                     if (subtitleManager != null)
                     {
                         subtitleManager.ShowCustomMessage(hint, 3f, null);
@@ -107,49 +229,40 @@ public class ObjectiveManager : MonoBehaviour
 
     private string GetHintForItem(string itemName)
     {
-        // Debug log to verify item names
         Debug.Log($"Getting hint for item: '{itemName}' (length: {itemName.Length})");
 
-        // Normalize item name to lowercase for comparison
         string itemLower = itemName.ToLower();
 
-        // Health/Medkit hints (matches "First Aid Kit")
         if (itemLower.Contains("health") || itemLower.Contains("medkit") || itemLower.Contains("first aid"))
         {
             return "Maybe I need to check the bathroom cabinet...";
         }
 
-        // Document hints (matches "Documents")
         if (itemLower.Contains("docu") || itemLower.Contains("document") || itemLower.Contains("paper"))
         {
             return "I should check the drawer in the bedroom...";
         }
 
-        // Smartphone/Phone hints (matches "Smartphone")
         if (itemLower.Contains("phone") || itemLower.Contains("smartphone") || itemLower.Contains("mobile"))
         {
             return "Where did I leave my phone? Maybe it's in the bedroom...";
         }
 
-        // Flashlight hints (matches "Flashlight")
         if (itemLower.Contains("flashlight") || itemLower.Contains("flash") || itemLower.Contains("torch"))
         {
             return "I need a flashlight... Maybe there's one in the kitchen cabinet?";
         }
 
-        // Battery hints (matches "Battery")
         if (itemLower.Contains("battery") || itemLower.Contains("batteries"))
         {
             return "I should look for batteries in the kitchen cabinet...";
         }
 
-        // Canned food hints (matches "Canned Food")
         if (itemLower.Contains("canned") || itemLower.Contains("food") || itemLower.Contains("can"))
         {
             return "There should be some canned food in the kitchen cabinet...";
         }
 
-        // Generic hint if no specific match
         return "I should search the house more carefully for essential items...";
     }
 
@@ -157,6 +270,13 @@ public class ObjectiveManager : MonoBehaviour
     {
         if (objectiveStage == 1 && isEssential)
         {
+            // ✅ Prevent duplicate counting (important for save/load)
+            if (itemsCollected.ContainsKey(itemName) && itemsCollected[itemName])
+            {
+                Debug.Log($"⚠️ Item '{itemName}' already counted, ignoring");
+                return;
+            }
+
             essentialItemsCollected++;
 
             // Mark item as collected
@@ -166,7 +286,8 @@ public class ObjectiveManager : MonoBehaviour
                 Debug.Log($"Item marked as collected: {itemName}");
             }
 
-            if (essentialItems.Length > 0)
+            // ✅ Only show subtitle if NOT loading from save
+            if (!isLoadingFromSave && essentialItems.Length > 0)
             {
                 subtitleManager.ShowObjective($"Collect essential items ({essentialItemsCollected}/{essentialItems.Length})");
             }
@@ -183,6 +304,7 @@ public class ObjectiveManager : MonoBehaviour
         if (objectiveStage == 1)
         {
             objectiveStage = 2;
+            SavedObjectiveStage = 2; // ✅ Save stage transition
 
             // Stop hint system
             if (hintCoroutine != null)
@@ -191,14 +313,23 @@ public class ObjectiveManager : MonoBehaviour
                 hintCoroutine = null;
             }
 
-            subtitleManager?.ShowCustomMessage(
-                "I have everything I need. Now I have to get out of here!",
-                2f,
-                () =>
-                {
-                    subtitleManager.ShowObjective("Find the nearest exit and escape the fire");
-                }
-            );
+            // ✅ Only show completion message if NOT loading from save
+            if (!isLoadingFromSave)
+            {
+                subtitleManager?.ShowCustomMessage(
+                    "I have everything I need. Now I have to get out of here!",
+                    2f,
+                    () =>
+                    {
+                        subtitleManager.ShowObjective("Find the nearest exit and escape the fire");
+                    }
+                );
+            }
+            else
+            {
+                // Just update objective silently
+                subtitleManager?.ShowObjective("Find the nearest exit and escape the fire");
+            }
         }
     }
 
@@ -207,7 +338,20 @@ public class ObjectiveManager : MonoBehaviour
         return objectiveStage;
     }
 
-    // Optional: Manual hint trigger (can be called from other scripts)
+    // ✅ Public method for save system
+    public static void RestoreObjectiveStage(int stage)
+    {
+        SavedObjectiveStage = stage;
+        Debug.Log($"📋 Restored objective stage: {stage}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetObjectiveProgress()
+    {
+        SavedObjectiveStage = 0;
+        Debug.Log("📋 Objective progress reset to stage 0");
+    }
+
     public void ShowHintForMissingItems()
     {
         List<string> missingItems = new List<string>();

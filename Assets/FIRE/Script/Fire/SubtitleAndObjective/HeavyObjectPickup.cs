@@ -60,10 +60,6 @@ public class HeavyObjectPickup : MonoBehaviour, IPickupable
         // Hide pickup button
         GenericPickupButton.Instance.HidePickupPrompt();
 
-        // Hide objective text
-        if (subtitleManager != null)
-            subtitleManager.HideObjective();
-
         // Tell the window escape script player has the heavy object
         if (windowEscapeScript != null)
         {
@@ -88,10 +84,8 @@ public class HeavyObjectPickup : MonoBehaviour, IPickupable
                             quiz.correctAnswerIndex,
                             () =>
                             {
-                                // ✅ After quiz, remind player to break window and re-show button if in range
-                                if (subtitleManager != null)
-                                    subtitleManager.ShowObjective("Use the heavy object to break the bedroom window");
-
+                                // ✅ After quiz, just show button if player near window
+                                // ✅ Removed objective setting - SequenceManager handles this
                                 if (windowEscapeScript != null && IsPlayerNearWindow())
                                 {
                                     GenericPickupButton.Instance.ShowPickupPrompt(windowEscapeScript, "Break Window");
@@ -102,8 +96,6 @@ public class HeavyObjectPickup : MonoBehaviour, IPickupable
                     else
                     {
                         Debug.LogError("Quiz 'wb_window_trap' not found!");
-                        if (subtitleManager != null)
-                            subtitleManager.ShowObjective("Use the heavy object to break the bedroom window");
 
                         // Fallback: show button right away if near window
                         if (windowEscapeScript != null && IsPlayerNearWindow())

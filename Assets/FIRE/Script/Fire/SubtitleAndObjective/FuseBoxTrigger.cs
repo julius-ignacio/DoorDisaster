@@ -8,6 +8,9 @@ public class FuseBoxTrigger : MonoBehaviour
 
     void Start()
     {
+        hasTriggered = false; // ✅ Reset on scene reload
+        playerInside = false;
+
         Collider col = GetComponent<Collider>();
         if (col == null)
         {
@@ -49,8 +52,8 @@ public class FuseBoxTrigger : MonoBehaviour
 
     void TryTriggerSubtitle()
     {
-        // Only trigger if door has been opened with towel AND hasn't triggered yet
-        if (!hasTriggered && HotDoorHandle.DoorOpenedWithTowel)
+        // Only trigger if door has been opened with towel AND hasn't triggered yet AND breaker puzzle not complete
+        if (!hasTriggered && HotDoorHandle.DoorOpenedWithTowel && !BreakerPuzzle.BreakerPuzzleComplete)
         {
             Debug.Log("FuseBoxTrigger: Conditions met! Showing subtitle...");
             hasTriggered = true;

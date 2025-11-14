@@ -18,19 +18,25 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         outline = GetComponent<Outline>();
         if (outline != null)
             outline.enabled = false;
+
+        // ✅ NEW: Check if cloth was already picked up (loaded from save)
+        if (clothObject != null && !clothObject.activeInHierarchy)
+        {
+            hasPickedUp = true;
+        }
     }
 
     void Update()
     {
-        // ✅ Show outline when door objective is active (instead of after touching door)
-        if (DoorObjectiveActive && !hasPickedUp)
+        // ✅ CHANGED: Only show outline if backpack is picked up AND door objective is active
+        if (DoorObjectiveActive && IsBackpackPickedUp() && !hasPickedUp)
         {
             if (outline != null)
                 outline.enabled = true;
         }
 
-        // Show button only if door objective is active
-        if (playerInRange && !hasPickedUp && DoorObjectiveActive)
+        // Show button only if backpack is picked up
+        if (playerInRange && !hasPickedUp && DoorObjectiveActive && IsBackpackPickedUp())
         {
             if (GameManager.Instance != null && !GameManager.Instance.isPaused)
             {
@@ -44,13 +50,29 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         }
     }
 
+    // ✅ NEW: Helper to check if backpack was picked up
+    private bool IsBackpackPickedUp()
+    {
+        // Check inventory unlock
+        if (InventoryManager_fire.Instance != null && InventoryManager_fire.Instance.IsBackpackUnlocked())
+            return true;
+
+        // Fallback: check if backpack GameObject is inactive
+        var backpackObj = GameObject.Find("Backpack"); // Adjust name to match your backpack object
+        if (backpackObj != null && !backpackObj.activeInHierarchy)
+            return true;
+
+        return false;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasPickedUp)
         {
             playerInRange = true;
 
-            if (DoorObjectiveActive)
+            // ✅ CHANGED: Only show if backpack is picked up
+            if (DoorObjectiveActive && IsBackpackPickedUp())
             {
                 if (GameManager.Instance == null || !GameManager.Instance.isPaused)
                 {
@@ -73,9 +95,10 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
     {
         if (!playerInRange || hasPickedUp) return;
 
-        if (!DoorObjectiveActive)
+        // ✅ CHANGED: Check backpack too
+        if (!DoorObjectiveActive || !IsBackpackPickedUp())
         {
-            Debug.Log("Cannot pick up cloth yet - complete previous objectives first");
+            Debug.Log("Cannot pick up cloth yet - pick up backpack first");
             return;
         }
 
@@ -91,30 +114,44 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         if (player != null)
             player.hasTowel = true;
 
-        if (subtitleManager != null)
-        {
-            if (HotDoorHandle.touchedHotHandle)
-            {
-                subtitleManager.ShowCustomMessage(
-                    "Got the cloth! Now I can safely open the hot door.",
-                    2.5f,
-                    () => {
-                        subtitleManager.ShowObjective("Use the cloth to open the bedroom door");
-                    }
-                );
-            }
-            else
-            {
-                subtitleManager.ShowCustomMessage(
-                    "This cloth might come in handy for the hot door.",
-                    2f,
-                    () => {
-                        subtitleManager.ShowObjective("Go to the bedroom door");
-                    }
-                );
-            }
-        }
+        // ✅ NEW: Show appropriate message based on whether player touched door yet
+        ShowClothPickupMessage();
 
-        Debug.Log("Cloth picked up!");
+        Debug.Log("✅ Cloth picked up!");
+    }
+
+    // ✅ NEW: Separated message logic for clarity
+    private void ShowClothPickupMessage()
+    {
+        if (subtitleManager == null) return;
+
+        if (HotDoorHandle.touchedHotHandle)
+        {
+            // Player already tried the door - remind them to use cloth
+            subtitleManager.ShowCustomMessage(
+                "Got the cloth! Now I can safely open the hot door.",
+                2.5f,
+                () => {
+                    subtitleManager.ShowObjective("Use the cloth to open the bedroom door");
+                }
+            );
+        }
+        else
+        {
+            // Player hasn't touched door yet - guide them there
+            subtitleManager.ShowCustomMessage(
+                "This cloth might come in handy for the hot door.",
+                2f,
+                () => {
+                    subtitleManager.ShowObjective("Go to the bedroom door");
+                }
+            );
+        }
+    }
+
+    // ✅ NEW: Public method to check pickup status
+    public bool HasBeenPickedUp()
+    {
+        return hasPickedUp;
     }
 }

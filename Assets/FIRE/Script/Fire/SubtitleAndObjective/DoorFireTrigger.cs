@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DoorFireTrigger : MonoBehaviour
 {
@@ -8,6 +8,37 @@ public class DoorFireTrigger : MonoBehaviour
     public ObjectiveManager objectiveManager;
 
     private bool fireMessageShown = false;
+
+    // ✅ Static flag for persistence across saves/restarts
+    public static bool FireMessageShown { get; private set; } = false;
+
+    void Start()
+    {
+        // ✅ Restore state from static flag
+        fireMessageShown = FireMessageShown;
+
+        if (fireMessageShown)
+        {
+            Debug.Log("✅ DoorFireTrigger restored: Fire message already shown");
+
+            // ✅ Restore the correct objective if fire was already triggered
+            if (subtitleManager != null)
+            {
+                // Small delay to ensure ObjectiveManager has initialized
+                Invoke(nameof(RestoreFireObjective), 0.1f);
+            }
+        }
+    }
+
+    private void RestoreFireObjective()
+    {
+        // ✅ Show the alternative escape objective silently
+        if (subtitleManager != null)
+        {
+            subtitleManager.ShowObjective("Find an alternative escape route - try the window!");
+            Debug.Log("✅ Restored fire-blocked objective");
+        }
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -41,6 +72,8 @@ public class DoorFireTrigger : MonoBehaviour
     private void TriggerFireSequence()
     {
         fireMessageShown = true;
+        FireMessageShown = true; // ✅ Update static flag
+
         subtitleManager.HideObjective();
 
         subtitleManager.ShowCustomMessage(
@@ -70,6 +103,22 @@ public class DoorFireTrigger : MonoBehaviour
                 }
             }
         );
+
+        Debug.Log("🔥 Door fire message shown - flag set");
+    }
+
+    // ✅ Public method for save system
+    public static void RestoreFireMessageState(bool shown)
+    {
+        FireMessageShown = shown;
+        Debug.Log($"🔥 Restored fire message state: shown={shown}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetFireMessageProgress()
+    {
+        FireMessageShown = false;
+        Debug.Log("🔥 Fire message progress reset");
     }
 
     public bool HasShownFireMessage()

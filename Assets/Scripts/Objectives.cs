@@ -1,6 +1,6 @@
 using UnityEngine;
 using TMPro;
-using Unity.Android.Gradle.Manifest;
+
 
 public class Objectives : MonoBehaviour
 {

@@ -9,7 +9,7 @@ public class InventoryManager_fire : MonoBehaviour
 
     [Header("UI References")]
     public GameObject inventoryPanel;
-    public GameObject backpackButton;
+    public GameObject backpackButton; // This should be the button that OPENS the inventory (UI button on screen)
 
     [Header("Backpack Model Reference")]
     public GameObject backpack_model;
@@ -42,8 +42,6 @@ public class InventoryManager_fire : MonoBehaviour
         else
             Destroy(gameObject);
     }
-
-
 
     void Start()
     {
@@ -87,11 +85,24 @@ public class InventoryManager_fire : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
-                    if(backpack_model != null)
+        // ✅ CRITICAL FIX: During hallway chase, FORCE hide and exit immediately
+        if (PlayerOxygen.InHallwayChase)
         {
-            if(!backpack_model.activeSelf)
+            if (backpackButton != null && backpackButton.activeSelf)
             {
-                backpackButton.SetActive(true);
+                backpackButton.SetActive(false);
+                Debug.Log("🚫 Forcing backpack button hidden during hallway chase");
+            }
+            return; // ← EXIT HERE - don't run ANY other logic
+        }
+
+        // ✅ Normal logic: Show backpack button when model is picked up (only if NOT in hallway)
+        if (backpack_model != null)
+        {
+            if (!backpack_model.activeSelf)
+            {
+                if (backpackButton != null)
+                    backpackButton.SetActive(true);
             }
         }
 
@@ -158,6 +169,13 @@ public class InventoryManager_fire : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
             return;
 
+        // ✅ FIXED: Can't open inventory during hallway chase
+        if (PlayerOxygen.InHallwayChase)
+        {
+            Debug.Log("Cannot open inventory during hallway chase!");
+            return;
+        }
+
         if (!isBackpackUnlocked)
         {
             Debug.Log("Backpack not unlocked yet!");
@@ -216,7 +234,8 @@ public class InventoryManager_fire : MonoBehaviour
     {
         isBackpackUnlocked = true;
 
-        if (backpackButton != null)
+        // ✅ FIXED: Don't show button if in hallway chase
+        if (backpackButton != null && !PlayerOxygen.InHallwayChase)
             backpackButton.SetActive(true);
 
         Debug.Log("Backpack unlocked and button shown!");
@@ -315,7 +334,8 @@ public class InventoryManager_fire : MonoBehaviour
             inventoryPanel.SetActive(true);
         }
 
-        if (backpackButton != null && isBackpackUnlocked)
+        // ✅ FIXED: Don't show button if in hallway chase
+        if (backpackButton != null && isBackpackUnlocked && !PlayerOxygen.InHallwayChase)
             backpackButton.SetActive(true);
 
         Debug.Log($"Inventory resumed. Restoring open state: {wasInventoryOpenBeforePause}");

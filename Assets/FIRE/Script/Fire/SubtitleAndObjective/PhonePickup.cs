@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PhonePickup : MonoBehaviour, IPickupable
 {
     [Header("References")]
     public EmergencyHotlineCall hotlineCall;
-    public GameObject phoneModel; // Optional: hide phone after pickup
+    public GameObject phoneModel; // Keep this visible!
 
     private bool playerInRange = false;
     private bool hasPickedUp = false;
@@ -14,8 +14,10 @@ public class PhonePickup : MonoBehaviour, IPickupable
         if (other.CompareTag("Player") && !hasPickedUp)
         {
             playerInRange = true;
-            // Only show prompt if intro story is complete and game is not paused
-            if (SubtitleManager2.IntroStoryComplete && !GameManager.Instance.isPaused)
+
+            if (SubtitleManager2.IntroStoryComplete &&
+                !GameManager.Instance.isPaused &&
+                GenericPickupButton.Instance != null)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Phone");
             }
@@ -27,11 +29,10 @@ public class PhonePickup : MonoBehaviour, IPickupable
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            GenericPickupButton.Instance.HidePickupPrompt();
+            GenericPickupButton.Instance?.HidePickupPrompt();
         }
     }
 
-    // Check if story just completed while player is in range
     void Update()
     {
         if (GameManager.Instance != null && GameManager.Instance.isPaused)
@@ -39,13 +40,11 @@ public class PhonePickup : MonoBehaviour, IPickupable
 
         if (playerInRange && !hasPickedUp && SubtitleManager2.IntroStoryComplete)
         {
-            if (GenericPickupButton.Instance != null && GenericPickupButton.Instance.pickupButton != null)
+            if (GenericPickupButton.Instance != null &&
+                GenericPickupButton.Instance.pickupButton != null &&
+                !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
             {
-                // Only show if it's not already showing
-                if (!GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
-                {
-                    GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Phone");
-                }
+                GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Phone");
             }
         }
     }
@@ -55,11 +54,12 @@ public class PhonePickup : MonoBehaviour, IPickupable
         if (!playerInRange || hasPickedUp) return;
 
         hasPickedUp = true;
-        GenericPickupButton.Instance.HidePickupPrompt();
+        Debug.Log("✅ Phone picked up (phone stays visible)");
 
-        // Optional: hide the phone model
-        if (phoneModel != null)
-            phoneModel.SetActive(true);
+        GenericPickupButton.Instance?.HidePickupPrompt();
+
+        // ✅ Phone model stays visible - don't hide it!
+        // Players should still be able to see the phone after calling
 
         // Trigger the hotline call system
         if (hotlineCall != null)

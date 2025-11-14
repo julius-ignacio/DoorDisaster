@@ -33,9 +33,16 @@ public class WindowEscape : MonoBehaviour, IPickupable
     private bool hasEscaped = false;
     private bool promptShown = false;
     private bool playerInRange = false;
+    private bool hasTriedWindow = false;
+
+    // ✅ Static flag for save/load persistence
+    public static bool WindowTried = false;
 
     void Start()
     {
+        // ✅ Restore state from static flag
+        hasTriedWindow = WindowTried;
+
         if (fadeOverlay != null)
         {
             fadeOverlay.gameObject.SetActive(true);
@@ -43,6 +50,8 @@ public class WindowEscape : MonoBehaviour, IPickupable
             c.a = 0f;
             fadeOverlay.color = c;
         }
+
+        Debug.Log($"🪟 WindowEscape.Start(): WindowTried={WindowTried}, hasTriedWindow={hasTriedWindow}");
     }
 
     void Update()
@@ -108,6 +117,11 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
         if (!hasHeavyObject)
         {
+            // ✅ Mark that player has tried the window
+            hasTriedWindow = true;
+            WindowTried = true; // Update static flag
+            Debug.Log("🪟 Player tried window - it's jammed!");
+
             if (heavyObjectPickup != null)
             {
                 heavyObjectPickup.EnablePickup();
@@ -199,8 +213,52 @@ public class WindowEscape : MonoBehaviour, IPickupable
             if (cc != null) cc.enabled = true;
         }
 
+        // ✅ Hide all UI during hallway chase
         if (healthBar != null)
             healthBar.SetActive(false);
+
+        // ✅ Hide pause button
+        if (GameManager.Instance != null && GameManager.Instance.pauseBtn != null)
+        {
+            GameManager.Instance.pauseBtn.SetActive(false);
+            Debug.Log("🚫 Pause button hidden for hallway chase");
+        }
+
+        // ✅ Hide tutorial icon button
+        TutorialManager tutorialManager = FindObjectOfType<TutorialManager>();
+        if (tutorialManager != null)
+        {
+            if (tutorialManager.tutorialIconBtn != null)
+            {
+                tutorialManager.tutorialIconBtn.gameObject.SetActive(false);
+                Debug.Log("🚫 Tutorial icon hidden for hallway chase");
+            }
+
+            // Force close tutorial panel if it's open
+            if (tutorialManager.tutorialPanel != null && tutorialManager.tutorialPanel.activeSelf)
+            {
+                tutorialManager.tutorialPanel.SetActive(false);
+                Debug.Log("🚫 Tutorial panel closed for hallway chase");
+            }
+        }
+
+        // ✅ Close inventory and hide backpack button
+        if (InventoryManager_fire.Instance != null)
+        {
+            // Force close inventory if open
+            if (InventoryManager_fire.Instance.IsInventoryOpen())
+            {
+                InventoryManager_fire.Instance.CloseInventory();
+                Debug.Log("🚫 Inventory force closed for hallway chase");
+            }
+
+            // Hide backpack button
+            if (InventoryManager_fire.Instance.backpackButton != null)
+            {
+                InventoryManager_fire.Instance.backpackButton.SetActive(false);
+                Debug.Log("🚫 Backpack button hidden for hallway chase");
+            }
+        }
 
         if (subtitleManager != null)
             subtitleManager.HideObjective();
@@ -213,12 +271,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
         PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
         if (oxygen != null)
         {
-            oxygen.RefillOxygen(); // Reset to maximum
-        }
-
-        if (InventoryManager_fire.Instance != null && InventoryManager_fire.Instance.backpackButton != null)
-        {
-            InventoryManager_fire.Instance.backpackButton.SetActive(false);
+            oxygen.RefillOxygen();
         }
 
         if (fadeOverlay != null)
@@ -268,8 +321,27 @@ public class WindowEscape : MonoBehaviour, IPickupable
         fadeOverlay.color = new Color(c.r, c.g, c.b, endAlpha);
     }
 
+    // ✅ Public getter for SequenceManager
+    public bool HasTriedWindow()
+    {
+        return hasTriedWindow;
+    }
+
     public bool HasHeavyObject()
     {
         return hasHeavyObject;
+    }
+
+    // ✅ Static methods for save system
+    public static void RestoreWindowTriedState(bool tried)
+    {
+        WindowTried = tried;
+        Debug.Log($"🪟 Restored window tried state: {tried}");
+    }
+
+    public static void ResetWindowProgress()
+    {
+        WindowTried = false;
+        Debug.Log("🪟 Window progress reset");
     }
 }

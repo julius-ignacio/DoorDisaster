@@ -53,8 +53,6 @@ public class BreakerPuzzle : MonoBehaviour
 
     void Start()
     {
-        BreakerPuzzleComplete = false;
-
         if (breakerPanel != null)
             breakerPanel.SetActive(false);
 
@@ -70,6 +68,30 @@ public class BreakerPuzzle : MonoBehaviour
 
         if (errorText != null)
             errorText.text = "";
+
+        // ✅ If puzzle was already completed, restore the lights-off state
+        if (BreakerPuzzleComplete)
+        {
+            puzzleComplete = true;
+            DimLights();
+            Debug.Log("✅ BreakerPuzzle restored: Puzzle already complete, lights turned off");
+        }
+
+        Debug.Log($"BreakerPuzzle.Start(): BreakerPuzzleComplete={BreakerPuzzleComplete}");
+    }
+
+    // ✅ Public method for save system
+    public static void RestoreBreakerState(bool complete)
+    {
+        BreakerPuzzleComplete = complete;
+        Debug.Log($"🔌 Restored breaker state: complete={complete}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetBreakerProgress()
+    {
+        BreakerPuzzleComplete = false;
+        Debug.Log("🔌 Breaker progress reset");
     }
 
     public void ShowPuzzle()
@@ -189,7 +211,6 @@ public class BreakerPuzzle : MonoBehaviour
         }
     }
 
-    // ✅ FIXED: Now changes the "ON" button text to "OFF", not the labels
     void UpdateButtonVisual(Button button, TextMeshProUGUI buttonText, bool isOff)
     {
         Image buttonImage = button.GetComponent<Image>();
@@ -198,13 +219,13 @@ public class BreakerPuzzle : MonoBehaviour
         {
             buttonImage.color = offColor;
             if (buttonText != null)
-                buttonText.text = "OFF";  // Changes "ON" to "OFF"
+                buttonText.text = "OFF";
         }
         else
         {
             buttonImage.color = onColor;
             if (buttonText != null)
-                buttonText.text = "ON";   // Resets back to "ON"
+                buttonText.text = "ON";
         }
     }
 

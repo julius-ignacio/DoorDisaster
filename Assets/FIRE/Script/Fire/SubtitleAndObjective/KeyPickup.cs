@@ -1,22 +1,34 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class KeyPickup : MonoBehaviour, IPickupable
 {
     [Header("References")]
-    public LockedDoor lockedDoor;           // Drag the door object here
-    public GameObject keyVisual;             // The key 3D model
+    public LockedDoor lockedDoor;
+    public GameObject keyVisual;
     public SubtitleManager2 subtitleManager;
 
     private bool playerInRange = false;
     private bool hasBeenPickedUp = false;
+
+    // ✅ Static flag for save system
+    public static bool KeyPickedUp { get; private set; } = false;
+
+    void Start()
+    {
+        // ✅ If key was already picked up, hide it
+        if (KeyPickedUp)
+        {
+            if (keyVisual != null)
+                keyVisual.SetActive(false);
+            gameObject.SetActive(false);
+        }
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasBeenPickedUp)
         {
             playerInRange = true;
-
-            // Don't show prompt if game is paused
             if (GameManager.Instance == null || !GameManager.Instance.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Key");
@@ -39,7 +51,6 @@ public class KeyPickup : MonoBehaviour, IPickupable
         {
             if (GameManager.Instance != null && !GameManager.Instance.isPaused)
             {
-                // Check if prompt isn't already showing
                 if (GenericPickupButton.Instance != null &&
                     GenericPickupButton.Instance.pickupButton != null &&
                     !GenericPickupButton.Instance.pickupButton.gameObject.activeSelf)
@@ -55,14 +66,13 @@ public class KeyPickup : MonoBehaviour, IPickupable
         if (!playerInRange || hasBeenPickedUp) return;
 
         hasBeenPickedUp = true;
+        KeyPickedUp = true; // ✅ Set static flag
 
-        // Tell the door we picked up the key
         if (lockedDoor != null)
         {
             lockedDoor.OnKeyPickedUp();
         }
 
-        // Show message
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
@@ -71,16 +81,24 @@ public class KeyPickup : MonoBehaviour, IPickupable
             );
         }
 
-        // Hide the key visual
         if (keyVisual != null)
             keyVisual.SetActive(false);
 
         Debug.Log("Key picked up!");
-
-        // Hide prompt before destroying
         GenericPickupButton.Instance.HidePickupPrompt();
-
-        // Destroy this pickup trigger
         Destroy(gameObject);
+    }
+
+    // ✅ For save system
+    public static void RestoreKeyState(bool pickedUp)
+    {
+        KeyPickedUp = pickedUp;
+        Debug.Log($"🔑 Restored key state: picked={pickedUp}");
+    }
+
+    public static void ResetKeyProgress()
+    {
+        KeyPickedUp = false;
+        Debug.Log("🔑 Key progress reset");
     }
 }

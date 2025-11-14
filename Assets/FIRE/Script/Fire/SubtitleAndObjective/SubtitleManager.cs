@@ -23,9 +23,23 @@ public class SubtitleManager2 : MonoBehaviour
     [Header("Story Settings")]
     public bool autoStartStory = true;
 
-    public static bool IntroStoryComplete { get; private set; } = false;
+    // ✅ CHANGED: These now persist properly across scene loads
+    private static bool _introStoryComplete = false;
+    private static bool _callObjectiveActive = false;
+
+    public static bool IntroStoryComplete
+    {
+        get => _introStoryComplete;
+        private set => _introStoryComplete = value;
+    }
+
     public static bool IsSubtitleActive { get; private set; } = false;
-    public static bool CallObjectiveActive { get; set; } = false;
+
+    public static bool CallObjectiveActive
+    {
+        get => _callObjectiveActive;
+        set => _callObjectiveActive = value;
+    }
 
     private string[] wakingStory = {
         "*sniff sniff*",
@@ -45,24 +59,49 @@ public class SubtitleManager2 : MonoBehaviour
 
     void Start()
     {
-        IntroStoryComplete = false;
-        CallObjectiveActive = false;
-
         if (subtitlePanel != null) subtitlePanel.SetActive(false);
         if (objectivePanel != null) objectivePanel.SetActive(false);
+
+        // ✅ NEW: If loading from save, force UI visible and skip story
+        var dm = DataManager.Instance;
+        if (dm != null && WorldSaveSystem.HasSaveData(dm.currentTrial, dm.currentMode))
+        {
+            Debug.Log("✅ Save detected in SubtitleManager - enabling UI, skipping story");
+
+            // Force UI visible
+            if (healthBar != null) healthBar.SetActive(true);
+            if (oxygenBar != null) oxygenBar.SetActive(true);
+
+            // Ensure player can move
+            var player = FindObjectOfType<Movements2>(true);
+            if (player != null && !player.enabled)
+            {
+                player.enabled = true;
+                var cc = player.GetComponent<CharacterController>();
+                if (cc != null && !cc.enabled)
+                    cc.enabled = true;
+            }
+
+            return; // Don't play wake-up story
+        }
+
+        // Fresh start - hide UI initially
         if (healthBar != null) healthBar.SetActive(false);
         if (oxygenBar != null) oxygenBar.SetActive(false);
 
-        // NEW: If wake-up is already done/disabled, skip the story and bring up HUD/objective
+        // ✅ If wake-up is already done/disabled, skip the story
         var wake = FindObjectOfType<WakeUpController>(true);
         if ((wake == null || !wake.enabled) && !IntroStoryComplete)
         {
             ForceIntroComplete();
-            return; // Don't start the story
+            return;
         }
 
-        if (autoStartStory)
+        // Only play story if this is a fresh start and intro not complete
+        if (autoStartStory && !IntroStoryComplete)
+        {
             StartCoroutine(PlayWakeUpStory());
+        }
     }
 
     public static void ForceIntroComplete()
@@ -97,6 +136,14 @@ public class SubtitleManager2 : MonoBehaviour
             CallObjectiveActive = true;
             inst.ShowObjective("Find the phone and call for help!");
         }
+    }
+
+    // ✅ NEW: Reset flags when starting a completely new trial
+    public static void ResetForNewTrial()
+    {
+        _introStoryComplete = false;
+        _callObjectiveActive = false;
+        Debug.Log("SubtitleManager flags reset for new trial");
     }
 
     public IEnumerator PlayWakeUpStory()

@@ -20,8 +20,20 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
     private bool hasTriggered = false;
     private bool playerInRange = false;
 
+    // ✅ Static flag for persistence
+    public static bool CatRescued { get; private set; } = false;
+
     void Start()
     {
+        // ✅ Restore state from save
+        hasTriggered = CatRescued;
+
+        // Hide cat if already rescued
+        if (CatRescued && cat != null)
+        {
+            cat.SetActive(false);
+        }
+
         // Ensure fade overlay starts invisible
         if (fadeOverlay != null)
         {
@@ -30,6 +42,20 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
             c.a = 0f;
             fadeOverlay.color = c;
         }
+    }
+
+    // ✅ Public method for save system
+    public static void RestoreCatState(bool rescued)
+    {
+        CatRescued = rescued;
+        Debug.Log($"🐱 Restored cat state: rescued={rescued}");
+    }
+
+    // ✅ Reset on new game
+    public static void ResetCatProgress()
+    {
+        CatRescued = false;
+        Debug.Log("🐱 Cat progress reset");
     }
 
     void OnTriggerEnter(Collider other)
@@ -78,10 +104,16 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
         if (!playerInRange || hasTriggered) return;
 
         hasTriggered = true;
+        CatRescued = true; // ✅ Set static flag
+
         subtitleManager.HideObjective();
         GenericPickupButton.Instance.HidePickupPrompt();
 
-        // Start the sequence - cat stays visible
+        // Hide cat immediately
+        if (cat != null)
+            cat.SetActive(false);
+
+        // Start the sequence
         subtitleManager.ShowCustomMessage(
             "Come on Mr. Kitty, let's get you to safety!",
             2f,

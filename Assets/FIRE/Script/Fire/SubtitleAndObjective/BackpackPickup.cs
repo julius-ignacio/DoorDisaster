@@ -15,30 +15,81 @@ public class BackpackPickup : MonoBehaviour, IPickupable
 
     private bool hasBeenPickedUp = false;
     private bool playerInRange = false;
-    private bool canPickup = false; // Only allow pickup after 911 call
+    private bool canPickup = false;
 
     void Start()
     {
         outline = GetComponent<Outline>();
         if (outline != null)
             outline.enabled = false;
+
+        // ✅ NEW: Check if backpack was already picked up (loaded from save)
+        if (InventoryManager_fire.Instance != null && InventoryManager_fire.Instance.IsBackpackUnlocked())
+        {
+            hasBeenPickedUp = true;
+            if (backpackModel != null)
+                backpackModel.SetActive(false);
+            gameObject.SetActive(false);
+            return;
+        }
+
+        // ✅ NEW: Check if hotline is already done on load
+        CheckHotlineStatus();
     }
 
     void Update()
     {
-        // ✅ Check if 911 call is complete to enable pickup
+        // ✅ Keep checking if 911 call completes during gameplay
         if (!canPickup)
         {
-            // Check if hotline call is done
-            EmergencyHotlineCall hotline = FindObjectOfType<EmergencyHotlineCall>();
-            if (hotline != null && hotline.HasCalledHotline())
-            {
-                canPickup = true;
+            CheckHotlineStatus();
+        }
+    }
 
-                // Show outline when ready to pickup
-                if (outline != null)
-                    outline.enabled = true;
-            }
+    // ✅ NEW: Robust method to check hotline completion
+    private void CheckHotlineStatus()
+    {
+        if (canPickup) return; // Already enabled
+
+        // Method 1: Check static flag (most reliable)
+        EmergencyHotlineCall hotline = FindObjectOfType<EmergencyHotlineCall>();
+        if (hotline != null && hotline.HasCalledHotline())
+        {
+            EnablePickup();
+            return;
+        }
+
+        // Method 2: Check if phone model is inactive (fallback)
+        PhonePickup phone = FindObjectOfType<PhonePickup>();
+        if (phone != null && phone.phoneModel != null && !phone.phoneModel.activeInHierarchy)
+        {
+            EnablePickup();
+            return;
+        }
+
+        // Method 3: Check if intro is complete AND CallObjectiveActive is false (means hotline was done)
+        if (SubtitleManager2.IntroStoryComplete && !SubtitleManager2.CallObjectiveActive)
+        {
+            EnablePickup();
+            return;
+        }
+    }
+
+    private void EnablePickup()
+    {
+        if (canPickup) return;
+
+        canPickup = true;
+        Debug.Log("✅ Backpack pickup enabled (hotline completed)");
+
+        // Show outline when ready to pickup
+        if (outline != null)
+            outline.enabled = true;
+
+        // If player is already in range, show prompt immediately
+        if (playerInRange && !hasBeenPickedUp)
+        {
+            GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Backpack");
         }
     }
 
@@ -48,7 +99,7 @@ public class BackpackPickup : MonoBehaviour, IPickupable
         {
             playerInRange = true;
 
-            // ✅ Only show pickup prompt after 911 call
+            // Only show pickup prompt after 911 call
             if (canPickup)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Backpack");
@@ -91,20 +142,21 @@ public class BackpackPickup : MonoBehaviour, IPickupable
         if (hasBeenPickedUp) return;
 
         hasBeenPickedUp = true;
+        Debug.Log("✅ Backpack picked up!");
 
         if (outline != null)
             outline.enabled = false;
 
         GenericPickupButton.Instance.HidePickupPrompt();
 
-        // ✅ Unlock the inventory UI
+        // Unlock the inventory UI
         if (InventoryManager_fire.Instance != null)
         {
             InventoryManager_fire.Instance.UnlockBackpack();
-            Debug.Log("Backpack picked up - inventory UI unlocked!");
+            Debug.Log("✅ Inventory UI unlocked!");
         }
 
-        // ✅ Show message and then door objective
+        // Show message and then door objective
         if (subtitleManager != null)
         {
             subtitleManager.ShowCustomMessage(
@@ -112,7 +164,6 @@ public class BackpackPickup : MonoBehaviour, IPickupable
                 2f,
                 () =>
                 {
-                    // ✅ Show door objective after backpack message
                     subtitleManager.ShowObjective("Exit the bedroom - find a way to open the door safely");
                 }
             );

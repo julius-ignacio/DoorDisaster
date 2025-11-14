@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 public class TutorialManager : MonoBehaviour
 {
+    [Header("Tutorial Icon")]
+    public Button tutorialIconBtn;
+
     [Header("Main Containers")]
     public GameObject tutorialPanel;
     public GameObject body1;
@@ -53,6 +56,18 @@ public class TutorialManager : MonoBehaviour
             nextBtn.onClick.AddListener(NextSlide);
         if (prevBtn != null)
             prevBtn.onClick.AddListener(PreviousSlide);
+
+        if (tutorialIconBtn != null)
+            tutorialIconBtn.onClick.AddListener(ShowTutorial);
+
+        var dm = DataManager.Instance;
+
+        // ✅ Skip tutorial if already done
+        if (dm != null && dm.playerData != null && dm.playerData.tutorialDone)
+        {
+            tutorialPanel.SetActive(false);
+            return;
+        }
 
         if (showOnStart)
         {
@@ -149,7 +164,6 @@ public class TutorialManager : MonoBehaviour
         if (body3Text != null)
             body3Text.text = "Your journey is guided by key objectives. Each one must be completed to move forward. Pay attention and stay focused. Your progress depends on it. <size=145%><color=#FF4444>BE QUICK</color></size> <color=white>the fire is spreading.</color>";
 
-        // Remove objective lines
         if (linesBody3Container != null)
         {
             foreach (Transform child in linesBody3Container)
@@ -158,7 +172,7 @@ public class TutorialManager : MonoBehaviour
             }
         }
     }
-        
+
     void DisplaySlide(int index)
     {
         foreach (GameObject slide in bodySlides)
@@ -228,5 +242,12 @@ public class TutorialManager : MonoBehaviour
     {
         tutorialPanel.SetActive(false);
         Time.timeScale = 1f;
+
+        // ✅ Mark tutorial as done
+        var dm = DataManager.Instance;
+        if (dm != null && dm.playerData != null)
+        {
+            dm.playerData.tutorialDone = true;
+        }
     }
 }

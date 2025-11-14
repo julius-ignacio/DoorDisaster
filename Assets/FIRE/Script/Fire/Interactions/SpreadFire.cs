@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpreadFire : MonoBehaviour
 {
@@ -18,12 +18,17 @@ public class SpreadFire : MonoBehaviour
         if (fireParticles != null && fireParticles.isPlaying)
         {
             fireParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            Debug.Log("Fire extinguished!");
+
+            // ✅ Deactivate GameObject so save system saves it as inactive
+            gameObject.SetActive(false);
+
+            Debug.Log($"Fire extinguished: {gameObject.name}");
         }
     }
 
     public bool IsActive()
     {
-        return fireParticles != null && fireParticles.isPlaying;
+        // ✅ Check both particle system and GameObject active state
+        return gameObject.activeSelf && fireParticles != null && fireParticles.isPlaying;
     }
 }

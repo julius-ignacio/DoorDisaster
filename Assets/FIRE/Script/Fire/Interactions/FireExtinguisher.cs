@@ -40,29 +40,164 @@ public class FireExtinguisher : MonoBehaviour
 
     private Dictionary<SpreadFire, Coroutine> firesBeingExtinguished = new Dictionary<SpreadFire, Coroutine>();
 
+    // ✅ Static flags for persistence
+    public static bool HasPickedUpExtinguisher { get; private set; } = false;
+    public static bool HasCompletedQuizzes { get; private set; } = false;
+    public static bool AllFiresOut { get; private set; } = false;
+
     void Start()
     {
-        if (pickupButton != null)
-            pickupButton.SetActive(false);
+        // ✅ Check if player already has extinguisher from previous session
+        if (HasPickedUpExtinguisher)
+        {
+            Debug.Log("🔥 Restoring fire extinguisher from previous session");
+            RestoreExtinguisher();
+        }
+        else
+        {
+            if (pickupButton != null)
+                pickupButton.SetActive(false);
+        }
 
         if (sprayButton != null)
         {
-            EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
-            if (trigger == null)
-                trigger = sprayButton.AddComponent<EventTrigger>();
+            // ✅ If fires are already out, don't show spray button
+            if (AllFiresOut)
+            {
+                sprayButton.SetActive(false);
+            }
+            else
+            {
+                EventTrigger trigger = sprayButton.GetComponent<EventTrigger>();
+                if (trigger == null)
+                    trigger = sprayButton.AddComponent<EventTrigger>();
 
-            trigger.triggers.Clear();
+                trigger.triggers.Clear();
 
-            EventTrigger.Entry pointerDown = new EventTrigger.Entry();
-            pointerDown.eventID = EventTriggerType.PointerDown;
-            pointerDown.callback.AddListener((data) => { OnSprayButtonPress(); });
-            trigger.triggers.Add(pointerDown);
+                EventTrigger.Entry pointerDown = new EventTrigger.Entry();
+                pointerDown.eventID = EventTriggerType.PointerDown;
+                pointerDown.callback.AddListener((data) => { OnSprayButtonPress(); });
+                trigger.triggers.Add(pointerDown);
 
-            EventTrigger.Entry pointerUp = new EventTrigger.Entry();
-            pointerUp.eventID = EventTriggerType.PointerUp;
-            pointerUp.callback.AddListener((data) => { OnSprayButtonRelease(); });
-            trigger.triggers.Add(pointerUp);
+                EventTrigger.Entry pointerUp = new EventTrigger.Entry();
+                pointerUp.eventID = EventTriggerType.PointerUp;
+                pointerUp.callback.AddListener((data) => { OnSprayButtonRelease(); });
+                trigger.triggers.Add(pointerUp);
+            }
         }
+    }
+
+    // ✅ Restore extinguisher without showing quizzes again
+    void RestoreExtinguisher()
+    {
+        hasExtinguisher = true;
+        canSpray = HasCompletedQuizzes;
+        allFiresExtinguished = AllFiresOut;
+
+        Debug.Log($"🔥 RestoreExtinguisher called: HasPickedUp={HasPickedUpExtinguisher}, Quizzes={HasCompletedQuizzes}, FiresOut={AllFiresOut}");
+
+        // Hide world extinguisher
+        if (worldExtinguisher != null)
+        {
+            worldExtinguisher.SetActive(false);
+            Debug.Log("🔥 World extinguisher hidden");
+        }
+        else
+        {
+            Debug.LogWarning("🔥 worldExtinguisher reference is null!");
+        }
+
+        // Spawn held extinguisher
+        if (!allFiresExtinguished) // Only show if fires aren't out
+        {
+            if (extinguisherHolder == null)
+            {
+                Debug.LogError("🔥 extinguisherHolder is NULL! Cannot restore held extinguisher!");
+                // Try to find it
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    extinguisherHolder = player.transform.Find("ExtinguisherHolder");
+                    if (extinguisherHolder != null)
+                    {
+                        Debug.Log("🔥 Found extinguisherHolder via player!");
+                    }
+                }
+            }
+
+            if (heldExtinguisherPrefab == null)
+            {
+                Debug.LogError("🔥 heldExtinguisherPrefab is NULL! Cannot restore held extinguisher!");
+            }
+
+            if (extinguisherHolder != null && heldExtinguisherPrefab != null)
+            {
+                heldInstance = Instantiate(heldExtinguisherPrefab, extinguisherHolder);
+                heldInstance.transform.localPosition = heldPosition;
+                heldInstance.transform.localRotation = Quaternion.Euler(heldRotation);
+                heldInstance.transform.localScale = Vector3.one * heldScale;
+
+                foreach (Collider col in heldInstance.GetComponentsInChildren<Collider>())
+                    col.enabled = false;
+
+                sprayParticleSystem = heldInstance.GetComponentInChildren<ParticleSystem>();
+                if (sprayParticleSystem != null)
+                {
+                    sprayParticleSystem.Stop();
+                    Debug.Log("🔥 Held extinguisher spawned and particle system found!");
+                }
+                else
+                {
+                    Debug.LogWarning("🔥 No ParticleSystem found on held extinguisher!");
+                }
+            }
+            else
+            {
+                Debug.LogError("🔥 Cannot spawn held extinguisher - missing references!");
+            }
+        }
+        else
+        {
+            Debug.Log("🔥 Fires already out, not spawning held extinguisher");
+        }
+
+        // Show spray button if quizzes done and fires not out
+        if (sprayButton != null && HasCompletedQuizzes && !AllFiresOut)
+        {
+            sprayButton.SetActive(true);
+            Debug.Log("🔥 Spray button restored and activated!");
+        }
+        else
+        {
+            Debug.Log($"🔥 Spray button NOT shown: sprayButton={sprayButton != null}, Quizzes={HasCompletedQuizzes}, FiresOut={AllFiresOut}");
+        }
+
+        // Hide pickup button
+        if (pickupButton != null)
+        {
+            pickupButton.SetActive(false);
+            Debug.Log("🔥 Pickup button hidden");
+        }
+
+        Debug.Log($"🔥 Extinguisher restored: canSpray={canSpray}, allFiresOut={allFiresExtinguished}");
+    }
+
+    // ✅ Reset static flags on new game/restart
+    public static void ResetExtinguisherProgress()
+    {
+        HasPickedUpExtinguisher = false;
+        HasCompletedQuizzes = false;
+        AllFiresOut = false;
+        Debug.Log("🔥 Fire extinguisher progress reset");
+    }
+
+    // ✅ Add this method here for loading from save data
+    public static void RestoreExtinguisherState(bool pickedUp, bool quizzesDone, bool firesOut)
+    {
+        HasPickedUpExtinguisher = pickedUp;
+        HasCompletedQuizzes = quizzesDone;
+        AllFiresOut = firesOut;
+        Debug.Log($"🔥 Restored extinguisher state: picked={pickedUp}, quizzes={quizzesDone}, firesOut={firesOut}");
     }
 
     void OnTriggerStay(Collider other)
@@ -165,6 +300,7 @@ public class FireExtinguisher : MonoBehaviour
     void PickupAndStartQuizzes(GameObject player)
     {
         hasExtinguisher = true;
+        HasPickedUpExtinguisher = true; // ✅ Set static flag
 
         if (worldExtinguisher != null)
             worldExtinguisher.SetActive(false);
@@ -201,8 +337,6 @@ public class FireExtinguisher : MonoBehaviour
             QuizQuestion2 quiz = QuizDatabase2.GetQuiz(quizIDs[i]);
             if (quiz != null)
             {
-                // ✅ REMOVED: quizManager.SetLastQuestion(i == quizIDs.Length - 1);
-
                 bool quizDone = false;
                 quizManager.ShowQuiz(quiz.question, quiz.answers, quiz.correctAnswerIndex, () => quizDone = true);
                 yield return new WaitUntil(() => quizDone);
@@ -214,6 +348,7 @@ public class FireExtinguisher : MonoBehaviour
         }
 
         canSpray = true;
+        HasCompletedQuizzes = true; // ✅ Set static flag
 
         // Only show spray button if fires aren't already extinguished
         if (sprayButton != null && !allFiresExtinguished)
@@ -291,6 +426,7 @@ public class FireExtinguisher : MonoBehaviour
         if (!anyFireActive && canSpray && !allFiresExtinguished)
         {
             allFiresExtinguished = true;
+            AllFiresOut = true; // ✅ Set static flag
             canSpray = false;
             Debug.Log("All fires extinguished!");
             StartCoroutine(OnAllFiresExtinguished());
@@ -336,5 +472,11 @@ public class FireExtinguisher : MonoBehaviour
                 () => subtitleManager.ShowObjective("Rescue Mr. Kitty in the bedroom")
             );
         }
+    }
+
+    // ✅ Public getter for SequenceManager to check status
+    public bool HasExtinguisherEquipped()
+    {
+        return hasExtinguisher;
     }
 }

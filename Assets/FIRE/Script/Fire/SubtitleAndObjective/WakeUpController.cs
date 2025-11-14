@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -10,12 +10,12 @@ public class WakeUpController : MonoBehaviour
     public bool playOnStart = true;
 
     [Header("Visual Effects")]
-    public Image fadeOverlay; 
+    public Image fadeOverlay;
     public float additionalFadeTime = 1f;
 
     [Header("References")]
-    public Transform mainCamera; 
-    public Movements2 movements; 
+    public Transform mainCamera;
+    public Movements2 movements;
 
     [Header("Audio (Optional)")]
     public AudioSource audioSource;
@@ -27,6 +27,29 @@ public class WakeUpController : MonoBehaviour
 
     void Start()
     {
+        // ✅ Check if wake-up was already done from loaded save
+        var dm = DataManager.Instance;
+        if (dm != null)
+        {
+            int trial = dm.currentTrial;
+            int mode = dm.currentMode;
+
+            // Check if save exists and wake-up is done
+            if (WorldSaveSystem.HasSaveData(trial, mode))
+            {
+                // Disable this script - wake-up already happened
+                hasWokenUp = true;
+                enabled = false;
+
+                // Make sure player can move
+                if (movements != null)
+                    movements.enabled = true;
+
+                Debug.Log("✅ Wake-up skipped - save data exists");
+                return;
+            }
+        }
+
         if (mainCamera == null)
         {
             Transform fpCamera = transform.Find("FirstPersonCamera");
@@ -58,13 +81,13 @@ public class WakeUpController : MonoBehaviour
         if (movements != null) movements.enabled = false;
 
         Quaternion startRotation = Quaternion.Euler(-60f, 0f, 0f);
-        Quaternion endRotation   = Quaternion.Euler(0f, 0f, 0f);
+        Quaternion endRotation = Quaternion.Euler(0f, 0f, 0f);
 
         if (mainCamera != null)
         {
             float currentY = mainCamera.localEulerAngles.y;
             startRotation = Quaternion.Euler(-60f, currentY, 0f);
-            endRotation   = Quaternion.Euler(0f,    currentY, 0f);
+            endRotation = Quaternion.Euler(0f, currentY, 0f);
             mainCamera.localRotation = startRotation;
         }
 
@@ -120,14 +143,19 @@ public class WakeUpController : MonoBehaviour
         hasWokenUp = true;
         isWakingUp = false;
 
-        // === IMPORTANT: Mark intro complete and persist that this script is done ===
+        // ✅ Mark intro as complete (this triggers the subtitle story)
         SubtitleManager2.ForceIntroComplete();
 
-        // Disable the wake-up script so SavableFlag captures enabled=false and it stays skipped on reload
+        // ✅ Disable so it won't run again
         enabled = false;
+
+        Debug.Log("✅ Wake-up animation complete");
     }
 
-    public bool HasWokenUp() => hasWokenUp;
+    public bool HasWokenUp()
+    {
+        return hasWokenUp;
+    }
 
     public void TriggerWakeUp()
     {

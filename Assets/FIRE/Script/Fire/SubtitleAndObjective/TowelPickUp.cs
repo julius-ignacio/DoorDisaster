@@ -23,6 +23,16 @@ public class TowelPickup : MonoBehaviour, IPickupable
     private bool hasPickedUp = false;
     private bool playerInRange = false;
 
+    // ✅ Static flag to track teleport state (persists across scene/saves)
+    public static bool HasTeleportedToHouseB { get; private set; } = false;
+
+    // ✅ Reset static flag on new game/restart
+    public static void ResetTeleportProgress()
+    {
+        HasTeleportedToHouseB = false;
+        Debug.Log("🏠 Towel teleport progress reset");
+    }
+
     void Awake()
     {
         // Stop cat audio at start
@@ -40,10 +50,9 @@ public class TowelPickup : MonoBehaviour, IPickupable
         // ✅ Setup fade overlay (BlackTP)
         if (fadeOverlay != null)
         {
-            fadeOverlay.gameObject.SetActive(true); // Must stay active
-            fadeOverlay.enabled = true; // Ensure Image is active
+            fadeOverlay.gameObject.SetActive(true);
+            fadeOverlay.enabled = true;
 
-            // Start fully transparent
             Color c = fadeOverlay.color;
             c.a = 0f;
             fadeOverlay.color = c;
@@ -52,12 +61,25 @@ public class TowelPickup : MonoBehaviour, IPickupable
         {
             Debug.LogWarning("Fade overlay (BlackTP) not assigned in TowelPickup!");
         }
+
+        // ✅ If already teleported, disable this pickup completely
+        if (HasTeleportedToHouseB)
+        {
+            DisablePickup();
+        }
+    }
+
+    // ✅ For loading from save data
+    public static void RestoreTeleportState(bool teleported)
+    {
+        HasTeleportedToHouseB = teleported;
+        Debug.Log($"🏠 Restored teleport state: {teleported}");
     }
 
     void Update()
     {
-        // ✅ Show outline only after breaker puzzle is complete
-        if (outline != null && !hasPickedUp)
+        // ✅ Show outline only after breaker puzzle is complete AND not picked up yet
+        if (outline != null && !hasPickedUp && !HasTeleportedToHouseB)
         {
             outline.enabled = BreakerPuzzle.BreakerPuzzleComplete;
         }
@@ -65,7 +87,8 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !hasPickedUp)
+        // ✅ Don't allow interaction if already picked up or teleported
+        if (other.CompareTag("Player") && !hasPickedUp && !HasTeleportedToHouseB)
         {
             playerInRange = true;
 
@@ -87,7 +110,7 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
     public void OnPickup()
     {
-        if (!playerInRange || hasPickedUp) return;
+        if (!playerInRange || hasPickedUp || HasTeleportedToHouseB) return;
 
         if (!BreakerPuzzle.BreakerPuzzleComplete)
         {
@@ -96,13 +119,17 @@ public class TowelPickup : MonoBehaviour, IPickupable
         }
 
         hasPickedUp = true;
+
+        // ✅ Hide prompt immediately
+        GenericPickupButton.Instance.HidePickupPrompt();
+        playerInRange = false; // ✅ Force range to false
+
         towel.SetActive(false);
 
         if (outline != null)
             outline.enabled = false;
 
         subtitleManager.HideObjective();
-        GenericPickupButton.Instance.HidePickupPrompt();
 
         PlayerOxygen oxygen = player.GetComponent<PlayerOxygen>();
         if (oxygen != null)
@@ -142,6 +169,12 @@ public class TowelPickup : MonoBehaviour, IPickupable
             }
 
             if (cc != null) cc.enabled = true;
+
+            HasTeleportedToHouseB = true; // ✅ Set flag after successful teleport
+            Debug.Log("✅ Player teleported to House B - flag set");
+
+            // ✅ Disable this pickup system completely after teleport
+            DisablePickup();
         }
         else
         {
@@ -204,6 +237,28 @@ public class TowelPickup : MonoBehaviour, IPickupable
 
         c.a = endAlpha;
         img.color = c;
+    }
+
+    // ✅ Completely disable the pickup after use
+    private void DisablePickup()
+    {
+        playerInRange = false;
+        hasPickedUp = true;
+
+        GenericPickupButton.Instance.HidePickupPrompt();
+
+        if (outline != null)
+            outline.enabled = false;
+
+        if (towel != null)
+            towel.SetActive(false);
+
+        // Disable the collider so no more triggers fire
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = false;
+
+        Debug.Log("🧼 Towel pickup disabled after teleport");
     }
 
     public bool HasPickedUpTowel()

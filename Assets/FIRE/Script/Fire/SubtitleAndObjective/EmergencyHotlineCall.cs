@@ -7,6 +7,9 @@ public class EmergencyHotlineCall : MonoBehaviour
 {
     public static bool IsHotlineActive = false;
 
+    // ✅ Make this static so it persists across scene loads
+    private static bool _hasCalledHotline = false;
+
     [Header("UI References")]
     public GameObject phoneUI;
 
@@ -27,12 +30,14 @@ public class EmergencyHotlineCall : MonoBehaviour
     public GameObject healthBar;
     public GameObject oxygenBar;
 
+    [Header("Hotline Completion Tracker")]
+    public GameObject hotlineCompletionFlag; // ✅ NEW: Drag the HotlineCompletionFlag object here
+
     [Header("Audio")]
     public int dialToneSFX = 34;
     public int dispatcherVoiceSFX = 35;
     public int wrongNumberSFX = 36;
 
-    private bool hasCalledHotline = false;
     private QuizQuestion2 currentQuiz;
     private Coroutine typingCoroutine;
     private bool skipDialogue = false;
@@ -51,7 +56,7 @@ public class EmergencyHotlineCall : MonoBehaviour
 
     public void TriggerHotlineObjective()
     {
-        if (hasCalledHotline) return;
+        if (_hasCalledHotline) return;
         ShowEmergencyNumberQuiz();
     }
 
@@ -68,7 +73,6 @@ public class EmergencyHotlineCall : MonoBehaviour
                 phoneUI.SetActive(true);
                 Time.timeScale = 0f;
 
-                // Hide joystick + jump button
                 if (GameManager.Instance != null)
                 {
                     if (GameManager.Instance.Joystick != null)
@@ -191,7 +195,7 @@ public class EmergencyHotlineCall : MonoBehaviour
     IEnumerator MakeEmergencyCall()
     {
         Debug.Log("Calling 911 - correct answer!");
-        hasCalledHotline = true;
+        _hasCalledHotline = true;
 
         foreach (Button btn in numberButtons)
         {
@@ -313,9 +317,16 @@ public class EmergencyHotlineCall : MonoBehaviour
 
     void EndCall()
     {
-        Debug.Log("Call ended");
+        Debug.Log("✅ Call ended - hotline completed!");
 
         IsHotlineActive = false;
+
+        // ✅ NEW: Deactivate the tracker flag (gets saved by WorldSaveSystem)
+        if (hotlineCompletionFlag != null)
+        {
+            hotlineCompletionFlag.SetActive(false);
+            Debug.Log("✅ Hotline completion flag deactivated (will be saved)");
+        }
 
         if (phoneUI != null)
             phoneUI.SetActive(false);
@@ -342,8 +353,6 @@ public class EmergencyHotlineCall : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.StopAll();
 
-        // ✅ Changed: Now just shows objective to pick up backpack
-        // Backpack object will unlock inventory UI when picked up
         if (subtitleManager != null)
         {
             SubtitleManager2.CallObjectiveActive = false;
@@ -359,12 +368,18 @@ public class EmergencyHotlineCall : MonoBehaviour
             );
         }
 
-        Debug.Log("Emergency call completed - player can now find and pickup backpack!");
+        Debug.Log("✅ _hasCalledHotline = " + _hasCalledHotline);
     }
 
     public bool HasCalledHotline()
     {
-        return hasCalledHotline;
+        return _hasCalledHotline;
+    }
+
+    public static void ResetForNewTrial()
+    {
+        _hasCalledHotline = false;
+        Debug.Log("EmergencyHotlineCall flag reset for new trial");
     }
 
     void OnSkipButtonPressed()
