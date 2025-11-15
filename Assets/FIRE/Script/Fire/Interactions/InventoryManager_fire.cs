@@ -34,6 +34,7 @@ public class InventoryManager_fire : MonoBehaviour
     private bool isInventoryOpen = false;
     private bool wasInventoryOpenBeforePause = false;
     private bool isBackpackUnlocked = false;
+    public GameManager gameManager;
 
     void Awake()
     {
@@ -84,7 +85,7 @@ public class InventoryManager_fire : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
                     if(backpack_model != null)
@@ -155,7 +156,7 @@ public class InventoryManager_fire : MonoBehaviour
 
     public void ToggleInventory()
     {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         if (!isBackpackUnlocked)
@@ -172,8 +173,8 @@ public class InventoryManager_fire : MonoBehaviour
             if (isInventoryOpen)
             {
                 Time.timeScale = 0f;
-                if (GameManager.Instance != null)
-                    GameManager.Instance.isPaused = true;
+                if (gameManager != null)
+                    gameManager.isPaused = true;
 
                 // ✅ Notify subtitle manager
                 SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
@@ -183,8 +184,8 @@ public class InventoryManager_fire : MonoBehaviour
             else
             {
                 Time.timeScale = 1f;
-                if (GameManager.Instance != null)
-                    GameManager.Instance.isPaused = false;
+                if (gameManager != null)
+                    gameManager.isPaused = false;
 
                 // ✅ Notify subtitle manager
                 SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();
@@ -202,8 +203,8 @@ public class InventoryManager_fire : MonoBehaviour
             inventoryPanel.SetActive(false);
             Time.timeScale = 1f;
 
-            if (GameManager.Instance != null)
-                GameManager.Instance.isPaused = false;
+            if (gameManager != null)
+                gameManager.isPaused = false;
 
             // ✅ Notify subtitle manager
             SubtitleManager2 subtitleManager = FindObjectOfType<SubtitleManager2>();

@@ -9,36 +9,9 @@ public class PlayDisasterThemeSFX : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-
-        
-
         // Stop any currently playing loop before starting a new one
         AudioManager.Instance.audLoop.Stop();
         AudioManager.Instance.audLoopSecondary.Stop();
-
-        // Play the selected disaster theme loop
-
-        switch (trialIndex)
-        {
-            case 0: // Earth
-                if (DataManager.Instance.playerData.isWaterFinished)
-                    SFX();
-                else
-                    PlayLockedTrialSFX();
-                break;
-
-            case 1: // Water
-                if (DataManager.Instance.playerData.isFireFinished)
-                    SFX();
-                else
-                    PlayLockedTrialSFX();
-                break;
-
-            case 2: // Water
-                SFX();
-                break;
-        }
-
     }
 
     private void PlayLockedTrialSFX()

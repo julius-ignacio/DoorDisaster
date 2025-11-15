@@ -37,6 +37,7 @@ public class DoorController : MonoBehaviour
     private Transform playerTransform;
     private Coroutine movementCoroutine;
     private bool playerInRange = false;
+    public GameManager gameManager;
 
     void Start()
     {
@@ -49,13 +50,13 @@ public class DoorController : MonoBehaviour
 
     void Update()
     {
-        if (playerTransform == null || GameManager.Instance == null)
+        if (playerTransform == null || gameManager == null)
             return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         bool playerNearby = distanceToPlayer <= interactionDistance;
 
-        if (GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
         {
             if (playerInRange)
             {

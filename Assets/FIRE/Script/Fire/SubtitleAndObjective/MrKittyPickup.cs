@@ -19,6 +19,7 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
 
     private bool hasTriggered = false;
     private bool playerInRange = false;
+    public GameManager gameManager;
 
     void Start()
     {
@@ -39,7 +40,7 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
             playerInRange = true;
 
             // Don't show prompt if game is paused
-            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Rescue Mr. Kitty");
             }
@@ -60,7 +61,7 @@ public class MrKittyPickup : MonoBehaviour, IPickupable
         // ✅ Show prompt when player is in range and game resumes
         if (playerInRange && !hasTriggered)
         {
-            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 // Check if prompt isn't already showing
                 if (GenericPickupButton.Instance != null &&

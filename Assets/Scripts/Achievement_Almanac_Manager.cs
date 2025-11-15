@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Achievement_Almanac_Manager_Profile : MonoBehaviour
 {
-    public GameObject AllDoorsCompleted, firedone, waterdone, earthdone, AchievementsUI, AlmanacUI, ProfileUI;
+    public GameObject AllDoorsCompleted, waterdone, earthdone, firedone, AchievementsUI, AlmanacUI, ProfileUI;
 
     // Update is called once per frame
     void Update()
@@ -21,9 +21,9 @@ public class Achievement_Almanac_Manager_Profile : MonoBehaviour
         var playerData = DataManager.Instance.playerData;
 
         if (playerData != null &&
-            playerData.isEarthFinished &&
-            playerData.isWaterFinished &&
-            playerData.isFireFinished)
+            playerData.isEarthFinishedNormal &&
+            playerData.isWaterFinishedNormal &&
+            playerData.isFireFinishedNormal)
         {
             AchievementUnlocker(AllDoorsCompleted.GetComponent<UnityEngine.UI.Image>());
         }
@@ -34,7 +34,7 @@ public class Achievement_Almanac_Manager_Profile : MonoBehaviour
 
 
         if (playerData != null &&
-            playerData.isFireFinished)
+            playerData.isFireFinishedNormal)
         {
             AchievementUnlocker(firedone.GetComponent<UnityEngine.UI.Image>());
         }
@@ -45,7 +45,7 @@ public class Achievement_Almanac_Manager_Profile : MonoBehaviour
 
 
         if (playerData != null &&
-          playerData.isWaterFinished)
+          playerData.isWaterFinishedNormal)
         {
             AchievementUnlocker(waterdone.GetComponent<UnityEngine.UI.Image>());
         }
@@ -56,7 +56,7 @@ public class Achievement_Almanac_Manager_Profile : MonoBehaviour
 
 
         if (playerData != null &&
-          playerData.isEarthFinished)
+          playerData.isEarthFinishedNormal)
         {
             AchievementUnlocker(earthdone.GetComponent<UnityEngine.UI.Image>());
         }

@@ -34,6 +34,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
     private bool doorOpen = false;
     private bool playerInRange = false;
     private bool promptShown = false;
+    public GameManager gameManager;
 
     private Quaternion closedRotation;
 
@@ -78,7 +79,7 @@ public class HotDoorHandle : MonoBehaviour, IPickupable
         if (!EmergencyHotlineCall.IsHotlineActive && SubtitleManager2.CallObjectiveActive)
             return;
 
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         if (doorLocked)

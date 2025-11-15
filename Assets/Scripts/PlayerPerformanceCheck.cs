@@ -19,9 +19,11 @@ public class PlayerPerformanceCheck : MonoBehaviour
         if (DestroyBtn3) DestroyBtn3.SetActive(false);
     }
 
-    void Update()
+    void NormalHard()
     {
-        if (DataManager.Instance.Npcs_saved >= 3 && DataManager.Instance.factsDiscovered >= 5)
+        if(DataManager.Instance.currentMode == 0)
+        {
+                    if (DataManager.Instance.Npcs_saved >= 2 && DataManager.Instance.factsDiscovered >= 3)
         {
             if (!isObjectivesCompleted)
             {
@@ -38,6 +40,31 @@ public class PlayerPerformanceCheck : MonoBehaviour
             isObjectivesCompleted = false;
             if (warning) warning.SetActive(true);
         }
+        } else
+        {
+                                if (DataManager.Instance.Npcs_saved >= 3 && DataManager.Instance.factsDiscovered >= 5)
+        {
+            if (!isObjectivesCompleted)
+            {
+                isObjectivesCompleted = true;
+                if (warning) warning.SetActive(false);
+            }
+
+            // Keep HUD visible once objectives are met during this session
+            if (HUD) HUD.SetActive(true);
+            if (PauseBtn) PauseBtn.SetActive(true);
+        }
+        else
+        {
+            isObjectivesCompleted = false;
+            if (warning) warning.SetActive(true);
+        }
+        }
+    }
+
+    void Update()
+    {
+        NormalHard();
     }
 
     void OnTriggerEnter(Collider other)

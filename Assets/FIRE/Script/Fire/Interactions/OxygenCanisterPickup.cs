@@ -8,6 +8,7 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
 
     private bool hasPickedUp = false;
     private bool playerInRange = false;
+    public GameManager gameManager;
 
     void OnTriggerEnter(Collider other)
     {
@@ -16,7 +17,7 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
             playerInRange = true;
 
             // ✅ Only show prompt if intro story is complete and game is not paused
-            if (SubtitleManager2.IntroStoryComplete && !GameManager.Instance.isPaused)
+            if (SubtitleManager2.IntroStoryComplete && !gameManager.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Oxygen Canister");
             }
@@ -35,7 +36,7 @@ public class OxygenCanisterPickup : MonoBehaviour, IPickupable
     void Update()
     {
         // ✅ Don't show button if game is paused
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         // If player is in range but prompt isn't showing yet, check if story is now complete

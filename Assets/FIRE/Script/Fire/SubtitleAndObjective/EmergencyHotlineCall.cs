@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class EmergencyHotlineCall : MonoBehaviour
 {
@@ -37,6 +38,11 @@ public class EmergencyHotlineCall : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool skipDialogue = false;
 
+    [Header("Joystick and Jump Button References")]
+    public GameObject Joystick;
+    public GameObject Jumpbtn;
+
+
     void Start()
     {
         if (phoneUI != null) phoneUI.SetActive(false);
@@ -68,14 +74,10 @@ public class EmergencyHotlineCall : MonoBehaviour
                 phoneUI.SetActive(true);
                 Time.timeScale = 0f;
 
-                // Hide joystick + jump button
-                if (GameManager.Instance != null)
-                {
-                    if (GameManager.Instance.Joystick != null)
-                        GameManager.Instance.Joystick.SetActive(false);
-                    if (GameManager.Instance.Jumpbtn != null)
-                        GameManager.Instance.Jumpbtn.SetActive(false);
-                }
+                    if (Joystick != null)
+                        Joystick.SetActive(false);
+                    if (Jumpbtn != null)
+                        Jumpbtn.SetActive(false);
             }
 
             if (subtitleManager != null)
@@ -325,13 +327,11 @@ public class EmergencyHotlineCall : MonoBehaviour
 
         Time.timeScale = 1f;
 
-        if (GameManager.Instance != null)
-        {
-            if (GameManager.Instance.Joystick != null)
-                GameManager.Instance.Joystick.SetActive(true);
-            if (GameManager.Instance.Jumpbtn != null)
-                GameManager.Instance.Jumpbtn.SetActive(true);
-        }
+ 
+            if (Joystick != null)
+                Joystick.SetActive(true);
+            if (Jumpbtn != null)
+               Jumpbtn.SetActive(true);
 
         if (healthBar != null)
             healthBar.SetActive(true);

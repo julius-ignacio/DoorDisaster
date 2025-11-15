@@ -21,6 +21,20 @@ public class PlayerState
     public bool hasWhistle;
     public bool isCovered;
 
+    //water
+    public float oxygen;
+    public int itemsCollected;
+    // Water objective incremental reward guards
+    public bool gaveO2, gaveO4, gaveO5, gaveO6, gaveO7, gaveO8, gaveO9;
+
+
+    
+
+    // NEW: water trial objective progression flags
+    public bool radioListened;
+    public bool breakerTurnedOFF;
+
+
 
     // Fire trial progression flags
     public bool tutorialDone;       // NEW

@@ -23,6 +23,7 @@ public class SequenceManager : MonoBehaviour
     private bool fixedAfterDoorWithTowel;
     private bool fixedRescuePush;
     private bool fixedPackingStart;
+    public GameManager gameManager;
 
     private void Awake()
     {
@@ -51,7 +52,7 @@ public class SequenceManager : MonoBehaviour
             if (!tutorialActive)
             {
                 Time.timeScale = 1f;
-                if (GameManager.Instance != null) GameManager.Instance.isPaused = false;
+                if (gameManager != null) gameManager.isPaused = false;
             }
         }
 

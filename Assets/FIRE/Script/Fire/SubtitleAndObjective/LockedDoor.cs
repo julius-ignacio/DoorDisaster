@@ -33,6 +33,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
     private Quaternion closedRotation;
     private Quaternion openRotation;
     private bool isDoorOpen = false;
+    public GameManager gameManager;
 
     void Start()
     {
@@ -46,7 +47,7 @@ public class LockedDoor : MonoBehaviour, IPickupable
     void Update()
     {
         // ✅ Don't update anything if game is paused
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         // Smooth door animation

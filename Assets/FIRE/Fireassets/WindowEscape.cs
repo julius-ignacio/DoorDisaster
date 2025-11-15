@@ -33,6 +33,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
     private bool hasEscaped = false;
     private bool promptShown = false;
     private bool playerInRange = false;
+    public GameManager gameManager; 
 
     void Start()
     {
@@ -49,7 +50,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
     {
         if (playerInRange && !hasEscaped)
         {
-            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 if (GenericPickupButton.Instance != null &&
                     GenericPickupButton.Instance.pickupButton != null &&
@@ -73,7 +74,7 @@ public class WindowEscape : MonoBehaviour, IPickupable
 
             playerInRange = true;
 
-            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, hasHeavyObject ? "Break Window" : "Try Window");
             }

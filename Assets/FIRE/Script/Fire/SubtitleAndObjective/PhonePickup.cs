@@ -8,6 +8,7 @@ public class PhonePickup : MonoBehaviour, IPickupable
 
     private bool playerInRange = false;
     private bool hasPickedUp = false;
+    public GameManager gameManager;
 
     void OnTriggerEnter(Collider other)
     {
@@ -15,7 +16,7 @@ public class PhonePickup : MonoBehaviour, IPickupable
         {
             playerInRange = true;
             // Only show prompt if intro story is complete and game is not paused
-            if (SubtitleManager2.IntroStoryComplete && !GameManager.Instance.isPaused)
+            if (SubtitleManager2.IntroStoryComplete && !gameManager.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Phone");
             }
@@ -34,7 +35,7 @@ public class PhonePickup : MonoBehaviour, IPickupable
     // Check if story just completed while player is in range
     void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         if (playerInRange && !hasPickedUp && SubtitleManager2.IntroStoryComplete)

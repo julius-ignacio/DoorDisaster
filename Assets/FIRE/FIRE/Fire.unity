@@ -8206,6 +8206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 114209626}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &114209630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45241,6 +45242,7 @@ MonoBehaviour:
   player: {fileID: 1587327401}
   clothObject: {fileID: 458963064}
   subtitleManager: {fileID: 811595114}
+  gameManager: {fileID: 0}
 --- !u!114 &458963066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62105,6 +62107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 600312968}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &600312974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67450,6 +67453,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 621746687}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &621746693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68187,6 +68191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 642045313}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &642045319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75290,6 +75295,7 @@ MonoBehaviour:
   houseASpawnPoint: {fileID: 1440004530}
   fadeOverlay: {fileID: 715777068}
   fadeDuration: 2
+  gameManager: {fileID: 0}
 --- !u!82 &758441345
 AudioSource:
   m_ObjectHideFlags: 0
@@ -75459,6 +75465,7 @@ MonoBehaviour:
   OnDoorClosed:
     m_PersistentCalls:
       m_Calls: []
+  gameManager: {fileID: 0}
 --- !u!82 &771698305
 AudioSource:
   m_ObjectHideFlags: 0
@@ -78036,6 +78043,7 @@ MonoBehaviour:
   breakerPuzzle: {fileID: 113803479}
   fireExtinguisher: {fileID: 1947068400}
   isPaused: 0
+  oxygenMeter: {fileID: 0}
   hudCanvasGroup: {fileID: 398742351}
 --- !u!224 &892650813
 RectTransform:
@@ -86119,6 +86127,7 @@ MonoBehaviour:
   OnDoorClosed:
     m_PersistentCalls:
       m_Calls: []
+  gameManager: {fileID: 0}
 --- !u!82 &1005597802
 AudioSource:
   m_ObjectHideFlags: 0
@@ -91648,6 +91657,7 @@ MonoBehaviour:
   burnSFX: 16
   doorOpenSFX: 25
   doorCloseSFX: 26
+  gameManager: {fileID: 0}
 --- !u!1001 &1035583192
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -91873,6 +91883,7 @@ MonoBehaviour:
   OnDoorClosed:
     m_PersistentCalls:
       m_Calls: []
+  gameManager: {fileID: 0}
 --- !u!114 &1058028597
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92763,50 +92774,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1104177955}
   m_CullTransparentMesh: 1
---- !u!1 &1115680280
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1115680282}
-  - component: {fileID: 1115680281}
-  m_Layer: 0
-  m_Name: WorldLoader
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1115680281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1115680280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f0ef494e75e1b1b6a5620c84fe68f26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1115680282
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1115680280}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -187.0394, y: 6.9109783, z: -62.326523}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1125286621
 GameObject:
   m_ObjectHideFlags: 0
@@ -93477,6 +93444,8 @@ MonoBehaviour:
   dialToneSFX: 34
   dispatcherVoiceSFX: 35
   wrongNumberSFX: 36
+  Joystick: {fileID: 0}
+  Jumpbtn: {fileID: 0}
 --- !u!4 &1136948898
 Transform:
   m_ObjectHideFlags: 0
@@ -131867,6 +131836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 1384733658}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &1384733662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138179,6 +138149,7 @@ MonoBehaviour:
   OnDoorClosed:
     m_PersistentCalls:
       m_Calls: []
+  gameManager: {fileID: 0}
 --- !u!1 &1432593611
 GameObject:
   m_ObjectHideFlags: 0
@@ -138843,7 +138814,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1447728120
 Transform:
   m_ObjectHideFlags: 0
@@ -149702,6 +149673,7 @@ MonoBehaviour:
   essentialItemsCountText: {fileID: 996402532}
   essentialItemsNameText: {fileID: 988741065}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!4 &1506615591
 Transform:
   m_ObjectHideFlags: 0
@@ -151345,6 +151317,7 @@ MonoBehaviour:
   openAngle: 90
   openSpeed: 2
   doorOpenSoundIndex: 25
+  gameManager: {fileID: 892650812}
 --- !u!1 &1568448671
 GameObject:
   m_ObjectHideFlags: 0
@@ -157977,6 +157950,7 @@ MonoBehaviour:
   fadeOverlay: {fileID: 0}
   fadeDuration: 1
   windowBreakSFX: 37
+  gameManager: {fileID: 0}
 --- !u!1 &1644746208
 GameObject:
   m_ObjectHideFlags: 0
@@ -158846,6 +158820,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 1654027864}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &1654027870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166053,6 +166028,8 @@ MonoBehaviour:
   quizPanel: {fileID: 1240019344}
   barrier: {fileID: 700703550}
   quizButton: {fileID: 1842228689}
+  objectivesWater: {fileID: 0}
+  objectToManipulate: {fileID: 0}
 --- !u!224 &1734817891
 RectTransform:
   m_ObjectHideFlags: 0
@@ -166562,6 +166539,7 @@ MonoBehaviour:
   mrKitty: {fileID: 758441342}
   phoneModel: {fileID: 1889249827}
   backpackModel: {fileID: 211764975}
+  gameManager: {fileID: 0}
 --- !u!4 &1739618382
 Transform:
   m_ObjectHideFlags: 0
@@ -172150,6 +172128,7 @@ MonoBehaviour:
   OnDoorClosed:
     m_PersistentCalls:
       m_Calls: []
+  gameManager: {fileID: 0}
 --- !u!1 &1767932916
 GameObject:
   m_ObjectHideFlags: 0
@@ -180021,6 +180000,7 @@ MonoBehaviour:
   fadeOverlay: {fileID: 715777068}
   fadeDuration: 3
   windowBreakSFX: 37
+  gameManager: {fileID: 0}
 --- !u!65 &1878655169
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -190030,6 +190010,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hotlineCall: {fileID: 1136948897}
   phoneModel: {fileID: 1889249827}
+  gameManager: {fileID: 892650812}
 --- !u!65 &1889249830
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -191164,6 +191145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canister: {fileID: 1925028383}
   player: {fileID: 1587327391}
+  gameManager: {fileID: 892650812}
 --- !u!114 &1925028389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198838,6 +198820,7 @@ MonoBehaviour:
   lockedDoor: {fileID: 1562861197}
   keyVisual: {fileID: 2037772816}
   subtitleManager: {fileID: 811595114}
+  gameManager: {fileID: 0}
 --- !u!114 &2037772819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199083,6 +199066,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupButton: {fileID: 1987477219}
   buttonText: {fileID: 2137818142}
+  gameManager: {fileID: 0}
 --- !u!4 &2053662025
 Transform:
   m_ObjectHideFlags: 0
@@ -225352,7 +225336,6 @@ SceneRoots:
   - {fileID: 512731398}
   - {fileID: 1739618382}
   - {fileID: 1447728120}
-  - {fileID: 1115680282}
   - {fileID: 305564016}
   - {fileID: 1311837732}
   - {fileID: 1831486934}

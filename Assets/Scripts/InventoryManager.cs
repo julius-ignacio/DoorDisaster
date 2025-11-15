@@ -13,9 +13,10 @@ public class InventoryManager : MonoBehaviour
     public GameObject GreenFlashEffect, BlueFlashEffect, YellowFlashEffect;
     public int water = 0;
     public int medkit = 0;
+    public int importanItems = 0;
     public GameNotifier gameNotifier;
 
-    public TextMeshProUGUI medkitCounter, waterCounter;
+    public TextMeshProUGUI medkitCounter, waterCounter, importantItemsCounter;
 
     void Start()
     {
@@ -32,19 +33,19 @@ public class InventoryManager : MonoBehaviour
             water = 0;
         }
     }
-    
-
-
-    void Update()
-    {
-        
-    }
 
     public void     ToggleInventory()
     {
         inventoryUI.SetActive(!inventoryUI.activeSelf);
         medkitCounter.text = medkit.ToString();
         waterCounter.text = water.ToString();
+    }
+
+
+    public void updateImportantItemsCounter(int items)
+    {
+        importanItems += items;
+        importantItemsCounter.text = importanItems.ToString();
     }
 
 

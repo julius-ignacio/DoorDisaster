@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
         [Header("Narrative/UI Managers")]
     public SubtitleManager2 subtitleManager2;
 
-    public static GameManager Instance;
 
     /// /////////////////
     [Header("Puzzle References")]
@@ -37,6 +36,13 @@ public class GameManager : MonoBehaviour
     public bool isPaused = false;
 
 
+    [Header("Water")]
+    public OxygenHealthMeterScript oxyHealthMeter;
+
+
+
+
+
 /// ////////////////////////////
 
     [Header("HUD Handling")]
@@ -46,18 +52,18 @@ public class GameManager : MonoBehaviour
 
 //9999999999999999999999999999999999999999999999999
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    // private void Awake()
+    // {
+    //     if (Instance == null)
+    //     {
+    //         Instance = this;
+    //         DontDestroyOnLoad(gameObject);
+    //     }
+    //     else
+    //     {
+    //         Destroy(gameObject);
+    //     }
+    // }
 
 
 
@@ -128,6 +134,14 @@ public class GameManager : MonoBehaviour
             playerGameOver();
         }
 
+        if (oxyHealthMeter != null && oxyHealthMeter.currHealth <= 0)
+        {
+            if (panicText != null) panicText.gameObject.SetActive(true);
+            if (injurtyText != null) injurtyText.gameObject.SetActive(true);
+            playerGameOver();
+        }
+
+
 
     }
 
@@ -140,6 +154,7 @@ public class GameManager : MonoBehaviour
             AudioManager.Instance.StopAll();
             AudioManager.Instance.StopLoop();
         }
+            isPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
@@ -249,6 +264,8 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         isPaused = false;
+        pauseUI.SetActive(true); // add this line
+
 
         AudioListener.pause = false; // 🔊 Resume ALL audio
 

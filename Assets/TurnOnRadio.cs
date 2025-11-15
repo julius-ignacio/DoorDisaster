@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class TurnOnRadio : MonoBehaviour
 {
-    public GameObject radioButton, radio;
+    public GameObject radioButton, radio, news;
     public Objectives_water objectivesWater;
     void Start()
     {
         radioButton.SetActive(false);
+        news.SetActive(false);
     }
 
 
@@ -18,6 +19,10 @@ public class TurnOnRadio : MonoBehaviour
             var outline = radio.GetComponent<Outline>();
             if (outline != null)
                 outline.enabled = false;
+
+            AudioManager.Instance.PlaySFX(36);
+            news.SetActive(true);
+
         }
     }
 

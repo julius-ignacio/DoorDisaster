@@ -22,13 +22,36 @@ public class discoverFacts : MonoBehaviour
 
     public GameManager gameManager;
 
+
+
+
     void Start()
     {
-        DecipherText.gameObject.SetActive(false);
-        DecipherSlider.gameObject.SetActive(false);
-        ReadBtn.SetActive(false);
-        foreach (GameObject fact in facts)
-            fact.SetActive(false);
+        if (DecipherText != null)
+            DecipherText.gameObject.SetActive(false);
+        else
+            Debug.LogWarning("DecipherText is not assigned in the Inspector.");
+
+        if (DecipherSlider != null)
+            DecipherSlider.gameObject.SetActive(false);
+        else
+            Debug.LogWarning("DecipherSlider is not assigned in the Inspector.");
+
+        if (ReadBtn != null)
+            ReadBtn.SetActive(false);
+        else
+
+        if (facts != null && facts.Length > 0)
+        {
+            foreach (GameObject fact in facts)
+            {
+                if (fact != null)
+                    fact.SetActive(false);
+                else
+                    Debug.LogWarning("One of the facts in the array is missing.");
+            }
+
+        }
     }
 
     public void DecipherInitiated()
@@ -40,6 +63,8 @@ public class discoverFacts : MonoBehaviour
 
         // ✅ Hide/disable UI states
         ReadBtn.SetActive(false);
+
+        //trigger plane
         Trigger[factIndex].SetActive(false);
 
         DecipherSlider.gameObject.SetActive(true);
@@ -97,5 +122,19 @@ public class discoverFacts : MonoBehaviour
         AudioManager.Instance.PlaySFX(8);
 
         objectives.UpdateObjectives();
+    }
+
+
+       public void ReadFacts_water()
+    {
+        Debug.Log($"Player has discovered fact {factIndex}: {facts[factIndex].name}. Trigger {factIndex}");
+
+        facts[factIndex].SetActive(true);
+        Trigger[factIndex].SetActive(false);
+        ReadBtn.SetActive(false);
+
+
+        DataManager.Instance.factsDiscovered++;
+        AudioManager.Instance.PlaySFX(8);
     }
 }

@@ -54,7 +54,7 @@ public class OpenLevelSelection : MonoBehaviour
         switch (trial)
         {
             case 0: return "Fire";
-            // case 1: return "Water";
+            case 1: return "Water";
             case 2: return "Earth";
             default:
                 Debug.LogWarning($"Unknown trial index {trial}, defaulting to Earth.");

@@ -9,6 +9,7 @@ public class KeyPickup : MonoBehaviour, IPickupable
 
     private bool playerInRange = false;
     private bool hasBeenPickedUp = false;
+    public GameManager gameManager;
 
     void OnTriggerEnter(Collider other)
     {
@@ -17,7 +18,7 @@ public class KeyPickup : MonoBehaviour, IPickupable
             playerInRange = true;
 
             // Don't show prompt if game is paused
-            if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Key");
             }
@@ -37,7 +38,7 @@ public class KeyPickup : MonoBehaviour, IPickupable
     {
         if (playerInRange && !hasBeenPickedUp)
         {
-            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            if (gameManager.isPaused)
             {
                 // Check if prompt isn't already showing
                 if (GenericPickupButton.Instance != null &&

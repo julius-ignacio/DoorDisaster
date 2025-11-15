@@ -15,6 +15,7 @@ public class GenericPickupButton : MonoBehaviour
     // 🟦 Track visibility before pausing
     private bool wasVisibleBeforePause = false;
     private IPickupable pausedPickupable = null; // Remember which object was active
+    public GameManager gameManager;
 
     void Awake()
     {
@@ -41,7 +42,7 @@ public class GenericPickupButton : MonoBehaviour
     public void ShowPickupPrompt(IPickupable pickupable, string promptText = "Pick Up")
     {
         // Don't show if game is paused
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+        if (gameManager.isPaused)
             return;
 
         currentPickupable = pickupable;

@@ -14,7 +14,8 @@ public class PlayerData
     public ModeData[] Mode = new ModeData[2];
     
     // Game progress
-    public bool isSurveyDone, isFireFinished, isWaterFinished, isEarthFinished;
+    public bool isSurveyDone, isFireFinishedNormal, isWaterFinishedNormal, isEarthFinishedNormal;
+    public bool  isFireFinishedHard, isWaterFinishedHard, isEarthFinishedHard;
 
 
     public PlayerData()

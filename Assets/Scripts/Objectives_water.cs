@@ -1,23 +1,36 @@
 using UnityEngine;
 using TMPro;
-using Unity.Android.Gradle.Manifest;
 using System.Collections;
 using System;
+using EasyDoorSystem;
+
 
 public class Objectives_water : MonoBehaviour
 {
     public TMP_Text objectivetext1;
     public TMP_Text objectivetext2;
     public TMP_Text objectivetext3;
-    public GameObject[] ItemsToCollect;
-   // public GameObject balconyBarrier;
+    public GameObject[] ItemsToCollect;  //keys - 0 3 4 7 11 15
+    public GameObject[] Doorlocks;
+    // public GameObject balconyBarrier;
     public bool radioListened = false;
     public bool breakerTurnedOFF = false;
 
 
 
+    [Header("Lights")]
+    public GameObject[] lightsToTurnOff;
+
+
+    public InventoryManager inventory;
+
+
+
     public GameNotifier gameNotifier;
     private bool AllobjectivesCompleted = false;
+
+    // Add to class:
+public bool gaveO2, gaveO4, gaveO5, gaveO6, gaveO7, gaveO8, gaveO9;
 
     void Start()
     {
@@ -36,14 +49,25 @@ public class Objectives_water : MonoBehaviour
                     col.enabled = false;
             }
         }
+    }
 
+
+    void EnableInteractionForItem(GameObject item)
+    {
+        if (item == null) return;
+
+        if (item.TryGetComponent<Outline>(out var outline))
+            outline.enabled = true;
+
+        if (item.TryGetComponent<Collider>(out var col))
+            col.enabled = true;
     }
 
 
     void Update()
     {
         Objective1();
-        
+
     }
 
 
@@ -57,8 +81,9 @@ public class Objectives_water : MonoBehaviour
 
         if (radioListened)
         {
-            enableCollidersAndOutlines(0, 1, 2);
-            StartCoroutine(Transition(2f));
+            EnableInteractionForItem(ItemsToCollect[0]);
+            EnableInteractionForItem(ItemsToCollect[1]);
+            EnableInteractionForItem(ItemsToCollect[2]);
             Objective2();
         }
     }
@@ -75,9 +100,17 @@ public class Objectives_water : MonoBehaviour
             ItemsToCollect[1].activeSelf == false &&
             ItemsToCollect[2].activeSelf == false)
         {
+            Doorlocks[0].GetComponent<EasyDoor>().enabled = true;
+            Doorlocks[0].GetComponent<BoxCollider>().enabled = false;
 
-            StartCoroutine(Transition(2f));
+            if (!gaveO2) { inventory.updateImportantItemsCounter(3); gaveO2 = true; }
+
             Objective3();
+        }
+
+        else
+        {
+            Doorlocks[0].GetComponent<EasyDoor>().enabled = false;
         }
     }
 
@@ -90,26 +123,43 @@ public class Objectives_water : MonoBehaviour
 
         if (breakerTurnedOFF)
         {
-            enableCollidersAndOutlines(3, 0, 0);
 
-            StartCoroutine(Transition(2f));
+            foreach (var light in lightsToTurnOff)
+            {
+                light.SetActive(false);
+            }
+
+            EnableInteractionForItem(ItemsToCollect[3]);
+
             Objective4();
         }
     }
 
     void Objective4()
     {
-        objectivetext1.text = "Get the key to open the office room.";
+        objectivetext1.text = "Get the key beside the breaker to open the office room.";
         objectivetext2.text = "";
         objectivetext3.text = "";
 
 
         if (ItemsToCollect[3].activeSelf == false)
         {
-            enableCollidersAndOutlines(4, 5, 6);
+            Doorlocks[1].GetComponent<EasyDoor>().enabled = true;
+            Doorlocks[1].GetComponent<BoxCollider>().enabled = false;
 
-            StartCoroutine(Transition(2f));
+           if (!gaveO4) { inventory.updateImportantItemsCounter(1); gaveO4 = true; }
+
+
+            EnableInteractionForItem(ItemsToCollect[4]);
+            EnableInteractionForItem(ItemsToCollect[5]);
+            EnableInteractionForItem(ItemsToCollect[6]);
+
             Objective5();
+        }
+
+        else
+        {
+            Doorlocks[1].GetComponent<EasyDoor>().enabled = false;
         }
     }
 
@@ -125,10 +175,22 @@ public class Objectives_water : MonoBehaviour
             ItemsToCollect[5].activeSelf == false &&
             ItemsToCollect[6].activeSelf == false)
         {
-            enableCollidersAndOutlines(7, 8, 9);
+            Doorlocks[2].GetComponent<EasyDoor>().enabled = true;
+            Doorlocks[2].GetComponent<BoxCollider>().enabled = false;
 
-            StartCoroutine(Transition(2f));
+           if (!gaveO5) { inventory.updateImportantItemsCounter(3); gaveO5 = true; }
+
+
+            EnableInteractionForItem(ItemsToCollect[7]);
+            EnableInteractionForItem(ItemsToCollect[8]);
+            EnableInteractionForItem(ItemsToCollect[9]);
+
+
             Objective6();
+        }
+        else
+        {
+            Doorlocks[2].GetComponent<EasyDoor>().enabled = false;
         }
     }
 
@@ -144,27 +206,48 @@ public class Objectives_water : MonoBehaviour
             ItemsToCollect[8].activeSelf == false &&
             ItemsToCollect[9].activeSelf == false)
         {
-            enableCollidersAndOutlines(10, 11, 0);
+            Doorlocks[3].GetComponent<EasyDoor>().enabled = true;
+            Doorlocks[3].GetComponent<BoxCollider>().enabled = false;
 
-            StartCoroutine(Transition(2f));
+            if (!gaveO6) { inventory.updateImportantItemsCounter(3); gaveO6 = true; }
+
+
+
+            EnableInteractionForItem(ItemsToCollect[10]);
+            EnableInteractionForItem(ItemsToCollect[11]);
+
+
             Objective7();
+        }
+        else
+        {
+            Doorlocks[3].GetComponent<EasyDoor>().enabled = false;
         }
     }
 
     void Objective7()
     {
         objectivetext1.text = "Get the Walkie Talkie.";
-        objectivetext2.text = "Get the ket to open the Garage.";
+        objectivetext2.text = "Get the key to open the Garage.";
         objectivetext3.text = " ";
 
 
         if (ItemsToCollect[10].activeSelf == false &&
             ItemsToCollect[11].activeSelf == false)
         {
-            enableCollidersAndOutlines(12, 0, 0);
+            Doorlocks[4].GetComponent<EasyDoor>().enabled = true;
+            Doorlocks[4].GetComponent<BoxCollider>().enabled = false;
 
-            StartCoroutine(Transition(2f));
+       if (!gaveO7) { inventory.updateImportantItemsCounter(2); gaveO7 = true; }
+
+
+            EnableInteractionForItem(ItemsToCollect[12]);
+
             Objective8();
+        }
+        else
+        {
+            Doorlocks[4].GetComponent<EasyDoor>().enabled = false;
         }
     }
 
@@ -177,9 +260,13 @@ public class Objectives_water : MonoBehaviour
 
         if (ItemsToCollect[12].activeSelf == false)
         {
-            enableCollidersAndOutlines(13, 14, 15);
+            EnableInteractionForItem(ItemsToCollect[13]);
+            EnableInteractionForItem(ItemsToCollect[14]);
+            EnableInteractionForItem(ItemsToCollect[15]);
 
-            StartCoroutine(Transition(2f));
+      if (!gaveO8) { inventory.updateImportantItemsCounter(1); gaveO8 = true; }
+
+
             Objective9();
         }
     }
@@ -195,44 +282,53 @@ public class Objectives_water : MonoBehaviour
             ItemsToCollect[15].activeSelf == false)
         {
 
-            StartCoroutine(Transition(2f));
-            Objective10();  
+            Doorlocks[5].GetComponent<BoxCollider>().enabled = true;
+
+           if (!gaveO9) { inventory.updateImportantItemsCounter(3); gaveO9 = true; }
+
+
+            Objective10();
+        }
+        else
+        {
+            Doorlocks[5].GetComponent<BoxCollider>().enabled = false;
         }
     }
 
-        void Objective10()
+    void Objective10()
     {
-        objectivetext1.text = "ESCAPE THE HOUSE!";
+        objectivetext1.text = "Open the Balcony door and escape.";
         objectivetext2.text = " ";
         objectivetext3.text = " ";
 
     }
-    
 
-    void enableCollidersAndOutlines(int index1, int index2, int index3)
+
+    public void ApplySavedState(bool radio, bool breaker)
+{
+    radioListened = radio;
+    breakerTurnedOFF = breaker;
+
+    // Reconstruct scene side-effects:
+    // If radio already listened, enable basement key/backpack/flashlight interactions
+    if (radioListened)
     {
-        ItemsToCollect[index1].GetComponent<Outline>().enabled = true;
-        ItemsToCollect[index1].GetComponent<BoxCollider>().enabled = true;
-
-        ItemsToCollect[index2].GetComponent<Outline>().enabled = true;
-        ItemsToCollect[index2].GetComponent<BoxCollider>().enabled = true;
-
-        ItemsToCollect[index3].GetComponent<Outline>().enabled = true;
-        ItemsToCollect[index3].GetComponent<BoxCollider>().enabled = true;
+        EnableInteractionForItem(ItemsToCollect[0]);
+        EnableInteractionForItem(ItemsToCollect[1]);
+        EnableInteractionForItem(ItemsToCollect[2]);
     }
 
-
-
-
-    
-      private IEnumerator Transition(float duration)
+    // If breaker turned off, ensure lights are off and basement progression items enabled
+    if (breakerTurnedOFF)
     {
-        objectivetext1.color = Color.green;
-        objectivetext2.color = Color.green;
-        objectivetext3.color = Color.green;
-        yield return new WaitForSeconds(duration);
-                objectivetext1.color = Color.white;
-        objectivetext2.color = Color.white;
-        objectivetext3.color = Color.white;
+        foreach (var light in lightsToTurnOff)
+        {
+            if (light != null) light.SetActive(false);
+        }
+        EnableInteractionForItem(ItemsToCollect[3]);
     }
+
+    // Force an immediate objective text refresh so UI matches restored state.
+    Objective1();
+}
 }

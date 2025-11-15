@@ -31,12 +31,12 @@ public class ConsistentQuake : MonoBehaviour
 
           if(DataManager.Instance.currentMode == 0) //easy mode
         {
-            quakeDuration = 15f;
+            quakeDuration = 10f;
             quakeInterval = 25f; 
         }
         else if (DataManager.Instance.currentMode == 1) //hard mode
         {
-            quakeDuration = 25f;
+            quakeDuration = 20f;
             quakeInterval = 15f; 
         }
     }

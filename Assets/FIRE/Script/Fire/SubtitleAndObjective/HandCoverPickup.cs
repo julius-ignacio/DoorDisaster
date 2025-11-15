@@ -10,6 +10,7 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
     private Outline outline;
     private bool hasPickedUp = false;
     private bool playerInRange = false;
+    public GameManager gameManager;
 
     public static bool DoorObjectiveActive { get; set; } = false;
 
@@ -32,7 +33,7 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
         // Show button only if door objective is active
         if (playerInRange && !hasPickedUp && DoorObjectiveActive)
         {
-            if (GameManager.Instance != null && !GameManager.Instance.isPaused)
+            if (!gameManager.isPaused)
             {
                 if (GenericPickupButton.Instance != null &&
                     GenericPickupButton.Instance.pickupButton != null &&
@@ -52,7 +53,7 @@ public class HandCoverPickup : MonoBehaviour, IPickupable
 
             if (DoorObjectiveActive)
             {
-                if (GameManager.Instance == null || !GameManager.Instance.isPaused)
+                if (gameManager.isPaused)
                 {
                     GenericPickupButton.Instance.ShowPickupPrompt(this, "Pick Up Cloth");
                 }

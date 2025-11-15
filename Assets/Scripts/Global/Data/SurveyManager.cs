@@ -71,7 +71,7 @@ public class SurveyManager : MonoBehaviour
         Light2.SetActive(false);
         }
 
-         Barrier.SetActive(!DataManager.Instance.playerData.isEarthFinished);
+         Barrier.SetActive(!DataManager.Instance.playerData.isEarthFinishedNormal);
 
     }
 

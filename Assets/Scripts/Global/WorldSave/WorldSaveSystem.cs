@@ -4,6 +4,8 @@ using System.IO;
 
 public class WorldSaveSystem : MonoBehaviour
 {
+
+    
     public static void SaveWorld(int trialIndex, int mode)
     {
         // Include inactive objects so we persist everything that changed
@@ -33,6 +35,8 @@ public class WorldSaveSystem : MonoBehaviour
             states.Add(st);
         }
 
+        
+
         // Collect player state
         var ps = new PlayerState();
 
@@ -60,6 +64,38 @@ public class WorldSaveSystem : MonoBehaviour
         var cover = Object.FindObjectsByType<CoverMechanic>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (cover.Length > 0 && cover[0].CoverCamera != null)
             ps.isCovered = cover[0].CoverCamera.enabled;
+
+                // --- NEW: collect water trial stuff ---
+
+    // Oxygen (example component name; adjust to your actual script)
+    var oxy = Object.FindObjectsByType<OxygenMeterScript>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+    if (oxy.Length > 0)
+        ps.oxygen = oxy[0].currHealth;        // or whatever property holds current oxygen
+
+    // Objectives (radio & breaker)
+    var waterObjs = Object.FindObjectsByType<Objectives_water>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+    if (waterObjs.Length > 0)
+    {
+            var w = waterObjs[0];
+
+        ps.radioListened = waterObjs[0].radioListened;
+        ps.breakerTurnedOFF = waterObjs[0].breakerTurnedOFF;
+        // If you want itemsCollected persisted:
+        ps.itemsCollected = waterObjs[0].inventory.importanItems;
+
+
+
+    ps.gaveO2 = w.gaveO2;
+    ps.gaveO4 = w.gaveO4;
+    ps.gaveO5 = w.gaveO5;
+    ps.gaveO6 = w.gaveO6;
+    ps.gaveO7 = w.gaveO7;
+    ps.gaveO8 = w.gaveO8;
+    ps.gaveO9 = w.gaveO9;
+    }
+
+
+
 
         // Collect behaviour/object flags (enabled / activeSelf)
         var flagComps = Object.FindObjectsByType<SavableFlag>(FindObjectsInactive.Include, FindObjectsSortMode.None);
@@ -97,6 +133,8 @@ public class WorldSaveSystem : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, $"save_trial{trialIndex}_mode{mode}.json");
         File.WriteAllText(path, JsonUtility.ToJson(saveData));
         Debug.Log($"Saved world state to {path}");
+
+        
     }
 
     public static bool HasSaveData(int trial, int mode)
@@ -201,6 +239,43 @@ public class WorldSaveSystem : MonoBehaviour
             var cover = Object.FindObjectsByType<CoverMechanic>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             if (cover.Length > 0)
                 cover[0].ApplyCoveredState(ps.isCovered);
+
+
+                    // --- NEW: restore oxygen ---
+        var oxy = Object.FindObjectsByType<OxygenMeterScript>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (oxy.Length > 0)
+        {
+            oxy[0].currHealth = ps.oxygen;      // match property name
+        }
+
+        // --- NEW: restore water objectives ---
+        var waterObjs = Object.FindObjectsByType<Objectives_water>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (waterObjs.Length > 0)
+        {
+                var w = waterObjs[0];
+                    w.gaveO2 = ps.gaveO2;
+    w.gaveO4 = ps.gaveO4;
+    w.gaveO5 = ps.gaveO5;
+    w.gaveO6 = ps.gaveO6;
+    w.gaveO7 = ps.gaveO7;
+    w.gaveO8 = ps.gaveO8;
+    w.gaveO9 = ps.gaveO9;
+             // If persisting important items counter:
+            if (waterObjs[0].inventory != null)
+            {
+                waterObjs[0].inventory.importanItems = ps.itemsCollected;
+                waterObjs[0].inventory.importantItemsCounter.text = ps.itemsCollected.ToString();
+            }
+
+            waterObjs[0].ApplySavedState(ps.radioListened, ps.breakerTurnedOFF);
+    w.ApplySavedState(ps.radioListened, ps.breakerTurnedOFF);
+
+
+   
+
+
+
+        }
         }
 
         // APPLY behaviour/object flags

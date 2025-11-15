@@ -23,7 +23,7 @@ Material:
   m_Name: ProBuilderDefault Variant
   m_Shader: {fileID: 4800000, guid: 8547ec39534635c4289065e5c5033f43, type: 3}
   m_Parent: {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
-  m_ModifiedSerializedProperties: 2
+  m_ModifiedSerializedProperties: 18
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _DISABLE_SSR_TRANSPARENT
@@ -31,7 +31,7 @@ Material:
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 1950
   stringTagMap:
     MotionVector: User
   disabledShaderPasses:
@@ -45,7 +45,8 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _QueueOffset: -50
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
