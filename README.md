@@ -38,6 +38,9 @@ Encourage quick thinking and proper response strategies
 Provide a fun and interactive way for students to learn emergency readiness
 
 
+<img width="1644" height="926" alt="Screenshot from 2025-11-13 18-39-11" src="https://github.com/user-attachments/assets/b279b7c9-b8bd-4506-b2d0-5ac63c5f2f10" />
+
+
 ![566624976_1369426364795547_431636832736821934_n](https://github.com/user-attachments/assets/8b5cb931-8fad-4fbd-a6b0-61b9aad629be)
 
 
